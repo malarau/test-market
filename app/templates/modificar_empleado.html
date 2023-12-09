@@ -1,0 +1,79 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+    <h1>Modificar Empleado</h1>
+    <div class="row">
+        <div class="col-md-3">
+            <form method="post">
+        {{ modificar_empleado_form.hidden_tag() }}
+
+        <div class="form-group mb-1">
+            <label for="Codigo_Sucursal">Codigo Sucursal:</label>
+            {{ modificar_empleado_form.Codigo_Sucursal(class="form-control", required=True) }}
+        </div>
+
+        <div class="form-group mb-1">
+            <label for="Codigo_cargo">Cargo:</label>
+            {{ modificar_empleado_form.Codigo_cargo(class="form-control", required=True) }}
+        </div>
+
+        
+        <div class="form-group mb-1">
+            <label for="nombre_empleado">Nombre del empleado:</label>
+            {{ modificar_empleado_form.nombre_empleado(class="form-control", required=True) }}
+        </div>
+
+        <div class="form-group mb-1">
+            <label for="apellido1_empleado">Primer apellido del empleado:</label>
+            {{ modificar_empleado_form.apellido1_empleado(class="form-control", required=True) }}
+        </div>
+
+        <div class="form-group mb-1">
+            <label for="apellido2_empleado">Segundo apellido del empleado:</label>
+            {{ modificar_empleado_form.apellido2_empleado(class="form-control", required=True) }}
+        </div>
+
+        <div class="form-group mb-1">
+            <label for="Telefono">Telefono Empleado:</label>
+            {{ modificar_empleado_form.Telefono(class="form-control", required=True) }}
+        </div>
+
+        <div class="form-group mb-1">
+            <label for="Email">Email del empleado:</label>
+            {{ modificar_empleado_form.Email(class="form-control", required=True) }}
+        </div>
+
+        <div class="form-group mb-1">
+            <label for="Usuario">Usuario del empleado:</label>
+            {{ modificar_empleado_form.Usuario(class="form-control", required=True) }}
+        </div>
+
+        <div class="form-group mb-1">
+            <label for="contraseña">Contraseña del empleado:</label>
+            {{ modificar_empleado_form.contraseña(class="form-control", required=True) }}
+        </div>
+        
+
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    </div>
+
+    </form>
+
+    <div class="col-md-9">
+            <h3>Datos Anteriores</h2> 
+            <ul class="list-group">
+                <li type="circle" class="list-group-item">Rut empleado: {{Rut[0]}}</li>
+                <li type="circle" class="list-group-item">Codigo sucursal: {{Rut[1]}}</li>
+                <li type="circle" class="list-group-item">Cargo: {{Rut[2]}}</li>
+                <li type="circle" class="list-group-item">Nombre del empleado: {{Rut[3]}}</li>
+                <li type="circle" class="list-group-item">Primer apellido del empleado: {{Rut[4]}}</li>
+                <li type="circle" class="list-group-item">Segundo apellido del empleado: {{Rut[5]}}</li>
+                <li type="circle" class="list-group-item">Telefono Empleado: {{Rut[6]}}</li>
+                <li type="circle" class="list-group-item">Email del empleado: {{Rut[7]}}</li>
+                <li type="circle" class="list-group-item">Usuario del empleado: {{Rut[8]}}</li>
+                
+            </ul>
+        </div>
+    </div>
+{% endblock %}

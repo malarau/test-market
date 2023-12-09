@@ -1,0 +1,38 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<div class="col-md-9">
+    <h2 class="mb-4">Lista de Sucursales</h2>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Codigo Sucursal</th>
+                <th>Codigo Bodega</th>
+                <th>Nombre Sucursal</th>
+                <th>Telefono Sucursal</th>
+                <th>Opciones</th> <!-- Columna para las opciones -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for producto in sucursales %}
+                <tr>
+                    <td>{{ producto[0] }}</td>
+                    <td>{{ producto[1] }}</td>
+                    <td>{{ producto[2] }}</td>
+                    <td>{{ producto[3] }}</td>
+                    <td>
+                        <a href="{{ url_for('modificar_producto', codigo=producto[0]) }}" class="btn btn-link text-dark">
+                            <i class="fas fa-pencil-alt"></i> Modificar
+                        </a>
+                        <a href="{{ url_for('eliminar_producto', codigo=producto[0]) }}" class="btn btn-link text-dark">
+                            <i class="fas fa-trash"></i> Eliminar
+                        </a>
+                    </td>
+                    
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

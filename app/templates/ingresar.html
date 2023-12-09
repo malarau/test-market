@@ -1,0 +1,34 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+    <span class="mb-0 text-muted">
+        {% if msg %}
+            <span class="text-danger">{{ msg | safe }}</span>
+        {% else %}
+            Add your credentials
+        {% endif %} 
+    </span>
+
+    <br />
+    <br />
+
+    <form role="form" method="post" action="">
+
+        {{ form.hidden_tag() }}                    
+
+        <div class="input-group mb-3">
+            {{ form.username(placeholder="Username or eMail", class="form-control") }}
+        </div>
+        
+        <div class="input-group mb-4">
+            {{ form.password(placeholder="Password", class="form-control", type="password") }}
+        </div>
+        
+        <button type="submit" name="login" class="btn btn-primary shadow-2 mb-4">Login</button>
+
+    </form>
+
+    <p class="mb-0 text-muted">Don’t have an account? <a href="{{ url_for('registrar') }}" >Sign UP</a></p>
+
+{% endblock %}

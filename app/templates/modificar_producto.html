@@ -1,0 +1,70 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+    <h1>Modificar Producto</h1>
+    <div class="row">
+        <div class="col-md-3">
+        <form method="post">
+            {{ modificar_producto_form.hidden_tag() }}
+            <div class="form-group mb-1">
+                <label for="cod_marca">Codigo de marca:</label>
+                {{ modificar_producto_form.cod_marca(class="form-control", required=True) }}
+            </div>
+
+            <div class="form-group mb-1">
+                <label for="cod_categoria">Codigo de categoria:</label>
+                {{ modificar_producto_form.cod_categoria(class="form-control", required=True) }}
+            </div>
+
+        
+            <div class="form-group mb-1">
+                <label for="nombre_producto">Nombre del Producto:</label>
+                {{ modificar_producto_form.nombre_producto(class="form-control", required=True) }}
+            </div>
+
+            <div class="form-group mb-1">
+                <label for="precio_compra">Precio compra:</label>
+                {{ modificar_producto_form.precio_compra(class="form-control", required=True) }}
+            </div>
+            
+            <div class="form-group mb-1">
+                <label for="precio_venta">Precio venta:</label>
+                {{ modificar_producto_form.precio_venta(class="form-control", required=True) }}
+            </div>
+
+            <div class="form-group mb-1">
+                <label for="stock_producto">Stock Producto:</label>
+                {{ modificar_producto_form.stock_producto(class="form-control", required=True) }}
+            </div>
+
+            <div class="form-group mb-1">
+                <label for="rut_proveedor">Rut Proveedor:</label>
+                {{ modificar_producto_form.rut_proveedor(class="form-control", required=True) }}
+            </div>
+
+            <div class="form-group mb-1">
+                <label for="cod_lote">Codigo Lote:</label>
+                {{ modificar_producto_form.cod_lote(class="form-control", required=True) }}
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+        </div>
+        </form>
+        <div class="col-md-9">
+            <h3>Datos Anteriores</h2> 
+            <ul class="list-group">
+                <li type="circle" class="list-group-item">Codigo Producto: {{producto[0]}}</li>
+                <li type="circle" class="list-group-item">Codigo de marca: {{producto[1]}}</li>
+                <li type="circle" class="list-group-item">Codigo de categoria:{{producto[2]}}</li>
+                <li type="circle" class="list-group-item">Nombre del Producto: {{producto[3]}}</li>
+                <li type="circle" class="list-group-item">Precio compra: {{producto[4]}}</li>
+                <li type="circle" class="list-group-item">Precio venta: {{producto[5]}}</li>
+                <li type="circle" class="list-group-item">Stock Producto: {{producto[6]}}</li>
+                <li type="circle" class="list-group-item">Rut Proveedor: {{producto[7]}}</li>
+                <li type="circle" class="list-group-item">Codigo Lote: {{producto[8]}}</li>
+                
+            </ul>
+        </div>
+    </div>
+{% endblock %}

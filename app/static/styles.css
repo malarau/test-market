@@ -1,0 +1,23 @@
+/* static/styles.css */
+
+body {
+    background-color: #f8f9fa;
+}
+
+/* Agregar estilos para hover en la barra lateral */
+.nav-link.text-dark:hover {
+    color: white; /* Cambiar el color a blanco */
+    background-color: #b4b7b9; /* Cambiar el color de fondo en hover, puedes ajustar esto según tu preferencia */
+    text-decoration: none; /* Eliminar subrayado en hover si lo hay */
+}
+
+/* Agregar padding a los elementos del sidebar */
+.nav-link {
+    padding: 20px; /* Ajusta el valor según sea necesario */
+}
+
+/* Ajustar el tamaño de fuente si es necesario */
+.nav-link i {
+    font-size: 20px; /* Tamaño de icono deseado */
+}
+
