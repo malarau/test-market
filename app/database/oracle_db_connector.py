@@ -72,14 +72,22 @@ class OracleDBConnector:
             print(f"Error executing query: {e}")
             return None
 
-    def agregar_empleado(self, rut,cod_sucursal,cargo,nombre_empleado,apellido1,apellido2,Telefono,Email):
+    def agregar_empleado(self,opcion, rut,cod_sucursal,cargo,nombre_empleado,apellido1,apellido2,Telefono,Email,user,passwd):
         try:
             with self._pool.acquire() as connection:
                 with connection.cursor() as cursor:
-
+                    print(type(opcion))
+                    print(type(rut))
+                    print(type(cod_sucursal))
+                    print(type(cargo))
+                    print(type(nombre_empleado))
+                    print(type(apellido1))
+                    print(type(apellido2))
+                    print(type(Telefono))
+                    print(type(Email))
                     out_val = cursor.var(int)
                     
-                    cursor.callproc('MMMB_CARGA_EMPLEADO', [rut,cod_sucursal,cargo,nombre_empleado,apellido1,apellido2,Telefono,Email])
+                    cursor.callproc('MMMB_PROC_EMPLEADO', [opcion,rut,cod_sucursal,cargo,nombre_empleado,apellido1,apellido2,Telefono,Email,user,passwd,out_val])
 
                     result = out_val.getvalue()              
                     return result

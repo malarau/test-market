@@ -10,7 +10,11 @@
 
         <div class="form-group mb-1">
             <label for="Codigo_Sucursal">Codigo Sucursal:</label>
-            {{ modificar_empleado_form.Codigo_Sucursal(class="form-control", required=True) }}
+            <select id="seleccion" name="seleccion" class="form-control" required=True>
+                {% for opcion in sucursales %}
+                    <option value="{{ opcion }}">{{ opcion }}</option>
+                {% endfor %}
+            </select>
         </div>
 
         <div class="form-group mb-1">
