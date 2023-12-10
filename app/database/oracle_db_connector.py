@@ -115,9 +115,6 @@ class OracleDBConnector:
         query = "SELECT * FROM MMMB_EMPLEADO WHERE RUT_EMPLEADO = :1"
         return self.execute_query(query, RUT)
     # MAL, USAR PROCEDIMIENTO
-    def update_product(self, nombre, nuevo_nombre, nueva_cantidad, nueva_marca):
-        query = "UPDATE PRODUCTOS SET nombre = :2, cantidad = :3, marca = :4 WHERE nombre = :1"
-        return self.execute_insert(query, nombre, nuevo_nombre, nueva_cantidad, nueva_marca)
 
     def actualizar_empleado(self, rut,cod_sucursal,cargo,nombre_empleado,apellido1,apellido2,Telefono,Email,Usuario,contraseña):
             try:

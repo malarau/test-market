@@ -19,10 +19,6 @@ def index():
     # Lógica de la ruta de la página de inicio
     return render_template('index.html', username=username)
 
-@app.route('/user/<name>')
-def user(name):
-    return render_template('user.html', name=name)
-
 @app.route('/logout')
 def logout():
     session.pop('username', None)
