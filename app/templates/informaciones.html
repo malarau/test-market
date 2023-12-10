@@ -1,0 +1,49 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+<h2 class="mb-4">Información general</h2>
+<div class="row contenedor">
+    <div class="col-md-8">
+            <h4 class="mb-4">Lista de Sucursales</h4>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Codigo Sucursal</th>
+                        <th>Codigo Bodega</th>
+                        <th>Nombre Sucursal</th>
+                        <th>Telefono Sucursal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sucursal in sucursales %}
+                        <tr>
+                            <td>{{ sucursal[0] }}</td>
+                            <td>{{ sucursal[1] }}</td>
+                            <td>{{ sucursal[2] }}</td>
+                            <td>{{ sucursal[3] }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <h4 class="mb-4">Lista de medios de pago</h4>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Codigo</th>
+                        <th>Nombre</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for medio in medio_de_pagos %}
+                        <tr>
+                            <td>{{ medio[0] }}</td>
+                            <td>{{ medio[1] }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

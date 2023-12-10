@@ -2,51 +2,59 @@
 
 <aside class="sidebar">
     <ul class="nav flex-column">
-        <li class="nav-item">
-            <a class="nav-link text-dark" href="/empleados">
-                <i class="fas fa-users"></i> Empleados
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-dark" href="/ventas">
-                <i class="fas fa-chart-line"></i> Ventas
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-dark" href="{{ url_for('productos') }}">
-                <i class="fas fa-box"></i> Productos
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-dark" href="/pedidos">
-                <i class="fas fa-clipboard-list"></i> Pedidos
-            </a>
-        </li>
-        <li class="nav-item">
+        <li class="divider-with-text">Ventas</li>
+        <li class="nav-item {% if request.path == '/cliente' %}active{% endif %}">
             <a class="nav-link text-dark" href="/cliente">
                 <i class="fas fa-users"></i> Clientes
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link text-dark" href="/sucursal">
-                <i class="	fas fa-cart-plus"></i> Sucursales
+        <li class="nav-item {% if request.path == '/ventas' %}active{% endif %}">
+            <a class="nav-link text-dark" href="/ventas">
+                <i class="fas fa-chart-line"></i> Ventas
             </a>
         </li>
-        <li class="nav-item">
+        <li class="divider-with-text">General</li>
+        <li class="nav-item {% if request.path == '/sucursal' %}active{% endif %}">
+            <a class="nav-link text-dark" href="/informaciones">
+                <i class="fas fa-cart-plus"></i> Informaciones
+            </a>
+        </li>
+        <li class="divider-with-text">RRHH</li>
+        <li class="nav-item {% if request.path == '/empleados' %}active{% endif %}">
+            <a class="nav-link text-dark" href="/empleados">
+                <i class="fas fa-users"></i> Empleados
+            </a>
+        </li>    
+        <li class="nav-item {% if request.path == '/horarios' %}active{% endif %}">
+            <a class="nav-link text-dark" href="/horarios">
+                <i class="far fa-calendar-alt"></i> Horarios 
+            </a>
+        </li>           
+        <li class="divider-with-text">Administración de negocio</li>   
+        <li class="nav-item {% if request.path == '/productos' %}active{% endif %}">
+            <a class="nav-link text-dark" href="{{ url_for('productos') }}">
+                <i class="fas fa-box"></i> Productos
+            </a>
+        </li>
+        <li class="nav-item {% if request.path == '/marcas' %}active{% endif %}">
             <a class="nav-link text-dark" href="/marcas">
-                <i class="	fas fa-cart-plus"></i> Marcas
+                <i class="fas fa-tag"></i> Marcas
             </a>
         </li>
-        <li class="nav-item">
+        <li class="nav-item {% if request.path == '/categorias' %}active{% endif %}">
             <a class="nav-link text-dark" href="/categorias">
-                <i class="	fas fa-cart-plus"></i> Categorias
+                <i class="fas fa-th-list"></i> Categorias
             </a>
         </li>
-
-        <li class="nav-item">
+        <li class="nav-item {% if request.path == '/proveedor' %}active{% endif %}">
             <a class="nav-link text-dark" href="/proveedor">
-                <i class="	fas fa-cart-plus"></i> Proveedores
+                <i class="fas fa-truck"></i> Proveedores
             </a>
         </li>
+        <li class="nav-item {% if request.path == '/pedidos' %}active{% endif %}">
+            <a class="nav-link text-dark" href="/pedidos">
+                <i class="fas fa-clipboard-list"></i> Pedidos
+            </a>
+        </li> 
     </ul>
 </aside>

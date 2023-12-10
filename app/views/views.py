@@ -326,14 +326,19 @@ def eliminar_cliente(rut_cliente):
     oracle_db_connector.eliminar_cliente('D',rut_cliente)
     return render_template('eliminar_cliente.html', rut_cliente=rut_cliente)
 
-@app.route('/sucursal', methods=['GET', 'POST'])
+@app.route('/informaciones', methods=['GET', 'POST'])
 def get_sucursal():
     oracle_db_connector = current_app.config['oracle_db_connector']
+    # Izquierda
     sucursales = oracle_db_connector.get_all_sucursals()
+    #bodegas = oracle_db_connector.get_all_bodegas()
+    #cargos = oracle_db_connector.get_all_cargos()
+
+    # Derecha
+    medio_de_pagos = oracle_db_connector.get_all_medio_de_pago()
+
     print(sucursales)
-    return render_template('sucursal.html',sucursales=sucursales)
-
-
+    return render_template('informaciones.html',sucursales=sucursales, medio_de_pagos=medio_de_pagos) #bodegas=bodegas, cargos=cargos
 
 @app.route('/categorias', methods=['GET', 'POST'])
 def categoria():

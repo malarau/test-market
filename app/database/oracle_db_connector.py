@@ -348,33 +348,36 @@ class OracleDBConnector:
             print(f"Error executing query: {e}")
             return None
 
-    
+    # Get all    
     def get_all_clients(self):
         query = "SELECT * FROM MMMB_CLIENTE"
         return self.execute_query(query)
-    
     def get_all_providers(self):
         query = "SELECT * FROM MMMB_PROVEEDOR"
         return self.execute_query(query)
     def get_all_cargos(self):
         query = "SELECT * FROM MMMB_CARGO"
         return self.execute_query(query)
-    
     def get_all_marcas(self):
         query = "SELECT * FROM MMMB_MARCA"
         return self.execute_query(query)
     def get_all_categorias(self):
         query = "SELECT * FROM MMMB_CATEGORIA"
         return self.execute_query(query)
+    def get_all_bodegas(self):
+        query = "SELECT * FROM MMMB_BODEGA"
+        return self.execute_query(query)
+    def get_all_medio_de_pago(self):
+        query = "SELECT * FROM MMMB_MEDIO_PAGO"
+        return self.execute_query(query)
     
+    # Get by Id
     def get_categoria_by_cod(self, RUT):
         query = "SELECT * FROM MMMB_CATEGORIA WHERE COD_CATEGORIA = :1"
         return self.execute_query(query, RUT)
-    
     def get_marca_by_cod(self, RUT):
         query = "SELECT * FROM MMMB_MARCA WHERE COD_MARCA = :1"
         return self.execute_query(query, RUT)
-    
     def get_cliente_by_rut(self, RUT):
         query = "SELECT * FROM MMMB_CLIENTE WHERE RUT_CLIENTE = :1"
         return self.execute_query(query, RUT)
