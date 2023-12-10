@@ -1,0 +1,30 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+    <h1>Modificar Categoria</h1>
+    <div class="row">
+        <div class="col-md-3">
+            <form method="post">
+                {{ modificar_categoria_form.hidden_tag() }}
+
+                <div class="form-group mb-1">
+                    <label for="Nombre">Nombre de la categoria:</label>
+                    {{ modificar_categoria_form.Nombre(class="form-control", required=True) }}
+                </div>
+
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            </form>
+        </div>
+
+        <div class="col-md-9">
+            <h3>Datos Anteriores</h3> 
+            <ul class="list-group">
+                <li type="circle" class="list-group-item">Código de categoria: {{ Cod_categoria[0] }}</li>
+                <li type="circle" class="list-group-item">Nombre de la categoria: {{ Cod_categoria[1] }}</li>
+                <!-- Agrega más elementos según los campos de tu tabla -->
+            </ul>
+        </div>
+    </div>
+
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+    <h2>La categoria de codigo: {{cod_categoria}} ha sido eliminada de la base de datos</h2>
+
+    <a href="{{ url_for('categoria')}}" class="btn btn-link text-dark">
+        <i></i> Volver a marcas
+    </a>
+{% endblock %}
