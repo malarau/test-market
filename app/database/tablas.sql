@@ -1,5 +1,3 @@
-SET DEFINE OFF;
-
 /*
     DROP TABLES
 */
@@ -506,9 +504,10 @@ END MMMB_EXISTE_PRODUCTO;
         	En el caso del borrado, se realizará a través del código.
         
     -   CONFIRM_OUTPUT
-            1: Todo OK
-           -1: Error general
-        	-2: Índice duplicado (DUP_VAL_ON_INDEX)
+                1: Todo OK
+               -1: Error general
+        	    -2: Índice duplicado (DUP_VAL_ON_INDEX)
+            -2292: Error de integridad referencial.
 */
 
 -- Empleado
@@ -615,8 +614,16 @@ EXCEPTION
     WHEN DUP_VAL_ON_INDEX THEN
         CONFIRM_OUTPUT := -2; -- Índice duplicado (DUP_VAL_ON_INDEX)
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_EMPLEADO.');
-        CONFIRM_OUTPUT := -1;
+        IF SQLCODE = -2292 THEN
+            -- Si es un error de violación de integridad referencial (ORA-02292)
+            DBMS_OUTPUT.PUT_LINE('Error de integridad referencial (ORA-02292) detectado. Violación de la restricción.');
+            CONFIRM_OUTPUT := SQLCODE;
+        ELSE
+            -- Otro manejo de errores
+            DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_MARCA.');
+            DBMS_OUTPUT.PUT_LINE('Error no manejado: ' || SQLERRM);
+            CONFIRM_OUTPUT := -1;
+        END IF;
         ROLLBACK;
 END;
 /
@@ -659,8 +666,16 @@ BEGIN
 
 EXCEPTION
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_MARCA.');
-        CONFIRM_OUTPUT := -1;
+        IF SQLCODE = -2292 THEN
+            -- Si es un error de violación de integridad referencial (ORA-02292)
+            DBMS_OUTPUT.PUT_LINE('Error de integridad referencial (ORA-02292) detectado. Violación de la restricción.');
+            CONFIRM_OUTPUT := SQLCODE;
+        ELSE
+            -- Otro manejo de errores
+            DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_MARCA.');
+            DBMS_OUTPUT.PUT_LINE('Error no manejado: ' || SQLERRM);
+            CONFIRM_OUTPUT := -1;
+        END IF;
         ROLLBACK;
 END;
 /
@@ -703,8 +718,16 @@ BEGIN
 
 EXCEPTION
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_CATEGORIA.');
-        CONFIRM_OUTPUT := -1;
+        IF SQLCODE = -2292 THEN
+            -- Si es un error de violación de integridad referencial (ORA-02292)
+            DBMS_OUTPUT.PUT_LINE('Error de integridad referencial (ORA-02292) detectado. Violación de la restricción.');
+            CONFIRM_OUTPUT := SQLCODE;
+        ELSE
+            -- Otro manejo de errores
+            DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_MARCA.');
+            DBMS_OUTPUT.PUT_LINE('Error no manejado: ' || SQLERRM);
+            CONFIRM_OUTPUT := -1;
+        END IF;
         ROLLBACK;
 END;
 /
@@ -751,8 +774,16 @@ BEGIN
 
 EXCEPTION
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_PROVEEDOR.');
-        CONFIRM_OUTPUT := -1;
+        IF SQLCODE = -2292 THEN
+            -- Si es un error de violación de integridad referencial (ORA-02292)
+            DBMS_OUTPUT.PUT_LINE('Error de integridad referencial (ORA-02292) detectado. Violación de la restricción.');
+            CONFIRM_OUTPUT := SQLCODE;
+        ELSE
+            -- Otro manejo de errores
+            DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_MARCA.');
+            DBMS_OUTPUT.PUT_LINE('Error no manejado: ' || SQLERRM);
+            CONFIRM_OUTPUT := -1;
+        END IF;
         ROLLBACK;
 END;
 /
@@ -834,9 +865,17 @@ BEGIN
 
 EXCEPTION
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_PRODUCTO.');
-        CONFIRM_OUTPUT := -1;
-    ROLLBACK;
+        IF SQLCODE = -2292 THEN
+            -- Si es un error de violación de integridad referencial (ORA-02292)
+            DBMS_OUTPUT.PUT_LINE('Error de integridad referencial (ORA-02292) detectado. Violación de la restricción.');
+            CONFIRM_OUTPUT := SQLCODE;
+        ELSE
+            -- Otro manejo de errores
+            DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_MARCA.');
+            DBMS_OUTPUT.PUT_LINE('Error no manejado: ' || SQLERRM);
+            CONFIRM_OUTPUT := -1;
+        END IF;
+        ROLLBACK;
 END;
 /
 
@@ -890,8 +929,16 @@ BEGIN
 
 EXCEPTION
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_HORARIO.');
-        CONFIRM_OUTPUT := -1;
+        IF SQLCODE = -2292 THEN
+            -- Si es un error de violación de integridad referencial (ORA-02292)
+            DBMS_OUTPUT.PUT_LINE('Error de integridad referencial (ORA-02292) detectado. Violación de la restricción.');
+            CONFIRM_OUTPUT := SQLCODE;
+        ELSE
+            -- Otro manejo de errores
+            DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_MARCA.');
+            DBMS_OUTPUT.PUT_LINE('Error no manejado: ' || SQLERRM);
+            CONFIRM_OUTPUT := -1;
+        END IF;
         ROLLBACK;
 END;
 /
@@ -944,11 +991,17 @@ BEGIN
     COMMIT;
 
 EXCEPTION
-    WHEN DUP_VAL_ON_INDEX THEN
-        CONFIRM_OUTPUT := -2; -- Índice duplicado (DUP_VAL_ON_INDEX)
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_TURNO.');
-        CONFIRM_OUTPUT := -1;
+        IF SQLCODE = -2292 THEN
+            -- Si es un error de violación de integridad referencial (ORA-02292)
+            DBMS_OUTPUT.PUT_LINE('Error de integridad referencial (ORA-02292) detectado. Violación de la restricción.');
+            CONFIRM_OUTPUT := SQLCODE;
+        ELSE
+            -- Otro manejo de errores
+            DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_MARCA.');
+            DBMS_OUTPUT.PUT_LINE('Error no manejado: ' || SQLERRM);
+            CONFIRM_OUTPUT := -1;
+        END IF;
         ROLLBACK;
 END;
 /
@@ -1001,8 +1054,16 @@ BEGIN
 
 EXCEPTION
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_CAJA.');
-        CONFIRM_OUTPUT := -1;
+        IF SQLCODE = -2292 THEN
+            -- Si es un error de violación de integridad referencial (ORA-02292)
+            DBMS_OUTPUT.PUT_LINE('Error de integridad referencial (ORA-02292) detectado. Violación de la restricción.');
+            CONFIRM_OUTPUT := SQLCODE;
+        ELSE
+            -- Otro manejo de errores
+            DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_MARCA.');
+            DBMS_OUTPUT.PUT_LINE('Error no manejado: ' || SQLERRM);
+            CONFIRM_OUTPUT := -1;
+        END IF;
         ROLLBACK;
 END;
 /
@@ -1061,8 +1122,16 @@ BEGIN
 
 EXCEPTION
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_DETALLE_CUADRATURA.');
-        CONFIRM_OUTPUT := -1;
+        IF SQLCODE = -2292 THEN
+            -- Si es un error de violación de integridad referencial (ORA-02292)
+            DBMS_OUTPUT.PUT_LINE('Error de integridad referencial (ORA-02292) detectado. Violación de la restricción.');
+            CONFIRM_OUTPUT := SQLCODE;
+        ELSE
+            -- Otro manejo de errores
+            DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_MARCA.');
+            DBMS_OUTPUT.PUT_LINE('Error no manejado: ' || SQLERRM);
+            CONFIRM_OUTPUT := -1;
+        END IF;
         ROLLBACK;
 END;
 /
@@ -1125,8 +1194,16 @@ BEGIN
 
 EXCEPTION
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_CLIENTE.');
-        CONFIRM_OUTPUT := -1;
+        IF SQLCODE = -2292 THEN
+            -- Si es un error de violación de integridad referencial (ORA-02292)
+            DBMS_OUTPUT.PUT_LINE('Error de integridad referencial (ORA-02292) detectado. Violación de la restricción.');
+            CONFIRM_OUTPUT := SQLCODE;
+        ELSE
+            -- Otro manejo de errores
+            DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_MARCA.');
+            DBMS_OUTPUT.PUT_LINE('Error no manejado: ' || SQLERRM);
+            CONFIRM_OUTPUT := -1;
+        END IF;
         ROLLBACK;
 END;
 /
@@ -1169,8 +1246,16 @@ BEGIN
 
 EXCEPTION
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_MEDIO_PAGO.');
-        CONFIRM_OUTPUT := -1;
+        IF SQLCODE = -2292 THEN
+            -- Si es un error de violación de integridad referencial (ORA-02292)
+            DBMS_OUTPUT.PUT_LINE('Error de integridad referencial (ORA-02292) detectado. Violación de la restricción.');
+            CONFIRM_OUTPUT := SQLCODE;
+        ELSE
+            -- Otro manejo de errores
+            DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_MARCA.');
+            DBMS_OUTPUT.PUT_LINE('Error no manejado: ' || SQLERRM);
+            CONFIRM_OUTPUT := -1;
+        END IF;
         ROLLBACK;
 END;
 /
@@ -1236,8 +1321,16 @@ BEGIN
 
 EXCEPTION
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_DESCUENTO.');
-        CONFIRM_OUTPUT := -1;
+        IF SQLCODE = -2292 THEN
+            -- Si es un error de violación de integridad referencial (ORA-02292)
+            DBMS_OUTPUT.PUT_LINE('Error de integridad referencial (ORA-02292) detectado. Violación de la restricción.');
+            CONFIRM_OUTPUT := SQLCODE;
+        ELSE
+            -- Otro manejo de errores
+            DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_MARCA.');
+            DBMS_OUTPUT.PUT_LINE('Error no manejado: ' || SQLERRM);
+            CONFIRM_OUTPUT := -1;
+        END IF;
         ROLLBACK;
 END;
 /
@@ -1324,8 +1417,16 @@ BEGIN
 
 EXCEPTION
     WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_VENTA.');
-        CONFIRM_OUTPUT := -1;
+        IF SQLCODE = -2292 THEN
+            -- Si es un error de violación de integridad referencial (ORA-02292)
+            DBMS_OUTPUT.PUT_LINE('Error de integridad referencial (ORA-02292) detectado. Violación de la restricción.');
+            CONFIRM_OUTPUT := SQLCODE;
+        ELSE
+            -- Otro manejo de errores
+            DBMS_OUTPUT.PUT_LINE('Ha ocurrido un error intentando realizar el procedimiento en la tabla MMMB_MARCA.');
+            DBMS_OUTPUT.PUT_LINE('Error no manejado: ' || SQLERRM);
+            CONFIRM_OUTPUT := -1;
+        END IF;
         ROLLBACK;
 END;
 /
@@ -1369,8 +1470,6 @@ END;
     BASE DATA
 */
 
-SET DEFINE OFF; -- Evitar que & sea interpretado sustitución de variables y pida datos a usuario.
-
 -- Inserts para añadir 2 bodegas
 INSERT INTO MMMB_BODEGA (COD_BODEGA) VALUES (1);
 INSERT INTO MMMB_BODEGA (COD_BODEGA) VALUES (2);
@@ -1404,7 +1503,6 @@ BEGIN
         'hashed_password',
         confirm_output
     );
-    DBMS_OUTPUT.PUT_LINE('Resultado del Insert para Dueño: ' || confirm_output);
 END;
 /
 
@@ -1427,7 +1525,6 @@ BEGIN
             'hashed_password',
             confirm_output
         );
-        DBMS_OUTPUT.PUT_LINE('Resultado del Insert para Cajero ' || i || ': ' || confirm_output);
     END LOOP;
 END;
 /
@@ -1442,10 +1539,11 @@ DELETE FROM MMMB_CATEGORIA;
 DELETE FROM MMMB_MARCA;
 */
 
+SET DEFINE OFF -- Evitar que & sea interpretado sustitución de variables y pida datos a usuario.
+
 DECLARE
     out_val NUMBER;
-BEGIN
-
+BEGIN    
     MMMB_PROC_PROVEEDOR('I', '', 'Frescos Ltda', 'ventas@frescos.com', '555-8888', out_val);
     MMMB_PROC_PROVEEDOR('I', '', 'Delicias SA', 'info@delicias.com', '555-7777', out_val);
     MMMB_PROC_PROVEEDOR('I', '', 'Sabores Exquisitos', 'contacto@sabores.com', '555-9999', out_val);

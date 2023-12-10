@@ -104,9 +104,6 @@ class OracleDBConnector:
         query = "SELECT * FROM MMMB_EMPLEADO"
         return self.execute_query(query)
     
-   
-    
-    
     def get_product_by_cod(self, COD):
         query = "SELECT * FROM MMMB_PRODUCTO WHERE COD_PRODUCTO = :1"
         return self.execute_query(query, COD)

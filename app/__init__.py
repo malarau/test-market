@@ -1,5 +1,6 @@
-import os, random, string, oracledb
+import os, random, string
 from flask import Flask
+from datetime import timedelta
 
 from app.database.oracle_db_connector import OracleDBConnector
 
@@ -20,6 +21,8 @@ def create_app():
     # Secret key
     SECRET_KEY = ''.join(random.choice( string.ascii_lowercase  ) for i in range( 32 ))
     app.config['SECRET_KEY'] = SECRET_KEY
+
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 
     return app
 
