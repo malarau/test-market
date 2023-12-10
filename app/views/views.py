@@ -48,7 +48,7 @@ def productos():
         precio_venta = agregar_producto_form.precio_venta.data
         stock_producto = agregar_producto_form.stock_producto.data
         rut_proveedor = agregar_producto_form.rut_proveedor.data
-        oracle_db_connector.agregar_producto(cod_marca,cod_categoria,nombre_producto,precio_compra,precio_venta,stock_producto,rut_proveedor,cod_lote)
+        oracle_db_connector.agregar_producto(cod_marca,cod_categoria,nombre_producto,precio_compra,precio_venta,stock_producto,rut_proveedor)
 
     # Desde acá es un GET:    
         # Locate user
@@ -339,10 +339,48 @@ def get_sucursal():
 
 
 
+@app.route('/categorias', methods=['GET', 'POST'])
+def categoria():
+    agregar_categoria_form = AgregarCategoria()
+    oracle_db_connector = current_app.config['oracle_db_connector']
+
+    if request.method == 'POST' and agregar_categoria_form.validate_on_submit():
+        nombre_categoria = agregar_categoria_form.nombre_categoria.data
+        i=oracle_db_connector.agregar_categoria('I',nombre_categoria)
+        print(i)
+    categorias = oracle_db_connector.get_all_categorias()
+
+    return render_template('categorias.html', categorias=categorias, agregar_categoria_form=agregar_categoria_form)
+
+@app.route('/modificar_categoria/<cod_categoria>', methods=['GET', 'POST'])
+def modificar_categoria(cod_categoria):
+    modificar_categoria_form = ModificarCategoriaForm(request.form)
+    
+    oracle_db_connector = current_app.config['oracle_db_connector']
+
+    Cod_categoria = oracle_db_connector.get_categoria_by_cod(cod_categoria)
+    print(Cod_categoria)
+    Cod_categoria = list(Cod_categoria[0])
+    
+   
+    if not Cod_categoria:
+        redirect(url_for('categorias'))
+
+    if request.method == 'POST':
+        nombre_categoria = request.form['Nombre']
+        oracle_db_connector.actualizar_categoria('U',cod_categoria, nombre_categoria)
+        return redirect(url_for('categoria'))
+    return render_template('modificar_categoria.html', Cod_categoria=Cod_categoria, modificar_categoria_form=modificar_categoria_form)
+
+@app.route('/eliminar_categoria/<cod_categoria>', methods=['GET', 'POST'])
+def eliminar_categoria(cod_categoria):
+    oracle_db_connector = current_app.config['oracle_db_connector']
+    i=oracle_db_connector.eliminar_categoria('D', cod_categoria)
+    print(i)
+    return render_template('eliminar_categoria.html', cod_categoria=cod_categoria)
+
 @app.route('/marcas', methods=['GET', 'POST'])
 def marcas():
-    
-
     agregar_marca_form = AgregarMarca()
     oracle_db_connector = current_app.config['oracle_db_connector']
 

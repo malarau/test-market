@@ -272,6 +272,46 @@ class OracleDBConnector:
             print(f"Error executing query: {e}")
             return None
 
+    def agregar_categoria(self,opcion, nombre):
+            try:
+                with self._pool.acquire() as connection:
+                    with connection.cursor() as cursor:
+                        out_val = cursor.var(int)
+                        cursor.callproc('MMMB_PROC_categoria', [opcion,221334,nombre,out_val])
+                        result = out_val.getvalue()              
+                    return result
+
+            except Exception as e:
+                print(f"Error executing query: {e}")
+                return None
+            
+    def actualizar_categoria(self, opcion, cod_categoria, nombre_categoria):
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
+                    out_val = cursor.var(int)
+
+                    cursor.callproc('MMMB_PROC_categoria', [opcion, int(cod_categoria), nombre_categoria, out_val])
+
+                    result = out_val.getvalue()
+                    return result
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return None
+    
+    def eliminar_categoria(self, opcion, cod_categoria):
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
+                    out_val = cursor.var(int)
+
+                    cursor.callproc('MMMB_PROC_CATEGORIA', [opcion, int(cod_categoria), None, out_val])
+
+                    result = out_val.getvalue()
+                    return result
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return None
     
     def get_all_clients(self):
         query = "SELECT * FROM MMMB_CLIENTE"
@@ -284,6 +324,13 @@ class OracleDBConnector:
     def get_all_marcas(self):
         query = "SELECT * FROM MMMB_MARCA"
         return self.execute_query(query)
+    def get_all_categorias(self):
+        query = "SELECT * FROM MMMB_CATEGORIA"
+        return self.execute_query(query)
+    
+    def get_categoria_by_cod(self, RUT):
+        query = "SELECT * FROM MMMB_CATEGORIA WHERE COD_CATEGORIA = :1"
+        return self.execute_query(query, RUT)
     
     def get_marca_by_cod(self, RUT):
         query = "SELECT * FROM MMMB_MARCA WHERE COD_MARCA = :1"

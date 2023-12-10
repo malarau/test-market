@@ -96,3 +96,10 @@ class ModificarMarcaForm(FlaskForm):
     Nombre = StringField('Nombre de Marca', validators=[DataRequired()])
     guardar_cambios = SubmitField('Guardar Cambios')
 
+class AgregarCategoria(FlaskForm):
+    nombre_categoria = StringField('Nombre de Categoria', validators=[DataRequired()])
+    
+class ModificarCategoriaForm(FlaskForm):
+    Cod_Categoria = IntegerField('Código de Categoria', validators=[DataRequired()])
+    Nombre = StringField('Nombre de Categoria', validators=[DataRequired()])
+    guardar_cambios = SubmitField('Guardar Cambios')
