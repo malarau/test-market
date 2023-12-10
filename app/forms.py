@@ -87,6 +87,18 @@ class ModificarClienteForm(FlaskForm):
     Apellido2 = StringField('Segundo Apellido del Cliente', validators=[DataRequired()])
     Correo = StringField('Correo del Cliente', validators=[DataRequired()])
     guardar_cambios = SubmitField('Guardar Cambios')
+    
+class AgregarProveedor(FlaskForm):
+    rut_proveedor = IntegerField('Rut del Proveedor', validators=[DataRequired()])
+    nombre_proveedor = StringField('Nombre del Proveedor', validators=[DataRequired()])
+    correo_proveedor = StringField('Correo del Proveedor', validators=[DataRequired()])
+    telefono_proveedor = StringField('Teléfono del Proveedor', validators=[DataRequired()])
+    
+class ModificarProveedorForm(FlaskForm):
+    Nombre = StringField('Nombre del Proveedor', validators=[DataRequired()])
+    Correo = StringField('Correo del Proveedor', validators=[DataRequired()])
+    Telefono= StringField('Teléfono del Proveedor', validators=[DataRequired()])
+    guardar_cambios = SubmitField('Guardar Cambios')
 
 class AgregarMarca(FlaskForm):
     nombre_marca = StringField('Nombre de Marca', validators=[DataRequired()])
