@@ -2,6 +2,11 @@ from flask import current_app, redirect, render_template, request, session, url_
 from app import app
 from app.forms import * #AgregarProducto, CreateAccountForm, LoginForm, ModificarProductoForm, AgregarEmpleado
 
+
+class MyForm(FlaskForm):
+    choices = [('opcion1', 'Opción 1'), ('opcion2', 'Opción 2')]
+    select_field = SelectField('Selecciona una opción', choices=choices)
+
 @app.route('/')
 def index():
     # DB Conn
@@ -43,7 +48,6 @@ def productos():
         precio_venta = agregar_producto_form.precio_venta.data
         stock_producto = agregar_producto_form.stock_producto.data
         rut_proveedor = agregar_producto_form.rut_proveedor.data
-        cod_lote = agregar_producto_form.cod_lote.data
         oracle_db_connector.agregar_producto(cod_marca,cod_categoria,nombre_producto,precio_compra,precio_venta,stock_producto,rut_proveedor,cod_lote)
 
     # Desde acá es un GET:    
@@ -56,32 +60,35 @@ def productos():
 def empleados():
 
     # Si no está logeado, chao!
-    if not 'username' in session:
-        return redirect(url_for('index'))
+    #if not 'username' in session:
+     #return redirect(url_for('index'))
     
     agregar_empleado_form = AgregarEmpleado()
     # DB Conn
     oracle_db_connector = current_app.config['oracle_db_connector']
-
+    sucursales = oracle_db_connector.get_all_sucursals()
+    sucursales_opciones = [(f"{sucursales[i][0]},{sucursales[i][2]}") for i in range(len(sucursales))]
+    agregar_empleado_form.cod_sucursal.choices=sucursales_opciones
     if request.method == 'POST' and agregar_empleado_form.validate_on_submit():
         # Obtener valores del formulario
         rut=agregar_empleado_form.rut.data
-        cod_sucursal= agregar_empleado_form.cod_sucursal.data 
+        cod_sucursal= agregar_empleado_form.cod_sucursal.data.split(',')[0]
+        print(cod_sucursal)
         cargo=agregar_empleado_form.cargo.data
         nombre_empleado = agregar_empleado_form.nombre_empleado.data
         apellido1 = agregar_empleado_form.apellido1_empleado.data
         apellido2 = agregar_empleado_form.apellido2_empleado.data
         Telefono = agregar_empleado_form.Telefono.data
         Email = agregar_empleado_form.Email.data
-
-        oracle_db_connector.agregar_empleado(rut,cod_sucursal,cargo,nombre_empleado,apellido1,apellido2,Telefono,Email)
+        user = agregar_empleado_form.user.data
+        password = agregar_empleado_form.passwd.data
+        oracle_db_connector.agregar_empleado('I',rut,cod_sucursal,cargo,nombre_empleado,apellido1,apellido2,Telefono,Email,user,password)
 
     # Desde acá es un GET:    
         # Locate user
     productos = oracle_db_connector.get_all_employees()
-    sucursales = oracle_db_connector.get_all_sucursals()
-    sucursales = [(sucursales[i][0]) for i in range(len(sucursales))]
-    return render_template('empleados.html', productos=productos, agregar_empleado_form=agregar_empleado_form,sucursales=sucursales)
+    
+    return render_template('empleados.html', productos=productos, agregar_empleado_form=agregar_empleado_form,sucursales=sucursales_opciones)
 
 @app.route('/eliminar_producto/<codigo>', methods=['GET', 'POST'])
 def eliminar_producto(codigo):
@@ -131,7 +138,7 @@ def modificar_empleado(rut):
     # Lógica para obtener el producto por su nombre desde la base de datos
     # DB Conn
     oracle_db_connector = current_app.config['oracle_db_connector']
-
+    sucursales = oracle_db_connector.get_all_sucursals()
     Rut = oracle_db_connector.get_employee_by_rut(rut)
     Rut = list(Rut[0])
     # Si no existe:
@@ -140,7 +147,7 @@ def modificar_empleado(rut):
 
     if request.method == 'POST':
         # Lógica para procesar el formulario de modificación y actualizar la base de datos
-        Codigo_Sucursal = request.form['Codigo_Sucursal']
+        Codigo_Sucursal = request.form['Codigo_Sucursal'].split(',')[0]
         Codigo_cargo = request.form['Codigo_cargo']
         nombre_empleado = request.form['nombre_empleado']
         apellido1_empleado= request.form['apellido1_empleado']
@@ -153,9 +160,10 @@ def modificar_empleado(rut):
 
         # Redirigir a la página de lista de productos después de la modificación
         return redirect(url_for('empleados'))
-
+    
+    sucursales = [(f"{sucursales[i][0]},{sucursales[i][2]}") for i in range(len(sucursales))]    
     # Renderizar el formulario de modificación con los datos del producto
-    return render_template('modificar_empleado.html', Rut=Rut, modificar_empleado_form=modificar_empleado_form)
+    return render_template('modificar_empleado.html', Rut=Rut, sucursales=sucursales,modificar_empleado_form=modificar_empleado_form)
 
 @app.route('/ingresar', methods=['GET', 'POST'])
 def ingresar():
