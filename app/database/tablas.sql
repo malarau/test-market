@@ -70,7 +70,7 @@ CREATE SEQUENCE MMMB_PK_MARCA
     CACHE 10;
 
 CREATE SEQUENCE MMMB_PK_PROVEEDOR
-    START WITH 1
+    START WITH 75000001
     INCREMENT BY 1
     CACHE 10;
 
@@ -1442,141 +1442,146 @@ DELETE FROM MMMB_CATEGORIA;
 DELETE FROM MMMB_MARCA;
 */
 
-INSERT INTO MMMB_PROVEEDOR VALUES (75000001, 'Frescos Ltda', 'ventas@frescos.com', '555-8888');
-INSERT INTO MMMB_PROVEEDOR VALUES (75000002, 'Delicias SA', 'info@delicias.com', '555-7777');
-INSERT INTO MMMB_PROVEEDOR VALUES (75000003, 'Sabores Exquisitos', 'contacto@sabores.com', '555-9999');
-INSERT INTO MMMB_PROVEEDOR VALUES (75000004, 'Natureza Alimentos', 'info@naturezaalimentos.com', '555-1010');
-INSERT INTO MMMB_PROVEEDOR VALUES (75000005, 'Gourmet Provisions', 'sales@gourmetprovisions.com', '555-1111');
-INSERT INTO MMMB_PROVEEDOR VALUES (75000006, 'Suministros Office', 'info@suministrosoffice.com', '555-1717');
-INSERT INTO MMMB_PROVEEDOR VALUES (75000007, 'EcoFresh', 'info@ecofresh.com', '555-1313');
-INSERT INTO MMMB_PROVEEDOR VALUES (75000008, 'Golden Harvest', 'sales@goldenharvest.com', '555-1414');
-INSERT INTO MMMB_PROVEEDOR VALUES (75000009, 'Tropical Delights', 'contacto@tropicaldelights.com', '555-1515');
-INSERT INTO MMMB_PROVEEDOR VALUES (75000010, 'Quality Foods', 'info@qualityfoods.com', '555-1616');
+DECLARE
+    out_val NUMBER;
+BEGIN
 
--- Categorías
-
-INSERT INTO MMMB_CATEGORIA VALUES (1, 'Bebidas');
-INSERT INTO MMMB_CATEGORIA VALUES (2, 'Enlatados');
-INSERT INTO MMMB_CATEGORIA VALUES (3, 'Productos lácteos');
-INSERT INTO MMMB_CATEGORIA VALUES (4, 'Panadería');
-INSERT INTO MMMB_CATEGORIA VALUES (5, 'Snacks');
-INSERT INTO MMMB_CATEGORIA VALUES (6, 'Cuidado personal');
-INSERT INTO MMMB_CATEGORIA VALUES (7, 'Limpieza');
-INSERT INTO MMMB_CATEGORIA VALUES (8, 'Higiene');
-INSERT INTO MMMB_CATEGORIA VALUES (9, 'Carnes y embutidos');
-INSERT INTO MMMB_CATEGORIA VALUES (10, 'Artículos de Oficina');
-INSERT INTO MMMB_CATEGORIA VALUES (11, 'Mascotas');
-INSERT INTO MMMB_CATEGORIA VALUES (12, 'Frutas y Verduras');
-
--- Marcas (En realidad, una marca, puede estar en varias categorías, por lo que podríamos enlazar y crear tabla intermedia (o no))
-
-    -- Bebidas
-INSERT INTO MMMB_MARCA VALUES (1, 'Coca-Cola');
-INSERT INTO MMMB_MARCA VALUES (2, 'Pepsi');
-    -- Enlatados
-INSERT INTO MMMB_MARCA VALUES (3, 'San José');
-INSERT INTO MMMB_MARCA VALUES (4, 'Robinson Crusoe');
-    -- Productos lácteos
-INSERT INTO MMMB_MARCA VALUES (5, 'Nestlé');
-INSERT INTO MMMB_MARCA VALUES (6, 'Colun');
-    -- Panadería
-INSERT INTO MMMB_MARCA VALUES (7, 'Bimbo');
-INSERT INTO MMMB_MARCA VALUES (8, 'Ideal');
-    -- Snacks
-INSERT INTO MMMB_MARCA VALUES (9, 'Costa');
-INSERT INTO MMMB_MARCA VALUES (10, 'Evercrisp');
-    -- Cuidado personal
-INSERT INTO MMMB_MARCA VALUES (11, 'Dove');
-INSERT INTO MMMB_MARCA VALUES (12, 'Pantene');
-    -- Limpieza
-INSERT INTO MMMB_MARCA VALUES (13, 'Clorox');
-INSERT INTO MMMB_MARCA VALUES (14, 'Cif');
-    -- Higiene
-INSERT INTO MMMB_MARCA VALUES (15, 'Colgate');
-INSERT INTO MMMB_MARCA VALUES (16, 'Johnson & Johnson');
-    -- Carnes y embutidos
-INSERT INTO MMMB_MARCA VALUES (17, 'Ariztía');
-INSERT INTO MMMB_MARCA VALUES (18, 'Super Pollo');
-    -- Artículos de Oficina
-INSERT INTO MMMB_MARCA VALUES (19, 'Proarte');
-INSERT INTO MMMB_MARCA VALUES (20, 'Torre');
-    -- Mascotas
-INSERT INTO MMMB_MARCA VALUES (21, 'Whiskas');
-INSERT INTO MMMB_MARCA VALUES (22, 'Master Dog');
+    MMMB_PROC_PROVEEDOR('I', '', 'Frescos Ltda', 'ventas@frescos.com', '555-8888', out_val);
+    MMMB_PROC_PROVEEDOR('I', '', 'Delicias SA', 'info@delicias.com', '555-7777', out_val);
+    MMMB_PROC_PROVEEDOR('I', '', 'Sabores Exquisitos', 'contacto@sabores.com', '555-9999', out_val);
+    MMMB_PROC_PROVEEDOR('I', '', 'Natureza Alimentos', 'info@naturezaalimentos.com', '555-1010', out_val);
+    MMMB_PROC_PROVEEDOR('I', '', 'Gourmet Provisions', 'sales@gourmetprovisions.com', '555-1111', out_val);
+    MMMB_PROC_PROVEEDOR('I', '', 'Suministros Office', 'info@suministrosoffice.com', '555-1717', out_val);
+    MMMB_PROC_PROVEEDOR('I', '', 'EcoFresh', 'info@ecofresh.com', '555-1313', out_val);
+    MMMB_PROC_PROVEEDOR('I', '', 'Golden Harvest', 'sales@goldenharvest.com', '555-1414', out_val);
+    MMMB_PROC_PROVEEDOR('I', '', 'Tropical Delights', 'contacto@tropicaldelights.com', '555-1515', out_val);
+    MMMB_PROC_PROVEEDOR('I', '', 'Quality Foods', 'info@qualityfoods.com', '555-1616', out_val);
+    
+    -- Categorías
+    
+    MMMB_PROC_CATEGORIA('I', '', 'Bebidas', out_val);
+    MMMB_PROC_CATEGORIA('I', '', 'Enlatados', out_val);
+    MMMB_PROC_CATEGORIA('I', '', 'Productos lácteos', out_val);
+    MMMB_PROC_CATEGORIA('I', '', 'Panadería', out_val);
+    MMMB_PROC_CATEGORIA('I', '', 'Snacks', out_val);
+    MMMB_PROC_CATEGORIA('I', '', 'Cuidado personal', out_val);
+    MMMB_PROC_CATEGORIA('I', '', 'Limpieza', out_val);
+    MMMB_PROC_CATEGORIA('I', '', 'Higiene', out_val);
+    MMMB_PROC_CATEGORIA('I', '', 'Carnes y embutidos', out_val);
+    MMMB_PROC_CATEGORIA('I', '', 'Artículos de Oficina', out_val);
+    MMMB_PROC_CATEGORIA('I', '', 'Mascotas', out_val);
+    MMMB_PROC_CATEGORIA('I', '', 'Frutas y Verduras', out_val);
+    
+    -- Marcas (En realidad, una marca, puede estar en varias categorías, por lo que podríamos enlazar y crear tabla intermedia (o no))
+    
+        -- Bebidas
+    MMMB_PROC_MARCA('I', '', 'Coca-Cola', out_val);
+    MMMB_PROC_MARCA('I', '', 'Pepsi', out_val);
+        -- Enlatados
+    MMMB_PROC_MARCA('I', '', 'San José', out_val);
+    MMMB_PROC_MARCA('I', '', 'Robinson Crusoe', out_val);
+        -- Productos lácteos
+    MMMB_PROC_MARCA('I', '', 'Nestlé', out_val);
+    MMMB_PROC_MARCA('I', '', 'Colun', out_val);
+        -- Panadería
+    MMMB_PROC_MARCA('I', '', 'Bimbo', out_val);
+    MMMB_PROC_MARCA('I', '', 'Ideal', out_val);
+        -- Snacks
+    MMMB_PROC_MARCA('I', '', 'Costa', out_val);
+    MMMB_PROC_MARCA('I', '', 'Evercrisp', out_val);
+        -- Cuidado personal
+    MMMB_PROC_MARCA('I', '', 'Dove', out_val);
+    MMMB_PROC_MARCA('I', '', 'Pantene', out_val);
+        -- Limpieza
+    MMMB_PROC_MARCA('I', '', 'Clorox', out_val);
+    MMMB_PROC_MARCA('I', '', 'Cif', out_val);
+        -- Higiene
+    MMMB_PROC_MARCA('I', '', 'Colgate', out_val);
+    MMMB_PROC_MARCA('I', '', 'Johnson & Johnson', out_val);
+        -- Carnes y embutidos
+    MMMB_PROC_MARCA('I', '', 'Ariztía', out_val);
+    MMMB_PROC_MARCA('I', '', 'Super Pollo', out_val);
+        -- Artículos de Oficina
+    MMMB_PROC_MARCA('I', '', 'Proarte', out_val);
+    MMMB_PROC_MARCA('I', '', 'Torre', out_val);
+        -- Mascotas
+    MMMB_PROC_MARCA('I', '', 'Whiskas', out_val);
+    MMMB_PROC_MARCA('I', '', 'Master Dog', out_val);
+        -- Frutas y verduras
+    MMMB_PROC_MARCA('I', '', 'Sin marca', out_val);  
+    
+    -- Productos
+    
+        -- Bebidas - Coca-Cola
+    MMMB_PROC_PRODUCTO('I', '', 1, 1, 'Coca-Cola Regular', 1500, 2500, 100, 75000001, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 1, 1, 'Coca-Cola Zero', 2500, 3000, 100, 75000001, out_val);
+        -- Bebidas - Pepsi
+    MMMB_PROC_PRODUCTO('I', '', 2, 1, 'Pepsi Regular', 1500, 2500, 100, 75000001, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 2, 1, 'Pepsi Max', 2500, 2800, 100, 75000001, out_val);
+        -- Enlatados - San José
+    MMMB_PROC_PRODUCTO('I', '', 3, 2, 'Atún San José', 2000, 3500, 50, 75000010, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 3, 2, 'Maíz enlatado', 1800, 2.8, 50, 75000010, out_val);
+        -- Enlatados - Robinson Crusoe
+    MMMB_PROC_PRODUCTO('I', '', 4, 2, 'Sardinas kawai', 1700, 3000, 40, 75000010, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 4, 2, 'Choclo enlatado', 1900, 3.2, 40, 75000010, out_val);
+        -- Productos lácteos - Nestlé
+    MMMB_PROC_PRODUCTO('I', '', 5, 3, 'Leche Nestlé', 2500, 3500, 30, 75000003, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 5, 3, 'Yogurt Nestlé', 1800, 2500, 40, 75000003, out_val);    
+        -- Productos lácteos - Colun
+    MMMB_PROC_PRODUCTO('I', '', 6, 3, 'Lache', 2200, 3000, 35, 75000003, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 6, 3, 'Queso de ayer', 3000, 4500, 25, 75000003, out_val);
+        -- Panadería - Bimbo
+    MMMB_PROC_PRODUCTO('I', '', 7, 4, 'Pan Blanco Bimbo', 1500, 2000, 50, 75000004, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 7, 4, 'Pan Integral Bimbo', 2000, 2500, 40, 75000004, out_val);
+        -- Panadería - Ideal
+    MMMB_PROC_PRODUCTO('I', '', 8, 4, 'Pan Blanco Ideal', 1800, 2200, 45, 75000004, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 8, 4, 'Pan Integral Ideal', 2200, 2800, 35, 75000004, out_val);
+        -- Snacks - Costa
+    MMMB_PROC_PRODUCTO('I', '', 9, 5, 'Papas Fritas', 1500, 2000, 60, 75000005, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 9, 5, 'Galletas Saladas', 1200, 1800, 75, 75000005, out_val);
+        -- Snacks - Evercrisp
+    MMMB_PROC_PRODUCTO('I', '', 10, 5, 'Chips HD', 2000, 2500, 55, 75000005, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 10, 5, 'Pretzels 2G', 1800, 2200, 50, 75000005, out_val);
+        -- Cuidado personal - Dove
+    MMMB_PROC_PRODUCTO('I', '', 11, 6, 'Shampoo 1L', 5000, 7000, 30, 75000006, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 11, 6, 'Acondicionador II', 4500, 6500, 25, 75000006, out_val);
+        -- Cuidado personal - Pantene
+    MMMB_PROC_PRODUCTO('I', '', 12, 6, 'Shampoo con instrucciones', 4800, 6800, 35, 75000006, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 12, 6, 'Acondicionador Palpelo', 4300, 6300, 28, 75000006, out_val);
+        -- Limpieza - Clorox
+    MMMB_PROC_PRODUCTO('I', '', 13, 7, 'Cloro 15L', 3000, 4500, 40, 75000007, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 13, 7, 'Limpiador Multiusos', 2500, 4000, 45, 75000007, out_val);
+        -- Limpieza - Cif
+    MMMB_PROC_PRODUCTO('I', '', 14, 7, 'Limpiador Baño', 2800, 4200, 38, 75000007, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 14, 7, 'Limpiador Cocina', 3200, 4800, 32, 75000007, out_val);
+        -- Higiene - Colgate
+    MMMB_PROC_PRODUCTO('I', '', 15, 8, 'Pasta Dental picante', 2000, 3500, 55, 75000008, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 15, 8, 'Cepillo Dental usado', 1500, 2800, 60, 75000008, out_val);
+        -- Higiene - Johnson & Johnson
+    MMMB_PROC_PRODUCTO('I', '', 16, 8, 'Jabón Líquido 2L', 4000, 5500, 28, 75000008, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 16, 8, 'Shampoo Bebé', 3500, 5000, 30, 75000008, out_val);
+    -- Carnes y embutidos - Ariztía
+    MMMB_PROC_PRODUCTO('I', '', 17, 9, 'Pollo fresco', 5000, 8000, 25, 75000010, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 17, 9, 'Embutidos en butido', 6000, 9000, 20, 75000010, out_val);
+    -- Carnes y embutidos - Super Pollo
+    MMMB_PROC_PRODUCTO('I', '', 18, 9, 'Pollo Super', 4500, 7500, 30, 75000010, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 18, 9, 'Embutidos embutibles', 5500, 8500, 22, 75000010, out_val);
+    -- Artículos de Oficina - Proarte
+    MMMB_PROC_PRODUCTO('I', '', 19, 10, 'Set Pinceles usados', 8000, 12000, 18, 75000006, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 19, 10, 'Bloc de Dibujo seminuevo', 6500, 10000, 25, 75000006, out_val);
+    -- Artículos de Oficina - Torre
+    MMMB_PROC_PRODUCTO('I', '', 20, 10, 'Lápices color blanco', 3000, 5000, 35, 75000006, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 20, 10, 'Libretas 50 hojas', 2500, 4000, 40, 75000006, out_val);
+    -- Mascotas - Whiskas
+    MMMB_PROC_PRODUCTO('I', '', 21, 11, 'Comida uwu', 7000, 10000, 15, 75000008, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 21, 11, 'Snacks Gatos', 4500, 7000, 20, 75000008, out_val);
+    -- Mascotas - Master Dog
+    MMMB_PROC_PRODUCTO('I', '', 22, 11, 'Comida Pa Kiltros', 8000, 12000, 12, 75000008, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 22, 11, 'Snacks Perros', 5500, 8000, 18, 75000008, out_val);
     -- Frutas y verduras
-INSERT INTO MMMB_MARCA VALUES (23, 'Sin marca');  
-
--- Productos
-
-    -- Bebidas - Coca-Cola
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 1, 1, 'Coca-Cola Regular', 1500, 2500, 100, 75000001);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 1, 1, 'Coca-Cola Zero', 2500, 3000, 100, 75000001);
-    -- Bebidas - Pepsi
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 2, 1, 'Pepsi Regular', 1500, 2500, 100, 75000001);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 2, 1, 'Pepsi Max', 2500, 2800, 100, 75000001);
-    -- Enlatados - San José
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 3, 2, 'Atún San José', 2000, 3500, 50, 75000010);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 3, 2, 'Maíz enlatado', 1800, 2.8, 50, 75000010);
-    -- Enlatados - Robinson Crusoe
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 4, 2, 'Sardinas kawai', 1700, 3000, 40, 75000010);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 4, 2, 'Choclo enlatado', 1900, 3.2, 40, 75000010);
-    -- Productos lácteos - Nestlé
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 5, 3, 'Leche Nestlé', 2500, 3500, 30, 75000003);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 5, 3, 'Yogurt Nestlé', 1800, 2500, 40, 75000003);    
-    -- Productos lácteos - Colun
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 6, 3, 'Lache', 2200, 3000, 35, 75000003);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 6, 3, 'Queso de ayer', 3000, 4500, 25, 75000003);
-    -- Panadería - Bimbo
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 7, 4, 'Pan Blanco Bimbo', 1500, 2000, 50, 75000004);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 7, 4, 'Pan Integral Bimbo', 2000, 2500, 40, 75000004);
-    -- Panadería - Ideal
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 8, 4, 'Pan Blanco Ideal', 1800, 2200, 45, 75000004);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 8, 4, 'Pan Integral Ideal', 2200, 2800, 35, 75000004);
-    -- Snacks - Costa
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 9, 5, 'Papas Fritas', 1500, 2000, 60, 75000005);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 9, 5, 'Galletas Saladas', 1200, 1800, 75, 75000005);
-    -- Snacks - Evercrisp
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 10, 5, 'Chips HD', 2000, 2500, 55, 75000005);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 10, 5, 'Pretzels 2G', 1800, 2200, 50, 75000005);
-    -- Cuidado personal - Dove
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 11, 6, 'Shampoo 1L', 5000, 7000, 30, 75000006);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 11, 6, 'Acondicionador II', 4500, 6500, 25, 75000006);
-    -- Cuidado personal - Pantene
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 12, 6, 'Shampoo con instrucciones', 4800, 6800, 35, 75000006);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 12, 6, 'Acondicionador Palpelo', 4300, 6300, 28, 75000006);
-    -- Limpieza - Clorox
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 13, 7, 'Cloro 15L', 3000, 4500, 40, 75000007);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 13, 7, 'Limpiador Multiusos', 2500, 4000, 45, 75000007);
-    -- Limpieza - Cif
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 14, 7, 'Limpiador Baño', 2800, 4200, 38, 75000007);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 14, 7, 'Limpiador Cocina', 3200, 4800, 32, 75000007);
-    -- Higiene - Colgate
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 15, 8, 'Pasta Dental picante', 2000, 3500, 55, 75000008);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 15, 8, 'Cepillo Dental usado', 1500, 2800, 60, 75000008);
-    -- Higiene - Johnson & Johnson
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 16, 8, 'Jabón Líquido 2L', 4000, 5500, 28, 75000008);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 16, 8, 'Shampoo Bebé', 3500, 5000, 30, 75000008);
--- Carnes y embutidos - Ariztía
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 17, 9, 'Pollo fresco', 5000, 8000, 25, 75000010);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 17, 9, 'Embutidos en butido', 6000, 9000, 20, 75000010);
--- Carnes y embutidos - Super Pollo
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 18, 9, 'Pollo Super', 4500, 7500, 30, 75000010);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 18, 9, 'Embutidos embutibles', 5500, 8500, 22, 75000010);
--- Artículos de Oficina - Proarte
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 19, 10, 'Set Pinceles usados', 8000, 12000, 18, 75000006);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 19, 10, 'Bloc de Dibujo seminuevo', 6500, 10000, 25, 75000006);
--- Artículos de Oficina - Torre
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 20, 10, 'Lápices color blanco', 3000, 5000, 35, 75000006);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 20, 10, 'Libretas 50 hojas', 2500, 4000, 40, 75000006);
--- Mascotas - Whiskas
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 21, 11, 'Comida uwu', 7000, 10000, 15, 75000008);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 21, 11, 'Snacks Gatos', 4500, 7000, 20, 75000008);
--- Mascotas - Master Dog
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 22, 11, 'Comida Pa Kiltros', 8000, 12000, 12, 75000008);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 22, 11, 'Snacks Perros', 5500, 8000, 18, 75000008);
--- Frutas y verduras
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 23, 12, 'Manzana 1Kg', 500, 2100, 18, 75000008);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 23, 12, 'Tomate 1Kg', 800, 1000, 18, 75000008);
-INSERT INTO MMMB_PRODUCTO VALUES (MMMB_PK_PRODUCTO.NEXTVAL, 23, 12, 'Zanahoria 1Kg', 500, 700, 18, 75000008);
-
+    MMMB_PROC_PRODUCTO('I', '', 23, 12, 'Manzana 1Kg', 500, 2100, 18, 75000008, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 23, 12, 'Tomate 1Kg', 800, 1000, 18, 75000008, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 23, 12, 'Zanahoria 1Kg', 500, 700, 18, 75000008, out_val);
+END;
+/
 ----
