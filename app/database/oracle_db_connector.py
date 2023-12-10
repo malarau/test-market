@@ -115,32 +115,29 @@ class OracleDBConnector:
         query = "SELECT * FROM MMMB_EMPLEADO WHERE RUT_EMPLEADO = :1"
         return self.execute_query(query, RUT)
     # MAL, USAR PROCEDIMIENTO
-    def update_product(self, nombre, nuevo_nombre, nueva_cantidad, nueva_marca):
-        query = "UPDATE PRODUCTOS SET nombre = :2, cantidad = :3, marca = :4 WHERE nombre = :1"
-        return self.execute_insert(query, nombre, nuevo_nombre, nueva_cantidad, nueva_marca)
 
-    def actualizar_empleado(self, rut,cod_sucursal,cargo,nombre_empleado,apellido1,apellido2,Telefono,Email,Usuario,contraseña):
+    def actualizar_empleado(self,opcion, rut,cod_sucursal,cargo,nombre_empleado,apellido1,apellido2,Telefono,Email,Usuario,contraseña):
             try:
                 with self._pool.acquire() as connection:
                     with connection.cursor() as cursor:
 
                         out_val = cursor.var(int)
                         
-                        cursor.callproc('MMMB_UPDATE_EMPLEADO', [rut,cod_sucursal,cargo,nombre_empleado,apellido1,apellido2,Telefono,Email,Usuario,contraseña])
+                        cursor.callproc('MMMB_PROC_EMPLEADO',[opcion,int(rut),int(cod_sucursal),int(cargo),nombre_empleado,apellido1,apellido2,Telefono,Email,Usuario,contraseña,out_val])
 
                         result = out_val.getvalue()              
                         return result
             except Exception as e:
                 print(f"Error executing query: {e}")
                 return None
-    def eliminar_empleado(self, rut):
+    def eliminar_empleado(self,opcion,rut):
             try:
                 with self._pool.acquire() as connection:
                     with connection.cursor() as cursor:
 
                         out_val = cursor.var(int)
                         
-                        cursor.callproc('MMMB_DELETE_EMPLEADO', [rut])
+                        cursor.callproc('MMMB_PROC_EMPLEADO', [opcion,rut,None,None,None,None,None,None,None,None,None,out_val])
 
                         result = out_val.getvalue()              
                         return result
@@ -187,3 +184,155 @@ class OracleDBConnector:
     def get_cod_sucursals(self):
         query = "SELECT COD_SUCURSAL FROM MMMB_SUCURSAL"
         return self.execute_query(query)
+    
+    def agregar_cliente(self,opcion, rut_cliente, nombre_cliente, apellido1_cliente, apellido2_cliente, correo_cliente):
+            try:
+                with self._pool.acquire() as connection:
+                    with connection.cursor() as cursor:
+                        out_val = cursor.var(int)
+                        # No necesitas una variable de salida (out_val) en este caso
+                        cursor.callproc('MMMB_PROC_CLIENTE', [opcion,int(rut_cliente), nombre_cliente, apellido1_cliente, apellido2_cliente, correo_cliente,out_val])
+
+                        result = out_val.getvalue()              
+                    return result
+
+            except Exception as e:
+                print(f"Error executing query: {e}")
+                return None
+            
+    def eliminar_cliente(self,opcion, rut_cliente):
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
+                    out_val = cursor.var(int)
+                    cursor.callproc('MMMB_PROC_CLIENTE', [opcion,int(rut_cliente),None,None,None,None,out_val])
+                    result = out_val.getvalue()
+                    return result
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return None
+        
+    def actualizar_cliente(self,opcion, rut, nombre_cliente, apellido1_cliente, apellido2_cliente, correo_cliente):
+            try:
+                with self._pool.acquire() as connection:
+                    with connection.cursor() as cursor:
+
+                        out_val = cursor.var(int)
+                        
+                        cursor.callproc('MMMB_PROC_CLIENTE',[opcion,int(rut),nombre_cliente, apellido1_cliente, apellido2_cliente, correo_cliente,out_val])
+
+                        result = out_val.getvalue()              
+                        return result
+            except Exception as e:
+                print(f"Error executing query: {e}")
+                return None
+    
+    
+    def agregar_marca(self,opcion, nombre):
+            try:
+                with self._pool.acquire() as connection:
+                    with connection.cursor() as cursor:
+                        out_val = cursor.var(int)
+                        cursor.callproc('MMMB_PROC_MARCA', [opcion,221334,nombre,out_val])
+                        result = out_val.getvalue()              
+                    return result
+
+            except Exception as e:
+                print(f"Error executing query: {e}")
+                return None
+            
+    def actualizar_marca(self, opcion, cod_marca, nombre_marca):
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
+                    out_val = cursor.var(int)
+
+                    cursor.callproc('MMMB_PROC_MARCA', [opcion, int(cod_marca), nombre_marca, out_val])
+
+                    result = out_val.getvalue()
+                    return result
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return None
+    
+    def eliminar_marca(self, opcion, cod_marca):
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
+                    out_val = cursor.var(int)
+
+                    cursor.callproc('MMMB_PROC_MARCA', [opcion, int(cod_marca), None, out_val])
+
+                    result = out_val.getvalue()
+                    return result
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return None
+
+    def agregar_categoria(self,opcion, nombre):
+            try:
+                with self._pool.acquire() as connection:
+                    with connection.cursor() as cursor:
+                        out_val = cursor.var(int)
+                        cursor.callproc('MMMB_PROC_categoria', [opcion,221334,nombre,out_val])
+                        result = out_val.getvalue()              
+                    return result
+
+            except Exception as e:
+                print(f"Error executing query: {e}")
+                return None
+            
+    def actualizar_categoria(self, opcion, cod_categoria, nombre_categoria):
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
+                    out_val = cursor.var(int)
+
+                    cursor.callproc('MMMB_PROC_categoria', [opcion, int(cod_categoria), nombre_categoria, out_val])
+
+                    result = out_val.getvalue()
+                    return result
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return None
+    
+    def eliminar_categoria(self, opcion, cod_categoria):
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
+                    out_val = cursor.var(int)
+
+                    cursor.callproc('MMMB_PROC_CATEGORIA', [opcion, int(cod_categoria), None, out_val])
+
+                    result = out_val.getvalue()
+                    return result
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return None
+    
+    def get_all_clients(self):
+        query = "SELECT * FROM MMMB_CLIENTE"
+        return self.execute_query(query)
+    
+    def get_all_cargos(self):
+        query = "SELECT * FROM MMMB_CARGO"
+        return self.execute_query(query)
+    
+    def get_all_marcas(self):
+        query = "SELECT * FROM MMMB_MARCA"
+        return self.execute_query(query)
+    def get_all_categorias(self):
+        query = "SELECT * FROM MMMB_CATEGORIA"
+        return self.execute_query(query)
+    
+    def get_categoria_by_cod(self, RUT):
+        query = "SELECT * FROM MMMB_CATEGORIA WHERE COD_CATEGORIA = :1"
+        return self.execute_query(query, RUT)
+    
+    def get_marca_by_cod(self, RUT):
+        query = "SELECT * FROM MMMB_MARCA WHERE COD_MARCA = :1"
+        return self.execute_query(query, RUT)
+    
+    def get_cliente_by_rut(self, RUT):
+        query = "SELECT * FROM MMMB_CLIENTE WHERE RUT_CLIENTE = :1"
+        return self.execute_query(query, RUT)

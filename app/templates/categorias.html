@@ -1,0 +1,54 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+    <div class="row">
+        <!-- Sección lateral para agregar Marcas -->
+        <div class="col-md-3">
+            <h2 class="mb-4">Agregar</h2>
+            
+            <!-- Formulario para agregar una nueva marca -->
+            <form method="post">
+                {{ agregar_categoria_form.hidden_tag() }}
+
+                <div class="form-group mb-1">
+                    <label for="nombre_categoria">Nombre de categoria:</label>
+                    {{ agregar_categoria_form.nombre_categoria(class="form-control", required=True) }}
+                </div>
+
+                <button type="submit" class="btn btn-primary" name="Agregar">Agregar</button>
+            </form>
+        </div>
+
+        <!-- Sección para ver todas las marcas -->
+        <div class="col-md-9">
+            <h2 class="mb-4">Lista de categorias</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Código de Categoria</th>
+                        <th>Nombre de Categoria</th>
+                        <th>Opciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for marca in categorias %}
+                        <tr>
+                            <td>{{ marca[0] }}</td>
+                            <td>{{ marca[1] }}</td>
+                            <td>
+                                    <a href="{{ url_for('modificar_categoria', cod_categoria=marca[0]) }}" class="btn btn-link text-dark">
+                                        <i class="fas fa-pencil-alt"></i> Modificar
+                                    </a>
+                                    <a href="{{ url_for('eliminar_categoria', cod_categoria=marca[0]) }}" class="btn btn-link text-dark" onclick="return confirm('¿Realmente desea eliminar?')">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

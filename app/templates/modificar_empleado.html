@@ -10,16 +10,13 @@
 
         <div class="form-group mb-1">
             <label for="Codigo_Sucursal">Codigo Sucursal:</label>
-            <select id="seleccion" name="seleccion" class="form-control" required=True>
-                {% for opcion in sucursales %}
-                    <option value="{{ opcion }}">{{ opcion }}</option>
-                {% endfor %}
-            </select>
+            {{ modificar_empleado_form.cod_sucursal(class="form-control", required=True) }}
+
         </div>
 
         <div class="form-group mb-1">
-            <label for="Codigo_cargo">Cargo:</label>
-            {{ modificar_empleado_form.Codigo_cargo(class="form-control", required=True) }}
+            <label for="cargo">Cargo:</label>
+            {{ modificar_empleado_form.cargo(class="form-control", required=True) }}
         </div>
 
         
