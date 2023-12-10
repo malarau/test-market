@@ -31,15 +31,16 @@ class CreateAccountForm(FlaskForm):
                              validators=[DataRequired()])
     
 class AgregarEmpleado(FlaskForm):
-    rut=StringField('Rut del Empleado')
-    cod_sucursal=StringField('Codigo de sucursal del Empleado')
-    cargo=StringField('Cargo del Empleado')
+    rut=IntegerField('Rut del Empleado')
+    cod_sucursal=SelectField('Codigo de sucursal del Empleado',choices=[])
+    cargo=IntegerField('Cargo del Empleado')
     nombre_empleado = StringField('Nombre del Empleado')
     apellido1_empleado = StringField('Apellido 1 del Empleado')
     apellido2_empleado = StringField('Apellido 2 del Empleado')
-    Telefono = IntegerField('Telefono')
+    Telefono = StringField('Telefono')
     Email = StringField('Email Empleado')
-    
+    user = StringField('Usuario Empleado')
+    passwd = StringField('Contraseña Empleado')
 class AgregarProducto(FlaskForm):
     cod_marca = IntegerField('Codigo Marca', validators=[DataRequired()])
     cod_categoria = IntegerField('Codigo Categoria', validators=[DataRequired()])
@@ -48,8 +49,6 @@ class AgregarProducto(FlaskForm):
     precio_venta = IntegerField('Precio Venta', validators=[DataRequired()])
     stock_producto = IntegerField('Stock Producto', validators=[DataRequired()])
     rut_proveedor = IntegerField('Rut Proveedor', validators=[DataRequired()])
-    cod_lote = IntegerField('Codigo Lote', validators=[DataRequired()])
-
 class ModificarProductoForm(FlaskForm):
     cod_marca = IntegerField('Codigo Marca', validators=[DataRequired()])
     cod_categoria = IntegerField('Codigo Categoria', validators=[DataRequired()])
@@ -63,11 +62,11 @@ class ModificarProductoForm(FlaskForm):
 
 class ModificarEmpleadoForm(FlaskForm):
     Codigo_Sucursal = SelectField('Codigo Sucursal', validators=[DataRequired()])
-    Codigo_cargo = IntegerField('Cargo', validators=[DataRequired()])
+    Codigo_cargo = SelectField('Cargo', validators=[DataRequired()])
     nombre_empleado = StringField('Nombre Empleado', validators=[DataRequired()])
     apellido1_empleado= StringField('Primer apellido Empleado', validators=[DataRequired()])
     apellido2_empleado=StringField('Segundo apellido Empleado', validators=[DataRequired()])
-    Telefono = IntegerField('Telefono', validators=[DataRequired()])
+    Telefono = StringField('Telefono', validators=[DataRequired()])
     Email = StringField('Email', validators=[DataRequired()])
     Usuario = StringField('Usuario Empleado', validators=[DataRequired()])
     contraseña = PasswordField('Password',
