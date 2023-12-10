@@ -1,0 +1,75 @@
+<!-- proveedores.html -->
+{% extends "layouts/base.html" %}
+
+{% block content %}    
+    <!-- ... (código existente) ... -->
+    <div class="row">
+    <!-- Sección lateral para agregar Proveedores -->
+    <div class="col-md-3">
+        <h2 class="mb-4">Agregar</h2>
+        
+        <!-- Formulario para agregar un nuevo proveedor -->
+        <form method="post">
+            {{ agregar_proveedor_form.hidden_tag() }}
+
+            <div class="form-group mb-1">
+                <label for="rut_proveedor">Rut del proveedor:</label>
+                {{ agregar_proveedor_form.rut_proveedor(class="form-control", required=True) }}
+            </div>
+            <div class="form-group mb-1">
+                <label for="nombre_proveedor">Nombre del proveedor:</label>
+                {{ agregar_proveedor_form.nombre_proveedor(class="form-control", required=True) }}
+            </div>
+            <div class="form-group mb-1">
+                <label for="correo_proveedor">Correo del proveedor:</label>
+                {{ agregar_proveedor_form.correo_proveedor(class="form-control", required=True) }}
+            </div>
+            <div class="form-group mb-1">
+                <label for="telefono_proveedor">Teléfono del proveedor:</label>
+                {{ agregar_proveedor_form.telefono_proveedor(class="form-control", required=True) }}
+            </div>
+
+            <button type="submit" class="btn btn-primary" name="Agregar">Agregar</button>
+        </form>
+    </div>
+
+    <!-- Sección para ver todos los proveedores -->
+    <div class="col-md-9">
+        <h2 class="mb-4">Lista de Proveedores</h2>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Rut</th>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Teléfono</th>
+                    <th>Opciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for proveedor in proveedores %}
+                    <tr>
+                        <td>{{ proveedor[0] }}</td>
+                        <td>{{ proveedor[1] }}</td>
+                        <td>{{ proveedor[2] }}</td>
+                        <td>{{ proveedor[3] }}</td>
+                        
+                        <td>
+                            <!-- Agrega aquí enlaces para modificar y eliminar proveedores -->
+                            <td>
+                                <a href="{{ url_for('modificar_proveedor', rut_proveedor=proveedor[0]) }}" class="btn btn-link text-dark">
+                                    <i class="fas fa-pencil-alt"></i> Modificar
+                                </a>
+                                <a href="{{ url_for('eliminar_proveedor', rut_proveedor=proveedor[0]) }}" class="btn btn-link text-dark" onclick="return confirm('¿Realmente desea eliminar?')">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </a>
+                            </td>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+    <!-- ... (código existente) ... -->
+{% endblock %}

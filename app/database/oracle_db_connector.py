@@ -307,10 +307,55 @@ class OracleDBConnector:
             print(f"Error executing query: {e}")
             return None
     
+    def agregar_proveedor(self, opcion, rut_proveedor, nombre_proveedor, correo_proveedor, telefono_proveedor):
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
+                    out_val = cursor.var(int)
+                    cursor.callproc('MMMB_PROC_PROVEEDOR', [opcion, int(rut_proveedor), nombre_proveedor, correo_proveedor, telefono_proveedor, out_val])
+
+                    result = out_val.getvalue()
+                    return result
+
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return None
+
+    def eliminar_proveedor(self, opcion, rut_proveedor):
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
+                    out_val = cursor.var(int)
+                    cursor.callproc('MMMB_PROC_PROVEEDOR', [opcion, int(rut_proveedor), None, None, None, out_val])
+                    result = out_val.getvalue()
+                    return result
+
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return None
+
+    def actualizar_proveedor(self, opcion, rut_proveedor, nombre_proveedor, correo_proveedor, telefono_proveedor):
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
+                    out_val = cursor.var(int)
+                    cursor.callproc('MMMB_PROC_PROVEEDOR', [opcion, int(rut_proveedor), nombre_proveedor, correo_proveedor, telefono_proveedor, out_val])
+
+                    result = out_val.getvalue()
+                    return result
+
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return None
+
+    
     def get_all_clients(self):
         query = "SELECT * FROM MMMB_CLIENTE"
         return self.execute_query(query)
     
+    def get_all_providers(self):
+        query = "SELECT * FROM MMMB_PROVEEDOR"
+        return self.execute_query(query)
     def get_all_cargos(self):
         query = "SELECT * FROM MMMB_CARGO"
         return self.execute_query(query)
@@ -332,4 +377,7 @@ class OracleDBConnector:
     
     def get_cliente_by_rut(self, RUT):
         query = "SELECT * FROM MMMB_CLIENTE WHERE RUT_CLIENTE = :1"
+        return self.execute_query(query, RUT)
+    def get_proveedor_by_rut(self, RUT):
+        query = "SELECT * FROM MMMB_PROVEEDOR WHERE RUT_PROVEEDOR = :1"
         return self.execute_query(query, RUT)

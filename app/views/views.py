@@ -419,6 +419,52 @@ def eliminar_marca(cod_marca):
     oracle_db_connector.eliminar_marca('D', cod_marca)
     return render_template('eliminar_marca.html', cod_marca=cod_marca)
 
+@app.route('/proveedor', methods=['GET', 'POST'])
+def proveedores():
+    if 'username' not in session:
+        return redirect(url_for('index'))
+
+    agregar_proveedor_form = AgregarProveedor()
+    oracle_db_connector = current_app.config['oracle_db_connector']
+
+    if request.method == 'POST' and agregar_proveedor_form.validate_on_submit():
+        rut_proveedor = agregar_proveedor_form.rut_proveedor.data
+        nombre_proveedor = agregar_proveedor_form.nombre_proveedor.data
+        correo_proveedor = agregar_proveedor_form.correo_proveedor.data
+        telefono_proveedor = agregar_proveedor_form.telefono_proveedor.data
+        oracle_db_connector.agregar_proveedor('I', rut_proveedor, nombre_proveedor, correo_proveedor, telefono_proveedor)
+
+    proveedores = oracle_db_connector.get_all_providers()
+
+    return render_template('proveedores.html', proveedores=proveedores, agregar_proveedor_form=agregar_proveedor_form)
+
+@app.route('/modificar_proveedor/<rut_proveedor>', methods=['GET', 'POST'])
+def modificar_proveedor(rut_proveedor):
+    modificar_proveedor_form = ModificarProveedorForm(request.form)
+    oracle_db_connector = current_app.config['oracle_db_connector']
+
+    proveedor = oracle_db_connector.get_proveedor_by_rut(rut_proveedor)
+    proveedor = list(proveedor[0])
+
+    if not proveedor:
+        return redirect(url_for('proveedores'))
+
+    if request.method == 'POST':
+        nombre_proveedor = request.form['Nombre']
+        correo_proveedor = request.form['Correo']
+        telefono_proveedor = request.form['Telefono']
+        oracle_db_connector.actualizar_proveedor('U', rut_proveedor, nombre_proveedor, correo_proveedor, telefono_proveedor)
+
+        return redirect(url_for('proveedores'))
+
+    return render_template('modificar_proveedor.html', proveedor=proveedor, modificar_proveedor_form=modificar_proveedor_form)
+
+@app.route('/eliminar_proveedor/<rut_proveedor>', methods=['GET', 'POST'])
+def eliminar_proveedor(rut_proveedor):
+    oracle_db_connector = current_app.config['oracle_db_connector']
+    oracle_db_connector.eliminar_proveedor('D', rut_proveedor)
+    return render_template('eliminar_proveedor.html', rut_proveedor=rut_proveedor)
+
 
 @app.errorhandler(404)
 def page_not_found(e):
