@@ -67,14 +67,16 @@ def empleados():
     # DB Conn
     oracle_db_connector = current_app.config['oracle_db_connector']
     sucursales = oracle_db_connector.get_all_sucursals()
+    cargos = oracle_db_connector.get_all_cargos()
     sucursales_opciones = [(f"{sucursales[i][0]},{sucursales[i][2]}") for i in range(len(sucursales))]
+    cargo_opciones = [(f"{cargos[i][0]},{cargos[i][1]}") for i in range(len(cargos))]
     agregar_empleado_form.cod_sucursal.choices=sucursales_opciones
+    agregar_empleado_form.cargo.choices=cargo_opciones
     if request.method == 'POST' and agregar_empleado_form.validate_on_submit():
         # Obtener valores del formulario
         rut=agregar_empleado_form.rut.data
         cod_sucursal= agregar_empleado_form.cod_sucursal.data.split(',')[0]
-        print(cod_sucursal)
-        cargo=agregar_empleado_form.cargo.data
+        cargo=agregar_empleado_form.cargo.data.split(',')[0]
         nombre_empleado = agregar_empleado_form.nombre_empleado.data
         apellido1 = agregar_empleado_form.apellido1_empleado.data
         apellido2 = agregar_empleado_form.apellido2_empleado.data
@@ -100,9 +102,9 @@ def eliminar_producto(codigo):
 @app.route('/eliminar_empleado/<rut>', methods=['GET', 'POST'])
 def eliminar_empleado(rut):
     oracle_db_connector = current_app.config['oracle_db_connector']
-    oracle_db_connector.eliminar_empleado(rut)    
+    oracle_db_connector.eliminar_empleado('D',rut)    
     
-    return render_template('eliminar_empleado.html' , rut=rut)
+    return render_template('eliminar_empleado.html' ,rut=rut)
 
 @app.route('/modificar_producto/<codigo>', methods=['GET', 'POST'])
 def modificar_producto(codigo):
@@ -139,6 +141,11 @@ def modificar_empleado(rut):
     # DB Conn
     oracle_db_connector = current_app.config['oracle_db_connector']
     sucursales = oracle_db_connector.get_all_sucursals()
+    cargos = oracle_db_connector.get_all_cargos()
+    cargo_opciones = [(f"{cargos[i][0]},{cargos[i][1]}") for i in range(len(cargos))]
+    modificar_empleado_form.cargo.choices=cargo_opciones
+    sucursales_opciones = [(f"{sucursales[i][0]},{sucursales[i][2]}") for i in range(len(sucursales))]
+    modificar_empleado_form.cod_sucursal.choices=sucursales_opciones
     Rut = oracle_db_connector.get_employee_by_rut(rut)
     Rut = list(Rut[0])
     # Si no existe:
@@ -147,8 +154,8 @@ def modificar_empleado(rut):
 
     if request.method == 'POST':
         # Lógica para procesar el formulario de modificación y actualizar la base de datos
-        Codigo_Sucursal = request.form['Codigo_Sucursal'].split(',')[0]
-        Codigo_cargo = request.form['Codigo_cargo']
+        Codigo_Sucursal = request.form['cod_sucursal'].split(',')[0]
+        cargo = request.form['cargo'].split(',')[0]
         nombre_empleado = request.form['nombre_empleado']
         apellido1_empleado= request.form['apellido1_empleado']
         apellido2_empleado=request.form['apellido2_empleado']
@@ -156,7 +163,7 @@ def modificar_empleado(rut):
         Email=request.form['Email']
         Usuario=request.form['Usuario']
         contraseña=request.form['contraseña']
-        oracle_db_connector.actualizar_empleado(rut, Codigo_Sucursal, Codigo_cargo, nombre_empleado,apellido1_empleado ,apellido2_empleado ,Telefono ,Email,Usuario,contraseña )
+        oracle_db_connector.actualizar_empleado('U',rut, Codigo_Sucursal, cargo, nombre_empleado,apellido1_empleado ,apellido2_empleado ,Telefono ,Email,Usuario,contraseña )
 
         # Redirigir a la página de lista de productos después de la modificación
         return redirect(url_for('empleados'))
@@ -269,12 +276,114 @@ def registrar():
 
 ##
 
+@app.route('/cliente', methods=['GET', 'POST'])
+def clientes():
+    if not 'username' in session:
+        return redirect(url_for('index'))
+
+    agregar_cliente_form = AgregarCliente()
+    oracle_db_connector = current_app.config['oracle_db_connector']
+
+    if request.method == 'POST' and agregar_cliente_form.validate_on_submit():
+        rut_cliente = agregar_cliente_form.rut_cliente.data
+        nombre_cliente = agregar_cliente_form.nombre_cliente.data
+        apellido1_cliente = agregar_cliente_form.apellido1_cliente.data
+        apellido2_cliente = agregar_cliente_form.apellido2_cliente.data
+        correo_cliente = agregar_cliente_form.correo_cliente.data
+        oracle_db_connector.agregar_cliente('I',rut_cliente, nombre_cliente, apellido1_cliente, apellido2_cliente, correo_cliente)
+
+    clientes = oracle_db_connector.get_all_clients()
+
+    return render_template('clientes.html', clientes=clientes, agregar_cliente_form=agregar_cliente_form)
+
+@app.route('/modificar_cliente/<rut>', methods=['GET', 'POST'])
+def modificar_cliente(rut):
+    modificar_cliente_form = ModificarClienteForm(request.form)
+    # Lógica para obtener el cliente por su rut desde la base de datos
+    # DB Conn
+    oracle_db_connector = current_app.config['oracle_db_connector']
+
+    Rut = oracle_db_connector.get_cliente_by_rut(rut)
+    Rut = list(Rut[0])
+    print("hola",Rut)
+    # Si no existe:
+    if Rut == []:
+        redirect(url_for('clientes'))
+
+    if request.method == 'POST':
+        # Lógica para procesar el formulario de modificación y actualizar la base de datos
+        nombre_cliente = request.form['Nombre']
+        apellido1_cliente = request.form['Apellido1']
+        apellido2_cliente = request.form['Apellido2']
+        correo_cliente = request.form['Correo']
+        oracle_db_connector.actualizar_cliente('U',rut, nombre_cliente, apellido1_cliente, apellido2_cliente, correo_cliente)
+
+        # Redirigir a la página de lista de clientes después de la modificación
+        return redirect(url_for('clientes'))
+
+    # Renderizar el formulario de modificación con los datos del cliente
+    return render_template('modificar_cliente.html', Rut=Rut, modificar_cliente_form=modificar_cliente_form)
+
+@app.route('/eliminar_cliente/<rut_cliente>', methods=['GET', 'POST'])
+def eliminar_cliente(rut_cliente):
+    oracle_db_connector = current_app.config['oracle_db_connector']
+    oracle_db_connector.eliminar_cliente('D',rut_cliente)
+    return render_template('eliminar_cliente.html', rut_cliente=rut_cliente)
+
 @app.route('/sucursal', methods=['GET', 'POST'])
 def get_sucursal():
     oracle_db_connector = current_app.config['oracle_db_connector']
     sucursales = oracle_db_connector.get_all_sucursals()
     print(sucursales)
     return render_template('sucursal.html',sucursales=sucursales)
+
+
+
+@app.route('/marcas', methods=['GET', 'POST'])
+def marcas():
+    
+
+    agregar_marca_form = AgregarMarca()
+    oracle_db_connector = current_app.config['oracle_db_connector']
+
+    if request.method == 'POST' and agregar_marca_form.validate_on_submit():
+        nombre_marca = agregar_marca_form.nombre_marca.data
+        i=oracle_db_connector.agregar_marca('I',nombre_marca)
+        print(i)
+    marcas = oracle_db_connector.get_all_marcas()
+
+    return render_template('marca.html', marcas=marcas, agregar_marca_form=agregar_marca_form)
+
+@app.route('/modificar_marca/<cod_marca>', methods=['GET', 'POST'])
+def modificar_marca(cod_marca):
+    modificar_marca_form = ModificarMarcaForm(request.form)
+    # Lógica para obtener la marca por su código desde la base de datos
+    # DB Conn
+    oracle_db_connector = current_app.config['oracle_db_connector']
+
+    Cod_Marca = oracle_db_connector.get_marca_by_cod(cod_marca)
+    Cod_Marca = list(Cod_Marca[0])
+    
+    # Si no existe:
+    if not Cod_Marca:
+        redirect(url_for('marcas'))
+
+    if request.method == 'POST':
+        # Lógica para procesar el formulario de modificación y actualizar la base de datos
+        nombre_marca = request.form['Nombre']
+        oracle_db_connector.actualizar_marca('U',cod_marca, nombre_marca)
+
+        # Redirigir a la página de lista de marcas después de la modificación
+        return redirect(url_for('marcas'))
+
+    # Renderizar el formulario de modificación con los datos de la marca
+    return render_template('modificar_marca.html', Cod_Marca=Cod_Marca, modificar_marca_form=modificar_marca_form)
+
+@app.route('/eliminar_marca/<cod_marca>', methods=['GET', 'POST'])
+def eliminar_marca(cod_marca):
+    oracle_db_connector = current_app.config['oracle_db_connector']
+    oracle_db_connector.eliminar_marca('D', cod_marca)
+    return render_template('eliminar_marca.html', cod_marca=cod_marca)
 
 
 @app.errorhandler(404)

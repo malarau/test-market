@@ -33,7 +33,7 @@ class CreateAccountForm(FlaskForm):
 class AgregarEmpleado(FlaskForm):
     rut=IntegerField('Rut del Empleado')
     cod_sucursal=SelectField('Codigo de sucursal del Empleado',choices=[])
-    cargo=IntegerField('Cargo del Empleado')
+    cargo=SelectField('Cargo del Empleado', choices=[], validators=[DataRequired()])
     nombre_empleado = StringField('Nombre del Empleado')
     apellido1_empleado = StringField('Apellido 1 del Empleado')
     apellido2_empleado = StringField('Apellido 2 del Empleado')
@@ -61,8 +61,8 @@ class ModificarProductoForm(FlaskForm):
     guardar_cambios = SubmitField('Guardar Cambios')
 
 class ModificarEmpleadoForm(FlaskForm):
-    Codigo_Sucursal = SelectField('Codigo Sucursal', validators=[DataRequired()])
-    Codigo_cargo = SelectField('Cargo', validators=[DataRequired()])
+    cod_sucursal = SelectField('Codigo Sucursal', choices=[], validators=[DataRequired()])
+    cargo = SelectField('Cargo', choices=[], validators=[DataRequired()])
     nombre_empleado = StringField('Nombre Empleado', validators=[DataRequired()])
     apellido1_empleado= StringField('Primer apellido Empleado', validators=[DataRequired()])
     apellido2_empleado=StringField('Segundo apellido Empleado', validators=[DataRequired()])
@@ -73,3 +73,26 @@ class ModificarEmpleadoForm(FlaskForm):
                              id='pwd_create',
                              validators=[DataRequired()])
     guardar_cambios = SubmitField('Guardar Cambios')
+    
+class AgregarCliente(FlaskForm):
+    rut_cliente = IntegerField('Rut del Cliente', validators=[DataRequired()])
+    nombre_cliente = StringField('Nombre del Cliente', validators=[DataRequired()])
+    apellido1_cliente = StringField('Apellido 1 del Cliente', validators=[DataRequired()])
+    apellido2_cliente = StringField('Apellido 2 del Cliente', validators=[DataRequired()])
+    correo_cliente = StringField('Correo del Cliente', validators=[DataRequired()])
+    
+class ModificarClienteForm(FlaskForm):
+    Nombre = StringField('Nombre del Cliente', validators=[DataRequired()])
+    Apellido1 = StringField('Primer Apellido del Cliente', validators=[DataRequired()])
+    Apellido2 = StringField('Segundo Apellido del Cliente', validators=[DataRequired()])
+    Correo = StringField('Correo del Cliente', validators=[DataRequired()])
+    guardar_cambios = SubmitField('Guardar Cambios')
+
+class AgregarMarca(FlaskForm):
+    nombre_marca = StringField('Nombre de Marca', validators=[DataRequired()])
+
+class ModificarMarcaForm(FlaskForm):
+    Cod_Marca = IntegerField('Código de Marca', validators=[DataRequired()])
+    Nombre = StringField('Nombre de Marca', validators=[DataRequired()])
+    guardar_cambios = SubmitField('Guardar Cambios')
+
