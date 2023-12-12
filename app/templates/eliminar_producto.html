@@ -1,9 +1,17 @@
 {% extends "layouts/base.html" %}
 
 {% block content %}
+
+    {%if output == 1%}
     <h2>El producto de codigo: {{codigo}} ha sido eliminado de la base de datos</h2>
+    {%elif output==-1%}
+    <h2>El producto de codigo: {{codigo}} no se pudo eliminar de la base de datos</h2>
+    {%elif output==-2292%}
+    <h2>
+        No fue posible eliminar el producto con el código {{codigo}} de la base de datos debido a su dependencia con otros datos.
+    </h2>
+    {% endif %}
     <a href="{{ url_for('productos')}}" class="btn btn-link text-dark">
         <i></i> Volver a Productos
     </a>
-    
 {% endblock %}
