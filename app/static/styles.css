@@ -4,6 +4,10 @@ body {
     background-color: #f8f9fa;
 }
 
+.list-group-item{
+    padding: 12px;
+}
+
 /* Agregar estilos para hover en la barra lateral */
 .nav-link.text-dark:hover {
     color: white; /* Cambiar el color a blanco */
@@ -49,4 +53,23 @@ body {
     height: 1px;
     background-color: #ccc; /* Color de la línea divisora */
     z-index: -1;
+}
+
+
+#turnosContainer{
+    margin-bottom: 10px;
+}
+.card-body{
+    padding: 4px 16px 0px 16px;
+}
+.panel-con-scroll{
+    flex: 1;
+    max-height: calc(100vh - 320px);
+    overflow-y: auto;
+}
+
+
+.alert{
+    margin-top: 4px;
+    margin-bottom: 4px;
 }

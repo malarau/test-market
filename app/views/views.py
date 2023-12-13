@@ -42,15 +42,66 @@ def productos():
         nombre_producto = agregar_producto_form.nombre_producto.data
         precio_compra = agregar_producto_form.precio_compra.data
         precio_venta = agregar_producto_form.precio_venta.data
-        stock_producto = agregar_producto_form.stock_producto.data
+        stock_s1 = agregar_producto_form.stock_sucursal1.data
+        stock_s2 = agregar_producto_form.stock_sucursal2.data
         rut_proveedor = agregar_producto_form.rut_proveedor.data
-        oracle_db_connector.agregar_producto(cod_marca,cod_categoria,nombre_producto,precio_compra,precio_venta,stock_producto,rut_proveedor)
+        oracle_db_connector.agregar_producto(cod_marca,cod_categoria,nombre_producto,precio_compra,precio_venta,stock_s1,stock_s2,rut_proveedor)
 
     # Desde acá es un GET:    
         # Locate user
     productos = oracle_db_connector.get_all_products()
 
+    print(productos[0])
+
     return render_template('productos.html', productos=productos, agregar_producto_form=agregar_producto_form)
+
+@app.route('/modificar_producto/<codigo>', methods=['GET', 'POST'])
+def modificar_producto(codigo):
+    modificar_producto_form = ModificarProductoForm(request.form)
+    error_msg = None
+    # Lógica para obtener el producto por su nombre desde la base de datos
+    # DB Conn
+    oracle_db_connector = current_app.config['oracle_db_connector']
+
+    producto = oracle_db_connector.get_product_by_cod(codigo)
+    stock_sucursales = oracle_db_connector.get_stock_sucursales_by_cod_producto(codigo)
+
+    # Si no existe:
+    if producto == None or producto == []:
+        redirect(url_for('productos'))
+    producto = list(producto[0])
+    print("producto", producto)
+    if request.method == 'POST' and modificar_producto_form.validate_on_submit():
+        # Lógica para procesar el formulario de modificación y actualizar la base de datos
+        cod_marca = request.form['cod_marca']
+        cod_categoria = request.form['cod_categoria']
+        nombre_producto = request.form['nombre_producto']
+        precio_compra = request.form['precio_compra']
+        precio_venta = request.form['precio_venta']
+        stock_sucursal1 = request.form['stock_sucursal1']
+        stock_sucursal2 = request.form['stock_sucursal2']
+        rut_proveedor = request.form['rut_proveedor']
+
+        result = oracle_db_connector.modificar_producto(producto[0], cod_marca,cod_categoria,nombre_producto,precio_compra,precio_venta,stock_sucursal1,stock_sucursal2,rut_proveedor)
+
+        print("result:", result)
+
+        if result > 0:
+            # Redirigir a la página de lista de productos después de la modificación
+            return redirect(url_for('productos'))
+        else:
+            error_msg = "Ha ocurrido un error intentando modificar el producto."
+            return render_template('modificar_producto.html', error_msg=error_msg, stock_sucursales=stock_sucursales, producto=producto, modificar_producto_form=modificar_producto_form)
+    else:
+        for field, errors in modificar_producto_form.errors.items():
+            for error in errors:
+                print(f"Error en el campo '{field}': {error}")
+                error_msg = error
+                break
+
+    # Renderizar el formulario de modificación con los datos del producto
+        
+    return render_template('modificar_producto.html', error_msg=error_msg, stock_sucursales=stock_sucursales, producto=producto, modificar_producto_form=modificar_producto_form)
 
 @app.route('/empleados', methods=['GET', 'POST'])
 def empleados():
@@ -91,7 +142,8 @@ def empleados():
 @app.route('/eliminar_producto/<codigo>', methods=['GET', 'POST'])
 def eliminar_producto(codigo):
     oracle_db_connector = current_app.config['oracle_db_connector']
-    oracle_db_connector.eliminar_producto(codigo)  
+    result = oracle_db_connector.eliminar_producto(codigo)  
+    print("result", result)
     return render_template('eliminar_producto.html',codigo=codigo)
 
 
@@ -101,34 +153,6 @@ def eliminar_empleado(rut):
     oracle_db_connector.eliminar_empleado('D',rut)    
     
     return render_template('eliminar_empleado.html' ,rut=rut)
-
-@app.route('/modificar_producto/<codigo>', methods=['GET', 'POST'])
-def modificar_producto(codigo):
-    modificar_producto_form = ModificarProductoForm(request.form)
-    # Lógica para obtener el producto por su nombre desde la base de datos
-    # DB Conn
-    oracle_db_connector = current_app.config['oracle_db_connector']
-
-    producto = oracle_db_connector.get_product_by_cod(codigo)
-
-    print(producto)
-
-    # Si no existe:
-    if producto == []:
-        redirect(url_for('productos'))
-    producto = list(producto[0])
-    if request.method == 'POST':
-        # Lógica para procesar el formulario de modificación y actualizar la base de datos
-        nuevo_nombre = request.form['nombre_producto']
-        nueva_cantidad = request.form['cantidad']
-        nueva_marca = request.form['marca']
-
-        # Redirigir a la página de lista de productos después de la modificación
-        return redirect(url_for('productos'))
-
-    # Renderizar el formulario de modificación con los datos del producto
-        
-    return render_template('modificar_producto.html', producto=producto, modificar_producto_form=modificar_producto_form)
 
 @app.route('/modificar_empleado/<rut>', methods=['GET', 'POST'])
 def modificar_empleado(rut):
@@ -271,7 +295,6 @@ def registrar():
         return render_template('registrar.html', form=create_account_form)
 
 ##
-
 @app.route('/cliente', methods=['GET', 'POST'])
 def clientes():
     if not 'username' in session:
@@ -331,14 +354,15 @@ def get_sucursal():
     oracle_db_connector = current_app.config['oracle_db_connector']
     # Izquierda
     sucursales = oracle_db_connector.get_all_sucursals()
-    #bodegas = oracle_db_connector.get_all_bodegas()
-    #cargos = oracle_db_connector.get_all_cargos()
-
-    # Derecha
     medio_de_pagos = oracle_db_connector.get_all_medio_de_pago()
 
+    # Derecha
+    rut_cajero = 15_000_001 # TODO: Recuperar desde la sesión!
+    horarios = oracle_db_connector.get_all_horarios_y_turnos(rut_cajero) # Es una lista
+
+
     print(sucursales)
-    return render_template('informaciones.html',sucursales=sucursales, medio_de_pagos=medio_de_pagos) #bodegas=bodegas, cargos=cargos
+    return render_template('informaciones.html',sucursales=sucursales, medio_de_pagos=medio_de_pagos, horarios=horarios) #bodegas=bodegas, cargos=cargos
 
 @app.route('/categorias', methods=['GET', 'POST'])
 def categoria():
@@ -470,6 +494,92 @@ def eliminar_proveedor(rut_proveedor):
     oracle_db_connector.eliminar_proveedor('D', rut_proveedor)
     return render_template('eliminar_proveedor.html', rut_proveedor=rut_proveedor)
 
+@app.route('/horarios', methods=['GET', 'POST'])
+def horarios():
+    # Conexión DB
+    oracle_db_connector = current_app.config['oracle_db_connector']
+    # Formulario
+    form = HorarioForm()
+    # Posible mensaje de error al validar datos
+    error_msg = None
+    info_msg = None
+
+    # Solo buscando horarios?
+    print(request.args)
+    if request.method == 'GET' and 'inputRUT' in request.args:
+        # Se ha presionado el botón para buscar horarios
+        rut_ingresado = request.args.get('inputRUT')
+        print("Se ha ingresado: ", rut_ingresado)
+
+        result_by_rut = oracle_db_connector.get_employee_by_rut(rut_ingresado)
+        if result_by_rut == None or len(result_by_rut) != 1:
+            error_msg = "El RUT ingresado no existe."
+            return render_template('horarios.html', form=form, error_msg=error_msg, info_msg=info_msg)
+        else:
+            # Obtener todos los horarios
+            horarios = oracle_db_connector.get_all_horarios_y_turnos(rut_ingresado, False) # Es una lista
+            return render_template('horarios.html', form=form, error_msg=error_msg, info_msg=info_msg, horarios=horarios)
+            
+
+    # Acá está ingresando
+    if request.method == 'POST':
+        codigo_horario_eliminar = request.form.get('eliminar_horario')
+        if codigo_horario_eliminar:
+            print("Eliminar horario cod:", codigo_horario_eliminar)
+            result = oracle_db_connector.eliminar_horario('D', codigo_horario_eliminar)
+            if result > 0:
+                info_msg = f"Horario código {codigo_horario_eliminar} y sus turnos dependientes han sido eliminados"
+                return render_template('horarios.html', form=form, info_msg=info_msg)
+            else:
+                info_msg = f"No fue posible eliminar el horario código {codigo_horario_eliminar}."
+                return render_template('horarios.html', form=form, error_msg=error_msg)
+            
+    if request.method == 'POST' and form.validate_on_submit():
+        # Acceder a los datos del formulario y procesarlos
+        rut_empleado = form.rut_empleado.data
+        fecha_inicio = form.fecha_inicio.data
+        turnos = []
+
+        # Iterar sobre los turnos del formulario
+        for turno_form in form.turnos.entries:
+            turno = {
+                'fecha': turno_form.fecha.data,
+                'hora_entrada': turno_form.hora_entrada.data,
+                'hora_salida': turno_form.hora_salida.data,
+                'inicio_colacion': turno_form.inicio_colacion.data,
+                'termino_colacion': turno_form.termino_colacion.data,
+            }
+            turnos.append(turno)
+ 
+        # Todo OK, enviar para guardar en DB
+        result = oracle_db_connector.agregar_horario('I', rut_empleado, fecha_inicio, turnos)
+
+        if result > 0:
+            info_msg = "Horario ingresado con éxito." # No se usa por algunos problemillas al resetear/limpiar el form, mejor redirect
+            # Limpiar turnos
+            form.rut_empleado.data = ""
+            form.fecha_inicio.data = ""
+            for _ in range(len(form.turnos.entries)):
+                form.turnos.pop_entry()
+            return redirect(url_for('horarios'))
+        else:
+            error_msg = "Ha ocurrido un error intentando ingresar el horario."
+            return render_template('horarios.html', form=form, error_msg=error_msg)
+    else:
+        for field, errors in form.errors.items():
+            for error in errors:
+                print(f"Error en el campo '{field}': {error}")
+                error_msg = error
+                break
+
+    return render_template('horarios.html', form=form, error_msg=error_msg, info_msg=info_msg)
+
+@app.route('/ventas', methods=['GET', 'POST'])
+def ventas():
+    info_msg = None
+    error_msg = None
+
+    return render_template('ventas.html', info_msg=info_msg, error_msg=error_msg)
 
 @app.errorhandler(404)
 def page_not_found(e):

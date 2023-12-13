@@ -1,0 +1,123 @@
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const turnosContainer = document.getElementById('turnosContainer');
+        const agregarTurnoBtn = document.getElementById('agregarTurno');
+
+        agregarTurnoBtn.addEventListener('click', function () {
+            const turnoIndex = turnosContainer.querySelectorAll('.card').length;
+
+            const nuevoTurnoHtml = `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="turnos-${turnoIndex}-fecha">Fecha</label>
+                                <input class="form-control" id="turnos-${turnoIndex}-fecha" name="turnos-${turnoIndex}-fecha" size="10" type="date" value="">
+                            </div>
+                            <div class="col">
+                                <label for="turnos-${turnoIndex}-hora_entrada">Hora Entrada</label>
+                                <input name="turnos-${turnoIndex}-hora_entrada" class="form-control" size="10" type="time">
+                            </div>
+                            <div class="col">
+                                <label for="turnos-${turnoIndex}-hora_salida">Hora Salida</label>
+                                <input name="turnos-${turnoIndex}-hora_salida" class="form-control" size="10" type="time">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="turnos-${turnoIndex}-inicio_colacion">Inicio Colación</label>
+                                <input class="form-control" id="turnos-${turnoIndex}-inicio_colacion" name="turnos-${turnoIndex}-inicio_colacion" size="10" type="time" value="">
+                            </div>
+                            <div class="col">
+                                <label for="turnos-${turnoIndex}-termino_colacion">Termino Colación</label>
+                                <input class="form-control" id="turnos-${turnoIndex}-termino_colacion" name="turnos-${turnoIndex}-termino_colacion" size="10" type="time" value="">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Resto del HTML del nuevo turno -->
+                    <div class="card-footer">
+                        <button type="button" class="btn btn-danger eliminarTurno">Eliminar</button>
+                    </div>
+                </div>
+            `;
+
+            // Agregar el nuevo turno al contenedor
+            turnosContainer.insertAdjacentHTML('beforeend', nuevoTurnoHtml);
+        });
+
+        // Agregar evento para eliminar turnos
+        turnosContainer.addEventListener('click', function (event) {
+            if (event.target.classList.contains('eliminarTurno')) {
+                // Eliminar el bloque del turno
+                const turnoCard = event.target.closest('.card');
+                turnoCard.parentNode.removeChild(turnoCard);
+            }
+        });
+    });
+
+
+    function mostrarPopupAlert(mensaje) {
+        const popupAlert = document.getElementById('popupAlert');
+        const popupMessage = document.getElementById('popupMessage');
+
+        // Actualizar el mensaje del popup
+        popupMessage.innerHTML = mensaje;
+
+        // Mostrar el popup y agregar la clase de animación 'show'
+        popupAlert.style.display = 'block';
+        popupAlert.classList.add('show');
+
+        // Esperar un breve momento antes de agregar la clase 'fade'
+        setTimeout(function() {
+            popupAlert.classList.add('fade');
+        }, 100);
+
+        // Ocultar el popup después de 5 segundos (puedes ajustar este tiempo)
+        setTimeout(function() {
+            // Quitar la clase de animación 'show' para desaparecer suavemente
+            popupAlert.classList.remove('show');
+
+            // Quitar la clase de animación 'fade' después de la desaparición
+            setTimeout(function() {
+                popupAlert.classList.remove('fade');
+
+                // Ocultar el popup después de la animación
+                popupAlert.style.display = 'none';
+            }, 200); // Ajusta el tiempo para que coincida con la duración de la animación
+        }, 8000);
+}
+
+    function mostrarPopupInfo(mensaje) {
+        const popupInfo = document.getElementById('popupInfo');
+        const popupInfoMessage = document.getElementById('popupInfoMessage');
+
+        // Actualizar el mensaje del popup de información
+        popupInfoMessage.innerHTML = mensaje;
+
+        // Mostrar el popup y agregar la clase de animación 'show'
+        popupInfo.style.display = 'block';
+        popupInfo.classList.add('show');
+
+        // Esperar un breve momento antes de agregar la clase 'fade'
+        setTimeout(function() {
+            popupInfo.classList.add('fade');
+        }, 100);
+
+        // Ocultar el popup después de 5 segundos (puedes ajustar este tiempo)
+        setTimeout(function() {
+            // Quitar la clase de animación 'show' para desaparecer suavemente
+            popupInfo.classList.remove('show');
+
+            // Quitar la clase de animación 'fade' después de la desaparición
+            setTimeout(function() {
+                popupInfo.classList.remove('fade');
+
+                // Ocultar el popup después de la animación
+                popupInfo.style.display = 'none';
+            }, 200); // Ajusta el tiempo para que coincida con la duración de la animación
+        }, 8000);
+    }
+
+</script>

@@ -15,6 +15,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
 
+    {% include 'layouts/scripts.html' %}
+
     <!-- Agregar tu archivo CSS personalizado -->
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
@@ -29,11 +31,11 @@
             </div>
 
             <!-- Contenido principal -->
-            <div class="col-md-10 p-4">                
+            <div class="col-md-10 p-4">     
                 {% block content %}{% endblock content %}
+                {% include 'layouts/popup_msg.html' %}
             </div>
         </div>
     </div>
-
 </body>
 </html>

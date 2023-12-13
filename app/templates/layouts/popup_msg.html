@@ -1,0 +1,26 @@
+<!-- Popup Alert -->
+<div class="alert alert-danger alert-dismissible fade" role="alert" id="popupAlert" style="display: none;">
+    <strong>Error:</strong> <span id="popupMessage"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+</div>
+
+<div class="alert alert-info alert-dismissible fade" role="alert" id="popupInfo" style="display: none;">
+    <strong>Info:</strong> <span id="popupInfoMessage"></span>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+</div>
+
+{% if error_msg %}
+<!-- Llama a la función para mostrar el popup alert con el mensaje de error -->
+<script>
+    mostrarPopupAlert("{{ error_msg }}");
+    console.log("{{ error_msg }}")
+</script>
+{% endif %}
+
+{% if info_msg %}
+<!-- Llama a la función para mostrar el popup info con el mensaje de información -->
+<script>
+    mostrarPopupInfo("{{ info_msg }}");
+    console.log("{{ info_msg }}")
+</script>
+{% endif %}

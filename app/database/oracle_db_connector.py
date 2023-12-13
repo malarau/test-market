@@ -1,3 +1,4 @@
+import datetime
 import oracledb
 
 class OracleDBConnector:
@@ -76,15 +77,7 @@ class OracleDBConnector:
         try:
             with self._pool.acquire() as connection:
                 with connection.cursor() as cursor:
-                    print(type(opcion))
-                    print(type(rut))
-                    print(type(cod_sucursal))
-                    print(type(cargo))
-                    print(type(nombre_empleado))
-                    print(type(apellido1))
-                    print(type(apellido2))
-                    print(type(Telefono))
-                    print(type(Email))
+  
                     out_val = cursor.var(int)
                     
                     cursor.callproc('MMMB_PROC_EMPLEADO', [opcion,rut,cod_sucursal,cargo,nombre_empleado,apellido1,apellido2,Telefono,Email,user,passwd,out_val])
@@ -97,7 +90,7 @@ class OracleDBConnector:
     
     # Productos
     def get_all_products(self):
-        query = "SELECT * FROM MMMB_PRODUCTO"
+        query = "SELECT P.COD_PRODUCTO,P.COD_MARCA,P.COD_CATEGORIA,P.NOMBRE_PRODUCTO,P.PRECIO_COMPRA,P.PRECIO_VENTA,SUM(D.STOCK_SUCURSAL_PRODUCTO) AS STOCK_PRODUCTO,P.RUT_PROVEEDOR FROM MMMB_PRODUCTO P JOIN MMMB_DETALLE_SUCURSAL_PRODUCTO D ON P.COD_PRODUCTO = D.COD_PRODUCTO GROUP BY P.COD_PRODUCTO, P.COD_MARCA, P.COD_CATEGORIA, P.NOMBRE_PRODUCTO, P.PRECIO_COMPRA, P.PRECIO_VENTA, P.RUT_PROVEEDOR"
         return self.execute_query(query)
     
     def get_all_employees(self):
@@ -105,7 +98,11 @@ class OracleDBConnector:
         return self.execute_query(query)
     
     def get_product_by_cod(self, COD):
-        query = "SELECT * FROM MMMB_PRODUCTO WHERE COD_PRODUCTO = :1"
+        query = "SELECT COD_PRODUCTO, COD_MARCA, COD_CATEGORIA, NOMBRE_PRODUCTO, PRECIO_COMPRA, PRECIO_VENTA, (SELECT SUM(STOCK_SUCURSAL_PRODUCTO) FROM MMMB_DETALLE_SUCURSAL_PRODUCTO WHERE COD_PRODUCTO = :1) STOCK_PRODUCTO, RUT_PROVEEDOR FROM MMMB_PRODUCTO WHERE COD_PRODUCTO = :1"
+        return self.execute_query(query, COD, COD)
+    
+    def get_stock_sucursales_by_cod_producto(self, COD):
+        query = "SELECT STOCK_SUCURSAL_PRODUCTO FROM MMMB_DETALLE_SUCURSAL_PRODUCTO WHERE COD_PRODUCTO = :1"
         return self.execute_query(query, COD)
     
     def get_employee_by_rut(self, RUT):
@@ -142,39 +139,82 @@ class OracleDBConnector:
                 print(f"Error executing query: {e}")
                 return None
             
-            
-    def eliminar_producto(self, codigo):
-            try:
-                with self._pool.acquire() as connection:
-                    with connection.cursor() as cursor:
-
-                        out_val = cursor.var(int)
-                        
-                        cursor.callproc('MMMB_DELETE_producto', [codigo])
-
-                        result = out_val.getvalue()              
-                        return result
-            except Exception as e:
-                print(f"Error executing query: {e}")
-                return None
-            
      # MALO MALO, VALIDAR ANTES
     
-    def agregar_producto(self,cod_marca,cod_categoria,nombre_producto,precio_compra,precio_venta,stock_producto,rut_proveedor,cod_lote ):
+    def agregar_producto(self,cod_marca,cod_categoria,nombre_producto,precio_compra,precio_venta,stock_s1, stock_s2,rut_proveedor):
             try:
+                result = 1
                 with self._pool.acquire() as connection:
                     with connection.cursor() as cursor:
 
+                        args = [cod_marca,cod_categoria,nombre_producto,precio_compra,precio_venta,stock_s1, stock_s2,rut_proveedor]
+                        for a in args:
+                            print(a)
+
                         out_val = cursor.var(int)
                         
-                        cursor.callproc('MMMB_CARGA_PRODUCTO', [cod_marca,cod_categoria,nombre_producto,precio_compra,precio_venta,stock_producto,rut_proveedor,cod_lote])
+                        cursor.callproc('MMMB_PROC_PRODUCTO', ['I', None, int(cod_marca),int(cod_categoria),nombre_producto,int(precio_compra),int(precio_venta),int(stock_s1),int(stock_s2),int(rut_proveedor), out_val])
 
                         result = out_val.getvalue()              
                         return result
             except Exception as e:
                 print(f"Error executing query: {e}")
-                return None        
+                return result  
+
+    def modificar_producto(self,cod_producto, cod_marca,cod_categoria,nombre_producto,precio_compra,precio_venta,stock_s1, stock_s2,rut_proveedor):
+            try:
+                result = 1
+                with self._pool.acquire() as connection:
+                    with connection.cursor() as cursor:
+
+                        args = [cod_marca,cod_categoria,nombre_producto,precio_compra,precio_venta,stock_s1, stock_s2,rut_proveedor]
+                        for a in args:
+                            print(type(a))
+
+                        out_val = cursor.var(int)
+                        
+                        cursor.callproc(
+                            'MMMB_PROC_PRODUCTO',
+                            ['U', cod_producto, int(cod_marca),int(cod_categoria),nombre_producto,int(precio_compra),int(precio_venta),int(stock_s1),int(stock_s2),int(rut_proveedor), out_val])
+
+                        """
+                            OPCION VARCHAR2,
+                            COD_PRODUCTO_P NUMBER,
+                            COD_MARCA_P NUMBER DEFAULT NULL,
+                            COD_CATEGORIA_P NUMBER DEFAULT NULL,
+                            NOMBRE_PRODUCTO_P VARCHAR2 DEFAULT NULL,
+                            PRECIO_COMPRA_P NUMBER DEFAULT NULL,
+                            PRECIO_VENTA_P NUMBER DEFAULT NULL,
+                            STOCK_SUCURSAL1_P NUMBER DEFAULT NULL, -- Se ha agregado stock sucursal 1
+                            STOCK_SUCURSAL2_P NUMBER DEFAULT NULL, -- Se ha agregado stock sucursal 2
+                            RUT_PROVEEDOR_P NUMBER DEFAULT NULL,
+                            CONFIRM_OUTPUT OUT NUMBER 
+                        """
+
+                        result = out_val.getvalue()              
+                        return result
+            except Exception as e:
+                print(f"Error executing query: {e}")
+                return result        
     
+    def eliminar_producto(self, cod_producto):
+        try:
+            with self._pool.acquire() as connection:
+                result = 1
+                with connection.cursor() as cursor:
+
+                    out_val = cursor.var(int)
+                    
+                    cursor.callproc(
+                        'MMMB_PROC_PRODUCTO',
+                        ['D', cod_producto, None,None,None,None,None,None,None,None, out_val])
+
+                    result = out_val.getvalue()              
+                    return result
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return result
+
     def get_all_sucursals(self):
         query = "SELECT * FROM MMMB_SUCURSAL"
         return self.execute_query(query)
@@ -333,7 +373,7 @@ class OracleDBConnector:
         except Exception as e:
             print(f"Error executing query: {e}")
             return None
-
+    
     def actualizar_proveedor(self, opcion, rut_proveedor, nombre_proveedor, correo_proveedor, telefono_proveedor):
         try:
             with self._pool.acquire() as connection:
@@ -347,6 +387,63 @@ class OracleDBConnector:
         except Exception as e:
             print(f"Error executing query: {e}")
             return None
+
+    #
+    #   Horario
+    #
+    def agregar_horario(self, opcion, rut_empleado, fecha_inicio, turnos):
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
+                    out_val = cursor.var(int)
+                    connection.autocommit = False
+
+                    cursor.callproc('MMMB_PROC_HORARIO', [opcion, None, rut_empleado, fecha_inicio, out_val])
+                    cod_horario = out_val.getvalue()
+                    if cod_horario < 0: # Es un error!
+                        connection.autocommit = True
+                        connection.rollback() # No tiene sentido
+                        return out_val
+                    else:
+                        result = 1
+                        for turno in turnos:
+                            print("turno:", turno)
+                            print("Combine:", datetime.datetime.combine(turno['fecha'], turno['hora_entrada'])) 
+                            cursor.callproc('MMMB_PROC_TURNO', 
+                                [opcion, 
+                                 None,
+                                 cod_horario,
+                                 turno['fecha'],
+                                 datetime.datetime.combine(turno['fecha'], turno['hora_entrada']).replace(microsecond=0),
+                                 datetime.datetime.combine(turno['fecha'], turno['hora_salida']).replace(microsecond=0),
+                                 datetime.datetime.combine(turno['fecha'], turno['inicio_colacion']).replace(microsecond=0),
+                                 datetime.datetime.combine(turno['fecha'], turno['termino_colacion']).replace(microsecond=0),
+                                 out_val])
+                            result = out_val.getvalue()
+                            if result < 0: # Es un error!
+                                connection.rollback() # No tiene sentido
+
+                        connection.autocommit = True
+                        connection.commit() # No tiene sentido
+                    return result
+
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return -1
+        
+    def eliminar_horario(self, opcion, cod_horario):
+        try:
+            result = 1
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
+                    out_val = cursor.var(int)
+                    cursor.callproc('MMMB_PROC_HORARIO', [opcion, int(cod_horario), None, None, out_val])
+                    result = out_val.getvalue()
+                    return result
+
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return -1
 
     # Get all    
     def get_all_clients(self):
@@ -370,11 +467,26 @@ class OracleDBConnector:
     def get_all_medio_de_pago(self):
         query = "SELECT * FROM MMMB_MEDIO_PAGO"
         return self.execute_query(query)
+    def get_all_horarios_y_turnos(self, RUT, limite):
+        if limite == False:
+            horarios_result = self.get_horarios_by_rut(RUT)
+        else:
+            horarios_result = self.get_last_5_horarios_by_rut(RUT)
+        horarios = []
+        for horario in horarios_result:
+            horario = list(horario)
+            # Obtener turnos
+            turnos = self.get_turnos_by_cod_horario(horario[0])
+            horario.append(list(turnos))
+            # Añadir
+            horarios.append(horario)
+            
+        return horarios
     
     # Get by Id
-    def get_categoria_by_cod(self, RUT):
+    def get_categoria_by_cod(self, COD):
         query = "SELECT * FROM MMMB_CATEGORIA WHERE COD_CATEGORIA = :1"
-        return self.execute_query(query, RUT)
+        return self.execute_query(query, COD)
     def get_marca_by_cod(self, RUT):
         query = "SELECT * FROM MMMB_MARCA WHERE COD_MARCA = :1"
         return self.execute_query(query, RUT)
@@ -383,4 +495,13 @@ class OracleDBConnector:
         return self.execute_query(query, RUT)
     def get_proveedor_by_rut(self, RUT):
         query = "SELECT * FROM MMMB_PROVEEDOR WHERE RUT_PROVEEDOR = :1"
+        return self.execute_query(query, RUT)
+    def get_turnos_by_cod_horario(self, COD_HORARIO):
+        query = "SELECT * FROM MMMB_TURNO WHERE COD_HORARIO = :1"
+        return self.execute_query(query, COD_HORARIO)
+    def get_horarios_by_rut(self, RUT):
+        query = "SELECT * FROM MMMB_HORARIO WHERE RUT_EMPLEADO = :1"
+        return self.execute_query(query, RUT)
+    def get_last_5_horarios_by_rut(self, RUT):
+        query = "SELECT COD_HORARIO, RUT_EMPLEADO, FECHA_INICIO FROM MMMB_HORARIO WHERE RUT_EMPLEADO = :1 ORDER BY FECHA_INICIO DESC FETCH FIRST 5 ROWS ONLY"
         return self.execute_query(query, RUT)
