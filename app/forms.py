@@ -6,8 +6,8 @@ Copyright (c) 2019 - present AppSeed.us
 from datetime import timedelta
 from flask import current_app
 from flask_wtf import FlaskForm
-from wtforms import DateField, DateTimeField, FieldList, FormField, HiddenField, IntegerField, StringField, PasswordField, SubmitField, SelectField, TimeField, ValidationError,EmailField
-from wtforms.validators import Email, DataRequired,Length
+from wtforms import DateField, DecimalField, FieldList, FormField, HiddenField, IntegerField, StringField, PasswordField, SubmitField, SelectField, TimeField, ValidationError,EmailField
+from wtforms.validators import Email, DataRequired,Length, NumberRange, InputRequired
 
 # login and registration
 
@@ -139,10 +139,12 @@ class ModificarClienteForm(FlaskForm):
     guardar_cambios = SubmitField('Guardar Cambios')
 
 def validador_rut_cliente(form, field):
-    oracle_db_connector = current_app.config['oracle_db_connector']
-    result = oracle_db_connector.get_cliente_by_rut(field.data)
-    if len(result) == 0:
-        raise ValidationError('El cliente no existe.') 
+    # Complementar con DataRequired si es requerido (en venta no es requerido, pero si se incluye, que exista).
+    if field.data != None and field.data != 0: # IF 0, ENTONCES DEFAULT
+        oracle_db_connector = current_app.config['oracle_db_connector']
+        result = oracle_db_connector.get_cliente_by_rut(field.data)
+        if len(result) == 0:
+            raise ValidationError('El cliente no existe.') 
 
 #
 # Proveedor
@@ -252,24 +254,69 @@ class HorarioForm(FlaskForm):
 #
 #   Ventas
 #
+class DetalleVentaBase():
+    def __init__(self) -> None:
+        producto = ''
+        cantidad = 0
+        subtotal = 0
 
 class DetalleVentaForm(FlaskForm):
     class Meta:
         csrf = False
-    producto = SelectField('Producto', choices=[], validators=[DataRequired()])
-    cantidad = IntegerField('Cantidad', validators=[DataRequired()])
+    cod_producto = IntegerField('Código', validators=[DataRequired()], render_kw={'readonly': True})
+    # producto -> validate_choice=False
+    #       Es horrible porque no supe como agregar/quitar elemento dinámicamente y que
+    #       el SelectField funcionara sin que form.validate_on_submit() me pateara, así que chao
+    #       Se podría validar que exista la elección igualmente, se debe.
+    producto = SelectField('Producto', choices=[], validators=[DataRequired()], validate_choice=False)
+    cantidad = IntegerField('Cantidad', validators=
+                            [DataRequired(),
+                             InputRequired(message= "Se debe ingresar la cantidad en todos los productos."),
+                             NumberRange(min=1, message="La cantidad de uno de los productos, no es correcta.")])
+    subtotal = DecimalField('Subtotal', validators=[DataRequired()], render_kw={'readonly': True})
 
 def validador_venta(form, field):
-    # TODO: Desde sesión, obtener la sucursal, según quién logeó
+    oracle_db_connector = current_app.config['oracle_db_connector']
 
+    # TODO: 
+    # Desde sesión, obtener la sucursal, según quién logeó
     # Con la sucursal, calcular si cierto producto, puede ser vendido en X cantidad.
 
-    pass
+    print("validador_venta:")
+    productos_agregados = set()
+    for detalle in field:
+
+        if detalle.data == None:
+            continue
+
+        # Validación base
+        #
+        # Que el cod no sea nulo
+        print("cod_producto: ", detalle.cod_producto.data)
+        if detalle.cod_producto.data == None:
+            raise ValidationError(f"El código de uno de los productos es nulo.")
+        # Que la cantidad no sea nula
+        if detalle.cantidad.data == None:
+            raise ValidationError(f"La cantidad en el producto código {detalle.cod_producto.data} es nula.") 
+        # Que 2 detalles sean del mismo producto
+        if detalle.cod_producto.data in productos_agregados:
+            raise ValidationError('Dos detalles contienen el mismo producto.')
+
+        # Validar con base de datos
+        #
+        # Validar que tengamos stock
+        sucursal = 1 # TODO: Obtener desde la session['sucursal'], que se asigna al logearse un empleado
+        result = oracle_db_connector.validar_stock(sucursal, detalle.cod_producto.data, detalle.cantidad.data)
+        if (result == -1):
+            raise ValidationError(f"No hay stock suficiente ({detalle.cantidad.data}) para el producto código {detalle.cod_producto.data}.") 
+
+        productos_agregados.add(detalle.cod_producto.data)
 
 class VentaForm(FlaskForm):
-    cod_caja = SelectField('Código de caja', choices=[], validators=[DataRequired()])
-    rut_cliente = IntegerField('RUT Cliente', validators=[DataRequired(), validador_rut_cliente])
-    rut_empleado = IntegerField('RUT Empleado', validators=[DataRequired(), validador_rut_empleado])
-    medio_de_pago = SelectField('Medio de pago', choices=[], validators=[DataRequired()])
-    detalles = FieldList(FormField(DetalleVentaForm), min_entries=1, validators=[DataRequired(), validador_venta])
+    cod_caja = IntegerField('Código de caja', validators=[]) # Al azar, input bloqueado. # DataRequired()
+    rut_cliente = IntegerField('RUT Cliente', validators=[validador_rut_cliente], default=0)
+    rut_empleado = IntegerField('RUT Empleado', validators=[validador_rut_empleado]) # Input bloqueado # DataRequired()
+    medio_de_pago = SelectField('Medio de pago', choices=[], validators=[]) # DataRequired()
+    detalles = FieldList(FormField(DetalleVentaForm, default=DetalleVentaBase), min_entries=0, validators=[validador_venta]) # DataRequired()
+    total = IntegerField('Total general:', validators=[DataRequired()], render_kw={'readonly': True}) # Requerido y bloqueado, se calcula automáticamente
     guardar = SubmitField('Enviar')

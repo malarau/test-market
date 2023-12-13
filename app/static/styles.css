@@ -73,3 +73,7 @@ body {
     margin-top: 4px;
     margin-bottom: 4px;
 }
+
+.flex-grow-1 {
+    flex-grow: 1;
+}

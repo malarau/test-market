@@ -2,48 +2,128 @@
 
 {% block content %}    
 
-    <div class="row contenedor">
-        <!-- Sección lateral para agregar Empleados -->
-        <div class="col-md-6">
-            <h2 class="mb-4">Nueva venta</h2>
-            
-            
+    <form method="post" action="/ventas">
+        <div class="row contenedor">
+        <!-- Sección lateral izquierda -->
+            {{ form.csrf_token }}
+            <div class="col-md-6">
 
-        </div>
-
-        <div class="col-md-6 panel-izquierdo">
-            <form method="post" action="/ventas">
-                {{ form.csrf_token }}
-        
-                <!-- Otras secciones del formulario... -->
-        
-                <div id="detallesVentaContainer" class="panel-con-scroll">
-                    {% for detalle in form.detalles %}
-                        <div class="card mb-3">
-                            <div class="card-body">
-                                <div class="row mb-3">
-                                    <div class="col">
-                                        {{ detalle.producto.label }} {{ detalle.producto(class="form-control") }}
-                                    </div>
-                                    <div class="col">
-                                        {{ detalle.cantidad.label }} {{ detalle.cantidad(class="form-control") }}
-                                    </div>
-                                </div>
+                <h2 class="mb-4">Detalles de la Venta</h2>
+            
+                <!-- Información General de la Venta -->
+                <div class="card mb-3">
+                    <h5 class="card-header">Información General</h5>
+                    <div class="card-body" style="margin-top: 12px;">
+                        <div class="row mb-3">
+                            <div class="col">
+                                {{ form.cod_caja.label }} {{ form.cod_caja(class="form-control", readonly="true") }}
                             </div>
-                            <div class="card-footer">
-                                <!-- Botón eliminar acá -->
-                                <button type="button" class="btn btn-danger eliminarDetalle float-end">Eliminar</button>
+                            <div class="col">
+                                {{ form.rut_cliente.label }} {{ form.rut_cliente(class="form-control") }}
                             </div>
                         </div>
-                    {% endfor %}
+                        <div class="row mb-3">
+                            <div class="col">
+                                {{ form.rut_empleado.label }} {{ form.rut_empleado(class="form-control", readonly="true") }}
+                            </div>
+                            <div class="col">
+                                {{ form.medio_de_pago.label }} {{ form.medio_de_pago(class="form-control") }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Total de la Venta -->
+                <div class="card mb-3">
+                    <h5 class="card-header">
+                        Total general
+                    </h5>
+                    <div class="card-body" style="margin: 16px;">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                                    {{ form.total(class="form-control", readonly="true") }}
+                                </div>
+                            </div>
+                            <div class="col">
+                                <button type="submit" class="btn btn-success float-end">Guardar Venta</button>
+                            </div>
+                        </div>                   
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección lateral derecha -->
+            <div class="col-md-6 panel-izquierdo">
+                <h2 class="mb-4">Agregar productos</h2>   
+                <!-- Detalles de venta (agregados o quitados dinámicamente) -->        
+                <div id="detallesContainer" class="panel-con-scroll">
+                    <!-- Detalles --> 
                 </div>
                 <!-- Botón agregar acá -->
                 <button type="button" class="btn btn-primary" id="agregarDetalle">Agregar Detalle</button>
                 <!-- <button type="submit" class="btn btn-success">Guardar Venta</button> -->
-            </form>
-
+            </div>
         </div>
-    </div>
+    </form>
     
+    <script>
+        let productos = JSON.parse('{{ productos | tojson | safe }}');
+        let opcionesProductos = productos.map(producto => {
+            const [cod_producto, nombre_producto, precio_venta, porcentaje] = producto.split(',');
+            const opcion = document.createElement('option');
+            opcion.value = parseInt(precio_venta);
+            
+            if (porcentaje != 0) {
+                opcion.textContent = cod_producto + ' - ' + nombre_producto + ' ($' + precio_venta + ')    -' +  porcentaje + '%!';
+            } else {
+                opcion.textContent = cod_producto + ' - ' + nombre_producto + ' ($' + precio_venta + ')';
+            }
 
+            return opcion;
+        });
+        // Función para llenar el select con las opciones de productos
+        function llenarOpcionesProductos(detalleIndex) {
+            const selectProducto = document.getElementById(`detalles-${detalleIndex}-producto`);
+
+            if (selectProducto != null) {
+                // Limpiar opciones existentes
+                selectProducto.innerHTML = '';
+
+                // Agregar las opciones predefinidas
+                opcionesProductos.forEach(opcion => {
+                    selectProducto.appendChild(opcion.cloneNode(true));
+                });
+            }
+
+            llenarCodProducto(detalleIndex);
+            llenarLabelDescuento(detalleIndex);
+        }
+
+        function llenarCodProducto(detalleIndex) {
+            const codProductoItem = document.getElementById(`detalles-${detalleIndex}-cod_producto`);
+            const selectProducto = document.getElementById(`detalles-${detalleIndex}-producto`);
+            codProductoItem.value = selectProducto.options[selectProducto.selectedIndex].text.split('-')[0];
+        }
+
+        function llenarLabelDescuento(detalleIndex) {
+            const descuentoLabel = document.getElementById(`descuentoLabel-${detalleIndex}`);
+            const selectProducto = document.getElementById(`detalles-${detalleIndex}-producto`);
+
+            if (descuentoLabel != null) {
+                // Lógica para obtener y mostrar el porcentaje de descuento
+                const porcentajeDescuentoMatch = selectProducto.options[selectProducto.selectedIndex].text.match(/-(\d+)%!/);
+                const porcentajeDescuento = porcentajeDescuentoMatch ? parseInt(porcentajeDescuentoMatch[1]) : 0;
+
+                console.log('porcentajeDescuento: ' + porcentajeDescuento);
+                if (!isNaN(porcentajeDescuento) && porcentajeDescuento !== 0) {
+                    descuentoLabel.textContent = ` Descuento: ${porcentajeDescuento}%`;
+                } else {
+                    descuentoLabel.textContent = '';
+                }
+            }
+        }
+    </script>
+    
 {% endblock %}

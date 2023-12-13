@@ -4,6 +4,11 @@ import oracledb
 class OracleDBConnector:
     _instance = None
 
+    #
+    # DOCUMENTACIÓN:
+    #          https://python-oracledb.readthedocs.io/en/latest/index.html
+    #    
+
     def __new__(cls, username, password, connect_string, mode=oracledb.SYSDBA):
         print(F'username, password, connect_string: {(username, password, connect_string)}')
         if not cls._instance:
@@ -93,6 +98,12 @@ class OracleDBConnector:
         query = "SELECT P.COD_PRODUCTO,P.COD_MARCA,P.COD_CATEGORIA,P.NOMBRE_PRODUCTO,P.PRECIO_COMPRA,P.PRECIO_VENTA,SUM(D.STOCK_SUCURSAL_PRODUCTO) AS STOCK_PRODUCTO,P.RUT_PROVEEDOR FROM MMMB_PRODUCTO P JOIN MMMB_DETALLE_SUCURSAL_PRODUCTO D ON P.COD_PRODUCTO = D.COD_PRODUCTO GROUP BY P.COD_PRODUCTO, P.COD_MARCA, P.COD_CATEGORIA, P.NOMBRE_PRODUCTO, P.PRECIO_COMPRA, P.PRECIO_VENTA, P.RUT_PROVEEDOR"
         return self.execute_query(query)
     
+    # "cod_producto, nombre_producto, precio_venta, %_descuento"
+    #       OBVIAMENTE QUEDARÍA MÁS LINDO SI SE SACARA DE AQUÍ O SE ORDENADA COMO TOOOODO LO DE ESTE ARCHIVO, PA LA OTRA A MENOS QUE DEJE LA CARRERA
+    def get_all_concat_products_with_discounts(self):
+        query = "SELECT P.COD_PRODUCTO || ',' || REPLACE(P.NOMBRE_PRODUCTO, ',', '') || ',' || P.PRECIO_VENTA || ',' || COALESCE(SUM(D.PORCENTAJE_DESCUENTO), 0) AS SUMA_DESCUENTOS FROM MMMB_PRODUCTO P LEFT JOIN MMMB_DESCUENTO D ON P.COD_PRODUCTO = D.COD_PRODUCTO AND VALIDO_DESDE <= SYSDATE AND VALIDO_HASTA >= SYSDATE GROUP BY P.COD_PRODUCTO, P.NOMBRE_PRODUCTO, P.PRECIO_VENTA"
+        return self.execute_query(query)
+
     def get_all_employees(self):
         query = "SELECT * FROM MMMB_EMPLEADO"
         return self.execute_query(query)
@@ -111,91 +122,92 @@ class OracleDBConnector:
     # MAL, USAR PROCEDIMIENTO
 
     def actualizar_empleado(self,opcion, rut,cod_sucursal,cargo,nombre_empleado,apellido1,apellido2,Telefono,Email,Usuario,contraseña):
-            try:
-                with self._pool.acquire() as connection:
-                    with connection.cursor() as cursor:
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
 
-                        out_val = cursor.var(int)
-                        
-                        cursor.callproc('MMMB_PROC_EMPLEADO',[opcion,int(rut),int(cod_sucursal),int(cargo),nombre_empleado,apellido1,apellido2,Telefono,Email,Usuario,contraseña,out_val])
+                    out_val = cursor.var(int)
+                    
+                    cursor.callproc('MMMB_PROC_EMPLEADO',[opcion,int(rut),int(cod_sucursal),int(cargo),nombre_empleado,apellido1,apellido2,Telefono,Email,Usuario,contraseña,out_val])
 
-                        result = out_val.getvalue()              
-                        return result
-            except Exception as e:
-                print(f"Error executing query: {e}")
-                return None
+                    result = out_val.getvalue()              
+                    return result
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return None
+           
     def eliminar_empleado(self,opcion,rut):
-            try:
-                with self._pool.acquire() as connection:
-                    with connection.cursor() as cursor:
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
 
-                        out_val = cursor.var(int)
-                        
-                        cursor.callproc('MMMB_PROC_EMPLEADO', [opcion,rut,None,None,None,None,None,None,None,None,None,out_val])
+                    out_val = cursor.var(int)
+                    
+                    cursor.callproc('MMMB_PROC_EMPLEADO', [opcion,rut,None,None,None,None,None,None,None,None,None,out_val])
 
-                        result = out_val.getvalue()              
-                        return result
-            except Exception as e:
-                print(f"Error executing query: {e}")
-                return None
+                    result = out_val.getvalue()              
+                    return result
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return None
             
      # MALO MALO, VALIDAR ANTES
     
     def agregar_producto(self,cod_marca,cod_categoria,nombre_producto,precio_compra,precio_venta,stock_s1, stock_s2,rut_proveedor):
-            try:
-                result = 1
-                with self._pool.acquire() as connection:
-                    with connection.cursor() as cursor:
+        try:
+            result = 1
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
 
-                        args = [cod_marca,cod_categoria,nombre_producto,precio_compra,precio_venta,stock_s1, stock_s2,rut_proveedor]
-                        for a in args:
-                            print(a)
+                    args = [cod_marca,cod_categoria,nombre_producto,precio_compra,precio_venta,stock_s1, stock_s2,rut_proveedor]
+                    for a in args:
+                        print(a)
 
-                        out_val = cursor.var(int)
-                        
-                        cursor.callproc('MMMB_PROC_PRODUCTO', ['I', None, int(cod_marca),int(cod_categoria),nombre_producto,int(precio_compra),int(precio_venta),int(stock_s1),int(stock_s2),int(rut_proveedor), out_val])
+                    out_val = cursor.var(int)
+                    
+                    cursor.callproc('MMMB_PROC_PRODUCTO', ['I', None, int(cod_marca),int(cod_categoria),nombre_producto,int(precio_compra),int(precio_venta),int(stock_s1),int(stock_s2),int(rut_proveedor), out_val])
 
-                        result = out_val.getvalue()              
-                        return result
-            except Exception as e:
-                print(f"Error executing query: {e}")
-                return result  
+                    result = out_val.getvalue()              
+                    return result
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return result  
 
     def modificar_producto(self,cod_producto, cod_marca,cod_categoria,nombre_producto,precio_compra,precio_venta,stock_s1, stock_s2,rut_proveedor):
-            try:
-                result = 1
-                with self._pool.acquire() as connection:
-                    with connection.cursor() as cursor:
+        try:
+            result = 1
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
 
-                        args = [cod_marca,cod_categoria,nombre_producto,precio_compra,precio_venta,stock_s1, stock_s2,rut_proveedor]
-                        for a in args:
-                            print(type(a))
+                    args = [cod_marca,cod_categoria,nombre_producto,precio_compra,precio_venta,stock_s1, stock_s2,rut_proveedor]
+                    for a in args:
+                        print(type(a))
 
-                        out_val = cursor.var(int)
-                        
-                        cursor.callproc(
-                            'MMMB_PROC_PRODUCTO',
-                            ['U', cod_producto, int(cod_marca),int(cod_categoria),nombre_producto,int(precio_compra),int(precio_venta),int(stock_s1),int(stock_s2),int(rut_proveedor), out_val])
+                    out_val = cursor.var(int)
+                    
+                    cursor.callproc(
+                        'MMMB_PROC_PRODUCTO',
+                        ['U', cod_producto, int(cod_marca),int(cod_categoria),nombre_producto,int(precio_compra),int(precio_venta),int(stock_s1),int(stock_s2),int(rut_proveedor), out_val])
 
-                        """
-                            OPCION VARCHAR2,
-                            COD_PRODUCTO_P NUMBER,
-                            COD_MARCA_P NUMBER DEFAULT NULL,
-                            COD_CATEGORIA_P NUMBER DEFAULT NULL,
-                            NOMBRE_PRODUCTO_P VARCHAR2 DEFAULT NULL,
-                            PRECIO_COMPRA_P NUMBER DEFAULT NULL,
-                            PRECIO_VENTA_P NUMBER DEFAULT NULL,
-                            STOCK_SUCURSAL1_P NUMBER DEFAULT NULL, -- Se ha agregado stock sucursal 1
-                            STOCK_SUCURSAL2_P NUMBER DEFAULT NULL, -- Se ha agregado stock sucursal 2
-                            RUT_PROVEEDOR_P NUMBER DEFAULT NULL,
-                            CONFIRM_OUTPUT OUT NUMBER 
-                        """
+                    """
+                        OPCION VARCHAR2,
+                        COD_PRODUCTO_P NUMBER,
+                        COD_MARCA_P NUMBER DEFAULT NULL,
+                        COD_CATEGORIA_P NUMBER DEFAULT NULL,
+                        NOMBRE_PRODUCTO_P VARCHAR2 DEFAULT NULL,
+                        PRECIO_COMPRA_P NUMBER DEFAULT NULL,
+                        PRECIO_VENTA_P NUMBER DEFAULT NULL,
+                        STOCK_SUCURSAL1_P NUMBER DEFAULT NULL, -- Se ha agregado stock sucursal 1
+                        STOCK_SUCURSAL2_P NUMBER DEFAULT NULL, -- Se ha agregado stock sucursal 2
+                        RUT_PROVEEDOR_P NUMBER DEFAULT NULL,
+                        CONFIRM_OUTPUT OUT NUMBER 
+                    """
 
-                        result = out_val.getvalue()              
-                        return result
-            except Exception as e:
-                print(f"Error executing query: {e}")
-                return result        
+                    result = out_val.getvalue()              
+                    return result
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return result        
     
     def eliminar_producto(self, cod_producto):
         try:
@@ -250,33 +262,33 @@ class OracleDBConnector:
             return None
         
     def actualizar_cliente(self,opcion, rut, nombre_cliente, apellido1_cliente, apellido2_cliente, correo_cliente):
-            try:
-                with self._pool.acquire() as connection:
-                    with connection.cursor() as cursor:
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
 
-                        out_val = cursor.var(int)
-                        
-                        cursor.callproc('MMMB_PROC_CLIENTE',[opcion,int(rut),nombre_cliente, apellido1_cliente, apellido2_cliente, correo_cliente,out_val])
+                    out_val = cursor.var(int)
+                    
+                    cursor.callproc('MMMB_PROC_CLIENTE',[opcion,int(rut),nombre_cliente, apellido1_cliente, apellido2_cliente, correo_cliente,out_val])
 
-                        result = out_val.getvalue()              
-                        return result
-            except Exception as e:
-                print(f"Error executing query: {e}")
-                return None
+                    result = out_val.getvalue()              
+                    return result
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return None
     
     
     def agregar_marca(self,opcion, nombre):
-            try:
-                with self._pool.acquire() as connection:
-                    with connection.cursor() as cursor:
-                        out_val = cursor.var(int)
-                        cursor.callproc('MMMB_PROC_MARCA', [opcion,221334,nombre,out_val])
-                        result = out_val.getvalue()              
-                    return result
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
+                    out_val = cursor.var(int)
+                    cursor.callproc('MMMB_PROC_MARCA', [opcion,221334,nombre,out_val])
+                    result = out_val.getvalue()              
+                return result
 
-            except Exception as e:
-                print(f"Error executing query: {e}")
-                return None
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return None
             
     def actualizar_marca(self, opcion, cod_marca, nombre_marca):
         try:
@@ -307,17 +319,17 @@ class OracleDBConnector:
             return None
 
     def agregar_categoria(self,opcion, nombre):
-            try:
-                with self._pool.acquire() as connection:
-                    with connection.cursor() as cursor:
-                        out_val = cursor.var(int)
-                        cursor.callproc('MMMB_PROC_categoria', [opcion,221334,nombre,out_val])
-                        result = out_val.getvalue()              
-                    return result
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
+                    out_val = cursor.var(int)
+                    cursor.callproc('MMMB_PROC_categoria', [opcion,221334,nombre,out_val])
+                    result = out_val.getvalue()              
+                return result
 
-            except Exception as e:
-                print(f"Error executing query: {e}")
-                return None
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return None
             
     def actualizar_categoria(self, opcion, cod_categoria, nombre_categoria):
         try:
@@ -445,6 +457,26 @@ class OracleDBConnector:
             print(f"Error executing query: {e}")
             return -1
 
+    #
+    #   VENTA
+    #
+
+    def agregar_venta(self, cod_caja, rut_cliente, rut_empleado, cod_medio_de_pago, total, detalles_venta):
+        # FECHA_VENTA = SYSDATE
+        # DESCUENTO_VENTA = Calcular diferencia entre precio_venta y subtotal para cada item de form.detalles.data
+
+        # 1.- Ingresar venta MMMB_VENTA creando un procedimiento (para calcular descuentos dentro)
+
+        # 2.- Ingresar detalles de venta MMMB_DETALLE_VENTA_PRODUCTO (un FOR sobre detalles_venta)
+
+        # 3.- Trigges para disminuir stock según sucursal
+            # Trigger sobre MMMB_DETALLE_VENTA_PRODUCTO que modifican MMMB_DETALLE_SUCURSAL_PRODUCTO
+            # Usar :NEW para obtener cod_venta, sacar cod_caja y recuperar cod_sucursal?
+        
+        # 3.- Rezar y esperar que salga todo bien
+                
+        return -1
+
     # Get all    
     def get_all_clients(self):
         query = "SELECT * FROM MMMB_CLIENTE"
@@ -505,3 +537,17 @@ class OracleDBConnector:
     def get_last_5_horarios_by_rut(self, RUT):
         query = "SELECT COD_HORARIO, RUT_EMPLEADO, FECHA_INICIO FROM MMMB_HORARIO WHERE RUT_EMPLEADO = :1 ORDER BY FECHA_INICIO DESC FETCH FIRST 5 ROWS ONLY"
         return self.execute_query(query, RUT)
+
+    # Nuevamente, podría existir una función general a la que le enviemos los prámetros, pero pa la otra
+    #
+    #   1   Hay stock
+    #   2   No alcanza
+    def validar_stock(self, sucursal, cod_producto, cantidad):
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
+                    return_val = cursor.callfunc("MMMB_VALIDAR_STOCK", int, [sucursal, cod_producto, cantidad])           
+                    return return_val
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return -1

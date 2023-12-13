@@ -302,6 +302,30 @@ CREATE TABLE MMMB_HISTORIAL_PRECIOS( -- Se ha agregado tabla
     FUNCTIONS
 */
 
+-- Hay stock?
+CREATE OR REPLACE FUNCTION MMMB_VALIDAR_STOCK(
+    COD_SUCURSAL_P NUMBER,
+    COD_PRODUCTO_P NUMBER,
+    CANTIDAD_P NUMBER
+) RETURN NUMBER AS
+    v_stock_disponible NUMBER DEFAULT -1;
+BEGIN
+    -- Obtener el stock disponible para el producto en la sucursal
+    SELECT STOCK_SUCURSAL_PRODUCTO
+    INTO v_stock_disponible
+    FROM MMMB_DETALLE_SUCURSAL_PRODUCTO
+    WHERE COD_SUCURSAL = COD_SUCURSAL_P
+        AND COD_PRODUCTO = COD_PRODUCTO_P;
+
+    -- Verificar si la cantidad supera el stock disponible
+    IF CANTIDAD_P > v_stock_disponible THEN
+        RETURN -1; -- La cantidad supera el stock disponible
+    ELSE
+        RETURN 1; -- La cantidad es válida
+    END IF;
+END;
+/
+
 -- Existe tal cargo? Retorna el número.
 CREATE OR REPLACE FUNCTION MMMB_EXISTE_CARGO(COD_CARGO_P NUMBER) RETURN NUMBER
 IS
@@ -1715,6 +1739,15 @@ BEGIN
     MMMB_PROC_PRODUCTO('I', '', 23, 12, 'Manzana 1Kg', 500, 2100, 78,87, 75000008, out_val);
     MMMB_PROC_PRODUCTO('I', '', 23, 12, 'Tomate 1Kg', 800, 1000, 112,44, 75000008, out_val);
     MMMB_PROC_PRODUCTO('I', '', 23, 12, 'Zanahoria 1Kg', 500, 700, 41,14, 75000008, out_val);
+
+    -- Descuentos
+
+    MMMB_PROC_DESCUENTO('I', NULL, 3, 2, TO_DATE('12/12/23', 'DD/MM/YY'), TO_DATE('15/12/23', 'DD/MM/YY'), OUPV);
+    MMMB_PROC_DESCUENTO('I', NULL, 4, 10, TO_DATE('12/12/23', 'DD/MM/YY'), TO_DATE('15/12/23', 'DD/MM/YY'), OUPV);
+    MMMB_PROC_DESCUENTO('I', NULL, 4, 2, TO_DATE('12/11/23', 'DD/MM/YY'), TO_DATE('10/12/23', 'DD/MM/YY'), OUPV);
+    MMMB_PROC_DESCUENTO('I', NULL, 4, 7, TO_DATE('12/12/23', 'DD/MM/YY'), TO_DATE('25/12/23', 'DD/MM/YY'), OUPV);
+    MMMB_PROC_DESCUENTO('I', NULL, 5, 6, TO_DATE('12/12/23', 'DD/MM/YY'), TO_DATE('25/12/23', 'DD/MM/YY'), OUPV);
+    MMMB_PROC_DESCUENTO('I', NULL, 6, 15, TO_DATE('12/12/23', 'DD/MM/YY'), TO_DATE('25/12/23', 'DD/MM/YY'), OUPV);
 END;
 /
 ----

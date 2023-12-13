@@ -1,4 +1,9 @@
 <script>
+
+    //
+    // HORARIOS
+    //
+
     document.addEventListener('DOMContentLoaded', function () {
         const turnosContainer = document.getElementById('turnosContainer');
         const agregarTurnoBtn = document.getElementById('agregarTurno');
@@ -57,9 +62,12 @@
         });
     });
 
+    //
+    // VENTAS
+    //
 
     document.addEventListener('DOMContentLoaded', function () {
-        const detallesContainer = document.getElementById('detallesVentaContainer');
+        const detallesContainer = document.getElementById('detallesContainer');
         const agregarDetalleBtn = document.getElementById('agregarDetalle');
 
         agregarDetalleBtn.addEventListener('click', function () {
@@ -69,35 +77,117 @@
                 <div class="card mb-3">
                     <div class="card-body">
                         <div class="row mb-3">
-                            <div class="col">
+                            <div class="col-auto">
+                                <label for="detalles-${detalleIndex}-cod_producto">Código</label>
+                                <input name="detalles-${detalleIndex}-cod_producto" id="detalles-${detalleIndex}-cod_producto" class="form-control" type="text" readonly style="width: 5em">
+                            </div>
+                            <div class="col-auto flex-grow-1">
                                 <label for="detalles-${detalleIndex}-producto">Producto</label>
-                                <select class="form-control" id="detalles-${detalleIndex}-producto" name="detalles-${detalleIndex}-producto">
+                                <select class="form-control" id="detalles-${detalleIndex}-producto" name="detalles-${detalleIndex}-producto" onchange="actualizarSubtotal(${detalleIndex})">
                                     <!-- Agrega tus opciones de productos aquí -->
                                 </select>
                             </div>
-                            <div class="col">
+                            <div class="col-auto">
                                 <label for="detalles-${detalleIndex}-cantidad">Cantidad</label>
-                                <input name="detalles-${detalleIndex}-cantidad" class="form-control" type="number">
+                                <input name="detalles-${detalleIndex}-cantidad" id="detalles-${detalleIndex}-cantidad" class="form-control" type="number" onchange="actualizarSubtotal(${detalleIndex})">
                             </div>
                         </div>
+
                     </div>
                     <div class="card-footer">
-                        <button type="button" class="btn btn-danger eliminarDetalle float-end">Eliminar</button>
+                        <div class="row d-flex align-items-center">
+                            <div class="row d-flex align-items-center">
+                                <!-- Subtotal a la izquierda -->
+                                <div class="col-auto">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                                        <input name="detalles-${detalleIndex}-subtotal" id="detalles-${detalleIndex}-subtotal" class="form-control" readonly="true">
+                                    </div>
+                                </div>
+                                <!-- Label de descuento a la derecha -->
+                                <div class="col-auto">
+                                    <span id="descuentoLabel-${detalleIndex}"></span>
+                                </div>
+                                <!-- Botón eliminar a la derecha -->
+                                <div class="col">
+                                    <button type="button" class="btn btn-danger eliminarDetalleVenta float-end">Eliminar</button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             `;
 
             detallesContainer.insertAdjacentHTML('beforeend', nuevoDetalleHtml);
+
+            // Llenar las opciones del select en el nuevo detalle
+            llenarOpcionesProductos(detalleIndex);
         });
 
         detallesContainer.addEventListener('click', function (event) {
-            if (event.target.classList.contains('eliminarDetalle')) {
+            if (event.target.classList.contains('eliminarDetalleVenta')) {
                 const detalleCard = event.target.closest('.card');
                 detalleCard.parentNode.removeChild(detalleCard);
+
+                actualizarTotalGeneral();
             }
         });
+
+        // Función para actualizar el subtotal al cambiar la cantidad o el producto
+        window.actualizarSubtotal = function (detalleIndex) {
+            const productoSelect = document.getElementById(`detalles-${detalleIndex}-producto`);
+            const cantidadInput = document.getElementById(`detalles-${detalleIndex}-cantidad`);
+            const subtotalInput = document.getElementById(`detalles-${detalleIndex}-subtotal`);
+            const descuentoLabel = document.getElementById(`descuento-label-${detalleIndex}`);
+
+            const precioVenta = parseInt(productoSelect.value);
+            const cantidad = parseInt(cantidadInput.value);
+
+            if (!isNaN(precioVenta) && !isNaN(cantidad)) {
+                // Obtener el porcentaje de descuento
+                const porcentajeDescuentoMatch = productoSelect.options[productoSelect.selectedIndex].text.match(/-(\d+)%!/);
+                const porcentajeDescuento = porcentajeDescuentoMatch ? parseInt(porcentajeDescuentoMatch[1]) : 0;
+
+                // Calcular el subtotal aplicando el descuento
+                const subtotal = (precioVenta * cantidad * (100 - porcentajeDescuento)) / 100;
+
+                subtotalInput.value = subtotal; //.toFixed(2)
+
+                // Llama a una función que actualice el total general
+                actualizarTotalGeneral();
+            } else {
+                subtotalInput.value = '';
+            }
+
+            // Actualizar cód producto si cambia algo:
+            llenarCodProducto(detalleIndex);
+            llenarLabelDescuento(detalleIndex);
+        };
+
+        // Función para actualizar el total general
+        window.actualizarTotalGeneral = function () {
+            const detalles = document.querySelectorAll('[id^="detalles-"]');
+            let totalGeneral = 0;
+
+            detalles.forEach(function (detalle) {                
+                const subtotalInput = detalle.id.match('-subtotal');
+
+                if (subtotalInput && detalle.value !== '') {
+                    totalGeneral += parseInt(detalle.value);
+                }
+            });
+
+            console.log('Total general: ' + totalGeneral);
+
+            const totalInput = document.getElementById('total');
+            totalInput.value = totalGeneral;
+        };
+
     });
 
+    //
+    // MENSAJES POPUP
+    //
 
     function mostrarPopupAlert(mensaje) {
         const popupAlert = document.getElementById('popupAlert');

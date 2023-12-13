@@ -2,11 +2,6 @@ from flask import current_app, redirect, render_template, request, session, url_
 from app import app
 from app.forms import * #AgregarProducto, CreateAccountForm, LoginForm, ModificarProductoForm, AgregarEmpleado
 
-
-class MyForm(FlaskForm):
-    choices = [('opcion1', 'Opción 1'), ('opcion2', 'Opción 2')]
-    select_field = SelectField('Selecciona una opción', choices=choices)
-
 @app.route('/')
 def index():
     # DB Conn
@@ -518,7 +513,7 @@ def horarios():
             return render_template('horarios.html', form=form, error_msg=error_msg, info_msg=info_msg, horarios=horarios)
             
 
-    # Acá está ingresando
+    # Post eliminando
     if request.method == 'POST':
         codigo_horario_eliminar = request.form.get('eliminar_horario')
         if codigo_horario_eliminar:
@@ -573,11 +568,62 @@ def horarios():
 
 @app.route('/ventas', methods=['GET', 'POST'])
 def ventas():
-    form = VentaForm()
+    form = VentaForm(request.form)
     info_msg = None
     error_msg = None
 
-    return render_template('ventas.html', form=form, info_msg=info_msg, error_msg=error_msg)
+    # DB
+    oracle_db_connector = current_app.config['oracle_db_connector']
+
+    # TODO: Cod caja random según sucursal
+    cod_caja = 1
+    form.cod_caja.data = cod_caja
+    # RUT empleado, TODO: Consultar según logeo
+    rut_empleado = 15000001
+    form.rut_empleado.data = rut_empleado
+    # Asignar lista de productos (enviados al template y usados por JS para cargar un bloque de "detalle de venta")
+    productos = oracle_db_connector.get_all_concat_products_with_discounts()
+    product_choices = [producto[0] for producto in productos]
+    # Medios de pago
+    medios_de_pago = oracle_db_connector.get_all_medio_de_pago()
+    form.medio_de_pago.choices = [f"{medio[0]}, {medio[1]}" for medio in medios_de_pago]
+
+    if request.method == 'POST':
+        if form.validate_on_submit(): # significa que todo está validado y OK, no? No??
+
+            print("form.rut_cliente: ", form.rut_cliente.data)
+            print("form.medio_de_pago: ", form.medio_de_pago.data[0])
+            print("form.total: ", form.total.data)
+            print("post, detalles.data:\n\t", form.detalles.data) # Detalle de venta
+
+            result = oracle_db_connector.agregar_venta(
+                cod_caja,
+                form.rut_cliente.data,
+                rut_empleado,
+                form.medio_de_pago.data[0],
+                # FECHA_VENTA = SYSDATE
+                # DESCUENTO_VENTA = Calcular diferencia entre precio_venta y subtotal para cada item de form.detalles.data
+                form.total.data,
+                form.detalles.data
+            )
+
+            if result < 0:
+                print("aaaaaaaaaaaaaaaaaaaaaaaa")
+
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    if field == 'total' and 'required' in error:
+                        error_msg = "El total no puede estar vacío."
+                        break    
+                    print(f"Error en el campo '{field}': {error}")
+                    if len(error) == 0:
+                        error_msg = f"Error en el campo {field}"
+                        break
+                    error_msg = error
+                    break
+
+    return render_template('ventas.html', productos=product_choices, form=form, info_msg=info_msg, error_msg=error_msg)
 
 @app.errorhandler(404)
 def page_not_found(e):
