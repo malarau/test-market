@@ -357,8 +357,7 @@ def get_sucursal():
 
     # Derecha
     rut_cajero = 15_000_001 # TODO: Recuperar desde la sesión!
-    horarios = oracle_db_connector.get_all_horarios_y_turnos(rut_cajero) # Es una lista
-
+    horarios = oracle_db_connector.get_all_horarios_y_turnos(rut_cajero, True) # Es una lista
 
     print(sucursales)
     return render_template('informaciones.html',sucursales=sucursales, medio_de_pagos=medio_de_pagos, horarios=horarios) #bodegas=bodegas, cargos=cargos
@@ -574,10 +573,11 @@ def horarios():
 
 @app.route('/ventas', methods=['GET', 'POST'])
 def ventas():
+    form = VentaForm()
     info_msg = None
     error_msg = None
 
-    return render_template('ventas.html', info_msg=info_msg, error_msg=error_msg)
+    return render_template('ventas.html', form=form, info_msg=info_msg, error_msg=error_msg)
 
 @app.errorhandler(404)
 def page_not_found(e):

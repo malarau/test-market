@@ -252,3 +252,24 @@ class HorarioForm(FlaskForm):
 #
 #   Ventas
 #
+
+class DetalleVentaForm(FlaskForm):
+    class Meta:
+        csrf = False
+    producto = SelectField('Producto', choices=[], validators=[DataRequired()])
+    cantidad = IntegerField('Cantidad', validators=[DataRequired()])
+
+def validador_venta(form, field):
+    # TODO: Desde sesión, obtener la sucursal, según quién logeó
+
+    # Con la sucursal, calcular si cierto producto, puede ser vendido en X cantidad.
+
+    pass
+
+class VentaForm(FlaskForm):
+    cod_caja = SelectField('Código de caja', choices=[], validators=[DataRequired()])
+    rut_cliente = IntegerField('RUT Cliente', validators=[DataRequired(), validador_rut_cliente])
+    rut_empleado = IntegerField('RUT Empleado', validators=[DataRequired(), validador_rut_empleado])
+    medio_de_pago = SelectField('Medio de pago', choices=[], validators=[DataRequired()])
+    detalles = FieldList(FormField(DetalleVentaForm), min_entries=1, validators=[DataRequired(), validador_venta])
+    guardar = SubmitField('Enviar')

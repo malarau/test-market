@@ -58,6 +58,47 @@
     });
 
 
+    document.addEventListener('DOMContentLoaded', function () {
+        const detallesContainer = document.getElementById('detallesVentaContainer');
+        const agregarDetalleBtn = document.getElementById('agregarDetalle');
+
+        agregarDetalleBtn.addEventListener('click', function () {
+            const detalleIndex = detallesContainer.querySelectorAll('.card').length;
+
+            const nuevoDetalleHtml = `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="detalles-${detalleIndex}-producto">Producto</label>
+                                <select class="form-control" id="detalles-${detalleIndex}-producto" name="detalles-${detalleIndex}-producto">
+                                    <!-- Agrega tus opciones de productos aquí -->
+                                </select>
+                            </div>
+                            <div class="col">
+                                <label for="detalles-${detalleIndex}-cantidad">Cantidad</label>
+                                <input name="detalles-${detalleIndex}-cantidad" class="form-control" type="number">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button type="button" class="btn btn-danger eliminarDetalle float-end">Eliminar</button>
+                    </div>
+                </div>
+            `;
+
+            detallesContainer.insertAdjacentHTML('beforeend', nuevoDetalleHtml);
+        });
+
+        detallesContainer.addEventListener('click', function (event) {
+            if (event.target.classList.contains('eliminarDetalle')) {
+                const detalleCard = event.target.closest('.card');
+                detalleCard.parentNode.removeChild(detalleCard);
+            }
+        });
+    });
+
+
     function mostrarPopupAlert(mensaje) {
         const popupAlert = document.getElementById('popupAlert');
         const popupMessage = document.getElementById('popupMessage');

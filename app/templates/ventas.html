@@ -1,7 +1,49 @@
 {% extends "layouts/base.html" %}
 
-{% block content %}
+{% block content %}    
 
-aaa
+    <div class="row contenedor">
+        <!-- Sección lateral para agregar Empleados -->
+        <div class="col-md-6">
+            <h2 class="mb-4">Nueva venta</h2>
+            
+            
+
+        </div>
+
+        <div class="col-md-6 panel-izquierdo">
+            <form method="post" action="/ventas">
+                {{ form.csrf_token }}
+        
+                <!-- Otras secciones del formulario... -->
+        
+                <div id="detallesVentaContainer" class="panel-con-scroll">
+                    {% for detalle in form.detalles %}
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col">
+                                        {{ detalle.producto.label }} {{ detalle.producto(class="form-control") }}
+                                    </div>
+                                    <div class="col">
+                                        {{ detalle.cantidad.label }} {{ detalle.cantidad(class="form-control") }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <!-- Botón eliminar acá -->
+                                <button type="button" class="btn btn-danger eliminarDetalle float-end">Eliminar</button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <!-- Botón agregar acá -->
+                <button type="button" class="btn btn-primary" id="agregarDetalle">Agregar Detalle</button>
+                <!-- <button type="submit" class="btn btn-success">Guardar Venta</button> -->
+            </form>
+
+        </div>
+    </div>
+    
 
 {% endblock %}
