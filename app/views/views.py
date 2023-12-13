@@ -142,15 +142,14 @@ def empleados():
 @app.route('/eliminar_producto/<codigo>', methods=['GET', 'POST'])
 def eliminar_producto(codigo):
     oracle_db_connector = current_app.config['oracle_db_connector']
-    result = oracle_db_connector.eliminar_producto(codigo)  
-    print("result", result)
-    return render_template('eliminar_producto.html',codigo=codigo)
+    output=oracle_db_connector.eliminar_producto(codigo)  
+    return render_template('eliminar_producto.html',codigo=codigo,output=output)
 
 
 @app.route('/eliminar_empleado/<rut>', methods=['GET', 'POST'])
 def eliminar_empleado(rut):
     oracle_db_connector = current_app.config['oracle_db_connector']
-    oracle_db_connector.eliminar_empleado('D',rut)    
+    output=oracle_db_connector.eliminar_empleado('D',rut)    
     
     return render_template('eliminar_empleado.html' ,rut=rut)
 
@@ -346,8 +345,8 @@ def modificar_cliente(rut):
 @app.route('/eliminar_cliente/<rut_cliente>', methods=['GET', 'POST'])
 def eliminar_cliente(rut_cliente):
     oracle_db_connector = current_app.config['oracle_db_connector']
-    oracle_db_connector.eliminar_cliente('D',rut_cliente)
-    return render_template('eliminar_cliente.html', rut_cliente=rut_cliente)
+    output=oracle_db_connector.eliminar_cliente('D',rut_cliente)
+    return render_template('eliminar_cliente.html', rut_cliente=rut_cliente,output=output)
 
 @app.route('/informaciones', methods=['GET', 'POST'])
 def get_sucursal():
@@ -400,9 +399,8 @@ def modificar_categoria(cod_categoria):
 @app.route('/eliminar_categoria/<cod_categoria>', methods=['GET', 'POST'])
 def eliminar_categoria(cod_categoria):
     oracle_db_connector = current_app.config['oracle_db_connector']
-    i=oracle_db_connector.eliminar_categoria('D', cod_categoria)
-    print(i)
-    return render_template('eliminar_categoria.html', cod_categoria=cod_categoria)
+    output=oracle_db_connector.eliminar_categoria('D', cod_categoria)
+    return render_template('eliminar_categoria.html', cod_categoria=cod_categoria, output=output)
 
 @app.route('/marcas', methods=['GET', 'POST'])
 def marcas():
@@ -445,8 +443,8 @@ def modificar_marca(cod_marca):
 @app.route('/eliminar_marca/<cod_marca>', methods=['GET', 'POST'])
 def eliminar_marca(cod_marca):
     oracle_db_connector = current_app.config['oracle_db_connector']
-    oracle_db_connector.eliminar_marca('D', cod_marca)
-    return render_template('eliminar_marca.html', cod_marca=cod_marca)
+    output=oracle_db_connector.eliminar_marca('D', cod_marca)
+    return render_template('eliminar_marca.html', cod_marca=cod_marca,output=output)
 
 @app.route('/proveedor', methods=['GET', 'POST'])
 def proveedores():
@@ -491,8 +489,8 @@ def modificar_proveedor(rut_proveedor):
 @app.route('/eliminar_proveedor/<rut_proveedor>', methods=['GET', 'POST'])
 def eliminar_proveedor(rut_proveedor):
     oracle_db_connector = current_app.config['oracle_db_connector']
-    oracle_db_connector.eliminar_proveedor('D', rut_proveedor)
-    return render_template('eliminar_proveedor.html', rut_proveedor=rut_proveedor)
+    output=oracle_db_connector.eliminar_proveedor('D', rut_proveedor)
+    return render_template('eliminar_proveedor.html', rut_proveedor=rut_proveedor,output=output)
 
 @app.route('/horarios', methods=['GET', 'POST'])
 def horarios():

@@ -1,5 +1,17 @@
 {% extends "layouts/base.html" %}
 
 {% block content %}
-    <h2>El producto de codigo: {{rut_cliente}} ha sido eliminado de la base de datos</h2>
+
+    {%if output == 1%}
+    <h2>El cliente de codigo: {{rut_cliente}} ha sido eliminado de la base de datos</h2>
+    {%elif output==-1%}
+    <h2>El cliente de codigo: {{rut_cliente}}  no se pudo eliminar de la base de datos</h2>
+    {%elif output==-2292%}
+    <h2>
+        No fue posible eliminar el cliente con el código {{rut_cliente}} de la base de datos debido a su dependencia con otros datos.
+    </h2>
+    {% endif %}
+    <a href="{{ url_for('clientes')}}" class="btn btn-link text-dark">
+        <i></i> Volver a Clientes
+    </a>
 {% endblock %}
