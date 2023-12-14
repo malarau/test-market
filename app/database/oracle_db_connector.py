@@ -58,12 +58,25 @@ class OracleDBConnector:
         return self.execute_query(query, id)
 
     def get_user_by_username(self, username):
-        query = "SELECT * FROM USUARIO WHERE username = :1"
+        query = "SELECT USUARIO_EMPLEADO FROM MMMB_EMPLEADO WHERE USUARIO_EMPLEADO = :1"
         print("query: ", query)
         return self.execute_query(query, username)
     
+    def get_cargo_by_user(self, username):
+        query = "SELECT COD_CARGO FROM MMMB_EMPLEADO WHERE USUARIO_EMPLEADO = :1"
+        return self.execute_query(query, username)
+    def get_rut_by_user(self, username):
+        query = "SELECT RUT_EMPLEADO FROM MMMB_EMPLEADO WHERE USUARIO_EMPLEADO = :1"
+        return self.execute_query(query, username)
+    def get_sucursal_by_user(self, username):
+        query = "SELECT COD_SUCURSAL FROM MMMB_EMPLEADO WHERE USUARIO_EMPLEADO = :1"
+        return self.execute_query(query, username)
+    def get_caja_by_sucursal(self, sucursal):
+        query = "SELECT COD_CAJA FROM MMMB_CAJA WHERE COD_SUCURSAL = :1"
+        return self.execute_query(query, sucursal)
+    
     def get_hash_by_username(self, username):
-        query = "SELECT CONTRASEÑA_EMPLEADO FROM USUARIO WHERE username = :1"
+        query = "SELECT CONTRASEÑA_EMPLEADO FROM MMMB_EMPLEADO WHERE USUARIO_EMPLEADO = :1"
         print("query: ", query)
         return self.execute_query(query, username)
     
@@ -523,7 +536,7 @@ class OracleDBConnector:
     # Get by Id
     def get_categoria_by_cod(self, COD):
         query = "SELECT * FROM MMMB_CATEGORIA WHERE COD_CATEGORIA = :1"
-        return self.execute_query(query, COD)
+    
     def get_marca_by_cod(self, RUT):
         query = "SELECT * FROM MMMB_MARCA WHERE COD_MARCA = :1"
         return self.execute_query(query, RUT)
@@ -542,7 +555,7 @@ class OracleDBConnector:
     def get_last_5_horarios_by_rut(self, RUT):
         query = "SELECT COD_HORARIO, RUT_EMPLEADO, FECHA_INICIO FROM MMMB_HORARIO WHERE RUT_EMPLEADO = :1 ORDER BY FECHA_INICIO DESC FETCH FIRST 5 ROWS ONLY"
         return self.execute_query(query, RUT)
-
+    
     # Nuevamente, podría existir una función general a la que le enviemos los prámetros, pero pa la otra
     #
     #   1   Hay stock
