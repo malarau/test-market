@@ -603,10 +603,10 @@ def ventas():
     oracle_db_connector = current_app.config['oracle_db_connector']
 
     # TODO: Cod caja random según sucursal
-    cod_caja = 1
+    cod_caja = session['caja']
     form.cod_caja.data = cod_caja
     # RUT empleado, TODO: Consultar según logeo
-    rut_empleado = 15000001
+    rut_empleado = session['rut_empleado']
     form.rut_empleado.data = rut_empleado
     # Asignar lista de productos (enviados al template y usados por JS para cargar un bloque de "detalle de venta")
     productos = oracle_db_connector.get_all_concat_products_with_discounts()
