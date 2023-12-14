@@ -668,3 +668,16 @@ class OracleDBConnector:
     def get_descuento_by_cod(self, COD):
         query="SELECT * FROM MMMB_DESCUENTO WHERE COD_DESCUENTO = :1"
         return self.execute_query(query, COD)
+    
+    def get_productos_en_bajo_stock_by_sucursal(self, cod_sucursal):
+        query = "SELECT P.COD_PRODUCTO, P.NOMBRE_PRODUCTO, DS.STOCK_SUCURSAL_PRODUCTO, P.PRECIO_COMPRA, P.PRECIO_VENTA FROM MMMB_PRODUCTO P JOIN MMMB_DETALLE_SUCURSAL_PRODUCTO DS ON P.COD_PRODUCTO = DS.COD_PRODUCTO WHERE DS.COD_SUCURSAL = :1 ORDER BY DS.STOCK_SUCURSAL_PRODUCTO ASC FETCH FIRST 5 ROWS ONLY"
+        return self.execute_query(query, cod_sucursal)
+    
+    def get_historial_precios_con_variacion(self, TIPO_PRECIO):
+        query = "SELECT P.COD_PRODUCTO,P.NOMBRE_PRODUCTO,H.TIPO_PRECIO,H.VALOR_ANTERIOR,H.VALOR_NUEVO,H.FECHA,MMMB_CALCULAR_DIFERENCIA_PORCENTUAL(H.VALOR_ANTERIOR, H.VALOR_NUEVO) AS DIFERENCIA_PORCENTUAL FROM MMMB_HISTORIAL_PRECIOS H JOIN MMMB_PRODUCTO P ON H.COD_PRODUCTO = P.COD_PRODUCTO WHERE H.TIPO_PRECIO = :1"
+        return self.execute_query(query, TIPO_PRECIO)
+    
+    def get_ventas_ultima_semana_by_sucursal(self, cod_sucursal):
+        query = "SELECT COD_VENTA,COD_SUCURSAL,COD_CAJA,RUT_CLIENTE,RUT_EMPLEADO,COD_PAGO,FECHA_VENTA,TOTAL_VENTA,DESCUENTO_VENTA FROM MMMB_VENTA WHERE FECHA_VENTA >= SYSDATE - 7 AND FECHA_VENTA < SYSDATE AND COD_SUCURSAL = :1"
+        return self.execute_query(query, cod_sucursal)
+        

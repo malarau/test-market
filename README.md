@@ -44,6 +44,9 @@ DB_PORT=1521
 
 DB_USERNAME=testuser
 DB_PASS=testpassword
+
+NOMBRE_NEGOCIO=Negocio pulento que pasa loco
+RUT_SUCURSAL=69.123.456-K
 ```
 
 #### Crear tablas en base de datos
