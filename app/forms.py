@@ -310,3 +310,16 @@ class VentaForm(FlaskForm):
     detalles = FieldList(FormField(DetalleVentaForm, default=DetalleVentaBase), min_entries=0, validators=[validador_venta]) # DataRequired()
     total = IntegerField('Total general:', validators=[DataRequired()], render_kw={'readonly': True}) # Requerido y bloqueado, se calcula automáticamente
     guardar = SubmitField('Enviar')
+
+class AgregarDescuentoForm(FlaskForm):
+    cod_producto = IntegerField('Código de Producto', validators=[DataRequired()])
+    porcentaje_descuento = IntegerField('Porcentaje de Descuento', validators=[DataRequired()])
+    valido_desde = DateField('Válido Desde', format='%Y-%m-%d', validators=[DataRequired()])
+    valido_hasta = DateField('Válido Hasta', format='%Y-%m-%d', validators=[DataRequired()])
+    agregar_descuento = SubmitField('Agregar Descuento')
+
+class ModificarDescuentoForm(FlaskForm):
+    PorcentajeDescuento = IntegerField('Porcentaje de Descuento', validators=[DataRequired()])
+    ValidoDesde = DateField('Válido Desde', format='%Y-%m-%d', validators=[DataRequired()])
+    ValidoHasta = DateField('Válido Hasta', format='%Y-%m-%d', validators=[DataRequired()])
+    guardar_cambios = SubmitField('Guardar Cambios')

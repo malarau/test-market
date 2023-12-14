@@ -455,6 +455,60 @@ def eliminar_proveedor(rut_proveedor):
     output=oracle_db_connector.eliminar_proveedor('D', rut_proveedor)
     return render_template('eliminar_proveedor.html', username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'],rut_proveedor=rut_proveedor,output=output)
 
+@app.route('/descuentos', methods=['GET', 'POST'])
+def descuentos():
+    #if 'username' not in session:
+    #    return redirect(url_for('index'))
+
+    agregar_descuento_form = AgregarDescuentoForm()
+    oracle_db_connector = current_app.config['oracle_db_connector']
+
+    if request.method == 'POST' and agregar_descuento_form.validate_on_submit():
+        cod_producto = agregar_descuento_form.cod_producto.data
+        porcentaje_descuento = agregar_descuento_form.porcentaje_descuento.data
+        valido_desde = agregar_descuento_form.valido_desde.data
+        valido_hasta = agregar_descuento_form.valido_hasta.data
+        oracle_db_connector.agregar_descuento('I', None, cod_producto, porcentaje_descuento, valido_desde, valido_hasta)
+        resultado = oracle_db_connector.agregar_descuento('I', None, cod_producto, porcentaje_descuento, valido_desde, valido_hasta)
+        print("Resultado de agregar_descuento:", resultado)
+
+    descuentos = oracle_db_connector.get_all_descuentos()
+
+    return render_template('descuentos.html', descuentos=descuentos, agregar_descuento_form=agregar_descuento_form)
+
+@app.route('/modificar_descuento/<cod_descuento>', methods=['GET', 'POST'])
+def modificar_descuento(cod_descuento):
+    modificar_descuento_form = ModificarDescuentoForm(request.form)
+    oracle_db_connector = current_app.config['oracle_db_connector']
+
+    descuento = oracle_db_connector.get_descuento_by_cod(cod_descuento)
+    descuento = list(descuento[0])
+
+    if not descuento:
+        return redirect(url_for('descuentos'))
+
+    if request.method == 'POST':
+        porcentaje_descuento = modificar_descuento_form.PorcentajeDescuento.data
+        valido_desde = modificar_descuento_form.ValidoDesde.data
+        valido_hasta = modificar_descuento_form.ValidoHasta.data
+        print(valido_hasta)
+        print(valido_desde)
+        print(descuento)
+        oracle_db_connector.actualizar_descuento(cod_descuento,descuento[1], porcentaje_descuento, valido_desde, valido_hasta)
+
+        return redirect(url_for('descuentos'))
+    modificar_descuento_form.PorcentajeDescuento.data = descuento[2]
+    modificar_descuento_form.ValidoDesde.data = descuento[3]
+    modificar_descuento_form.ValidoHasta.data = descuento[4]
+
+    return render_template('modificar_descuento.html', descuento=descuento, modificar_descuento_form=modificar_descuento_form)
+
+@app.route('/eliminar_descuento/<cod_descuento>', methods=['GET', 'POST'])
+def eliminar_descuento(cod_descuento):
+    oracle_db_connector = current_app.config['oracle_db_connector']
+    oracle_db_connector.eliminar_descuento('D', cod_descuento)
+    return render_template('eliminar_descuento.html', cod_descuento=cod_descuento)
+
 @app.route('/horarios', methods=['GET', 'POST'])
 def horarios():
     if not 'username' in session:

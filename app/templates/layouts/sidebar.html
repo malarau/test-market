@@ -59,7 +59,12 @@
             <a class="nav-link text-dark" href="/pedidos">
                 <i class="fas fa-clipboard-list"></i> Pedidos
             </a>
-        </li> 
+        </li>
+        <li class="nav-item {% if request.path == '/descuentos' %}active{% endif %}">
+            <a class="nav-link text-dark" href="/descuentos">
+                <i class="fas fa-percent"></i> Descuentos
+            </a>
+        </li>  
         {%endif%}
     </ul>
 </aside>

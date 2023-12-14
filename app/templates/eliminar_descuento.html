@@ -1,0 +1,12 @@
+<!-- eliminar_descuento.html -->
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+    <h2>El descuento con código: {{ cod_descuento }} ha sido eliminado de la base de datos</h2>
+
+    <a href="{{ url_for('descuentos') }}" class="btn btn-link text-dark">
+        <i></i> Volver a Descuentos
+    </a>
+
+{% endblock %}
