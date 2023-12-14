@@ -136,7 +136,7 @@ CREATE TABLE MMMB_EMPLEADO(
     TELEFONO_EMPLEADO VARCHAR2(15),     -- Se ha cambiado a VARCHAR2 15
     EMAIL_EMPLEADO VARCHAR2(50),
     USUARIO_EMPLEADO VARCHAR2(30),
-    CONTRASEÑA_EMPLEADO VARCHAR2(64),   -- Se ha cambiado a 64, por supuesto hash de 64
+    CONTRASEÑA_EMPLEADO VARCHAR2(100),   -- Se ha cambiado a 100, por supuesto hash de 256
     CONSTRAINT PK_EMPLEADO PRIMARY KEY (RUT_EMPLEADO),
     CONSTRAINT FK_EMPLEADO_CARGO FOREIGN KEY (COD_CARGO) REFERENCES MMMB_CARGO(COD_CARGO),
     CONSTRAINT FK_EMPLEADO_SUCURSAL FOREIGN KEY (COD_SUCURSAL) REFERENCES MMMB_SUCURSAL(COD_SUCURSAL)
@@ -1337,8 +1337,8 @@ BEGIN
                             MMMB_PK_DESCUENTO.NEXTVAL,
                             COD_PRODUCTO_P,
                             PORCENTAJE_DESCUENTO_P,
-                            VALIDO_DESDE_P,
-                            VALIDO_HASTA_P
+                            TO_DATE(VALIDO_DESDE_P, 'DD/MM/YY'),
+                            TO_DATE(VALIDO_HASTA_P, 'DD/MM/YY')
                         );
                     CONFIRM_OUTPUT := 1;
                 END IF;
@@ -1351,8 +1351,8 @@ BEGIN
                 UPDATE MMMB_DESCUENTO 
                     SET COD_PRODUCTO = COD_PRODUCTO_P,
                         PORCENTAJE_DESCUENTO = PORCENTAJE_DESCUENTO_P,
-                        VALIDO_DESDE = VALIDO_DESDE_P,
-                        VALIDO_HASTA = VALIDO_HASTA_P
+                        VALIDO_DESDE = TO_DATE(VALIDO_DESDE_P, 'DD/MM/YY'),
+                        VALIDO_HASTA = TO_DATE(VALIDO_HASTA_P, 'DD/MM/YY')
                     WHERE (COD_DESCUENTO = COD_DESCUENTO_P);
                 CONFIRM_OUTPUT := 1;
             END IF;
@@ -1791,6 +1791,12 @@ BEGIN
     MMMB_PROC_DESCUENTO('I', NULL, 4, 7, TO_DATE('12/12/23', 'DD/MM/YY'), TO_DATE('25/12/23', 'DD/MM/YY'), out_val);
     MMMB_PROC_DESCUENTO('I', NULL, 5, 6, TO_DATE('12/12/23', 'DD/MM/YY'), TO_DATE('25/12/23', 'DD/MM/YY'), out_val);
     MMMB_PROC_DESCUENTO('I', NULL, 6, 15, TO_DATE('12/12/23', 'DD/MM/YY'), TO_DATE('25/12/23', 'DD/MM/YY'), out_val);
+
+    -- Cajas
+    MMMB_PROC_CAJA('I', 1,1,out_val);
+    MMMB_PROC_CAJA('I', 1,1,out_val);
+    MMMB_PROC_CAJA('I', 1,2,out_val);
+    MMMB_PROC_CAJA('I', 1,2,out_val);
 END;
 /
 ----

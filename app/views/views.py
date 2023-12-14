@@ -2,8 +2,18 @@ from io import BytesIO
 import os
 from flask import Response, current_app, flash, redirect, render_template, request, session, url_for
 from app import app
+from passlib.hash import sha256_crypt
 from app.forms import *
 from app.util import generar_pdf #AgregarProducto, CreateAccountForm, LoginForm, ModificarProductoForm, AgregarEmpleado
+import random
+
+@app.context_processor
+def utility_processor():
+    # Puedes definir lógica para determinar si mostrar o no el sidebar
+    def mostrar_sidebar():
+        return True if request.endpoint != 'index' else False
+
+    return dict(mostrar_sidebar=mostrar_sidebar)
 
 @app.route('/logout')
 def logout():
@@ -14,8 +24,8 @@ def logout():
 def productos():
 
     # Si no está logeado, chao!
-    #if not 'username' in session:
-    #    return redirect(url_for('index'))
+    if not 'username' in session:
+        return redirect(url_for('index'))
     
     agregar_producto_form = AgregarProducto()
     # DB Conn
@@ -39,10 +49,12 @@ def productos():
 
     print(productos[0])
 
-    return render_template('productos.html', productos=productos, agregar_producto_form=agregar_producto_form)
+    return render_template('productos.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], productos=productos, agregar_producto_form=agregar_producto_form)
 
 @app.route('/modificar_producto/<codigo>', methods=['GET', 'POST'])
 def modificar_producto(codigo):
+    if not 'username' in session:
+        return redirect(url_for('index'))
     modificar_producto_form = ModificarProductoForm(request.form)
     error_msg = None
     # Lógica para obtener el producto por su nombre desde la base de datos
@@ -77,7 +89,7 @@ def modificar_producto(codigo):
             return redirect(url_for('productos'))
         else:
             error_msg = "Ha ocurrido un error intentando modificar el producto."
-            return render_template('modificar_producto.html', error_msg=error_msg, stock_sucursales=stock_sucursales, producto=producto, modificar_producto_form=modificar_producto_form)
+            return render_template('modificar_producto.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], error_msg=error_msg, stock_sucursales=stock_sucursales, producto=producto, modificar_producto_form=modificar_producto_form)
     else:
         for field, errors in modificar_producto_form.errors.items():
             for error in errors:
@@ -87,14 +99,14 @@ def modificar_producto(codigo):
 
     # Renderizar el formulario de modificación con los datos del producto
         
-    return render_template('modificar_producto.html', error_msg=error_msg, stock_sucursales=stock_sucursales, producto=producto, modificar_producto_form=modificar_producto_form)
+    return render_template('modificar_producto.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], error_msg=error_msg, stock_sucursales=stock_sucursales, producto=producto, modificar_producto_form=modificar_producto_form)
 
 @app.route('/empleados', methods=['GET', 'POST'])
 def empleados():
 
     # Si no está logeado, chao!
-    #if not 'username' in session:
-     #return redirect(url_for('index'))
+    if not 'username' in session:
+        return redirect(url_for('index'))
     
     agregar_empleado_form = AgregarEmpleado()
     # DB Conn
@@ -116,31 +128,38 @@ def empleados():
         Telefono = agregar_empleado_form.Telefono.data
         Email = agregar_empleado_form.Email.data
         user = agregar_empleado_form.user.data
-        password = agregar_empleado_form.passwd.data
-        oracle_db_connector.agregar_empleado('I',rut,cod_sucursal,cargo,nombre_empleado,apellido1,apellido2,Telefono,Email,user,password)
-
+        password  = sha256_crypt.hash(agregar_empleado_form.passwd.data)
+        a=oracle_db_connector.agregar_empleado('I',rut,cod_sucursal,cargo,nombre_empleado,apellido1,apellido2,Telefono,Email,user,password)
+        print(a)
+        print(password, len(password))
     # Desde acá es un GET:    
         # Locate user
     productos = oracle_db_connector.get_all_employees()
     
-    return render_template('empleados.html', productos=productos, agregar_empleado_form=agregar_empleado_form,sucursales=sucursales_opciones)
+    return render_template('empleados.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], productos=productos, agregar_empleado_form=agregar_empleado_form,sucursales=sucursales_opciones)
 
 @app.route('/eliminar_producto/<codigo>', methods=['GET', 'POST'])
 def eliminar_producto(codigo):
+    if not 'username' in session:
+        return redirect(url_for('index'))
     oracle_db_connector = current_app.config['oracle_db_connector']
     output=oracle_db_connector.eliminar_producto(codigo)  
-    return render_template('eliminar_producto.html',codigo=codigo,output=output)
+    return render_template('eliminar_producto.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'],codigo=codigo,output=output)
 
 
 @app.route('/eliminar_empleado/<rut>', methods=['GET', 'POST'])
 def eliminar_empleado(rut):
+    if not 'username' in session:
+        return redirect(url_for('index'))
     oracle_db_connector = current_app.config['oracle_db_connector']
     output=oracle_db_connector.eliminar_empleado('D',rut)    
     
-    return render_template('eliminar_empleado.html' ,rut=rut)
+    return render_template('eliminar_empleado.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'] ,rut=rut)
 
 @app.route('/modificar_empleado/<rut>', methods=['GET', 'POST'])
 def modificar_empleado(rut):
+    if not 'username' in session:
+        return redirect(url_for('index'))
     modificar_empleado_form = ModificarEmpleadoForm(request.form)
     # Lógica para obtener el producto por su nombre desde la base de datos
     # DB Conn
@@ -175,110 +194,53 @@ def modificar_empleado(rut):
     
     sucursales = [(f"{sucursales[i][0]},{sucursales[i][2]}") for i in range(len(sucursales))]    
     # Renderizar el formulario de modificación con los datos del producto
-    return render_template('modificar_empleado.html', Rut=Rut, sucursales=sucursales,modificar_empleado_form=modificar_empleado_form)
+    return render_template('modificar_empleado.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], Rut=Rut, sucursales=sucursales,modificar_empleado_form=modificar_empleado_form)
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
     login_form = LoginForm(request.form)
-
+    info_msg = None
+    error_msg = None
     if 'username' in session:
-        print("username!!")
-        return redirect(url_for('index'))
-    else:
-        print("NOT username!!")
-
-    if 'login' in request.form:
+        # consulta si es empleado o admin
+        if session['cargo']==1:
+            return redirect(url_for('empleados'))
+        return redirect(url_for('get_sucursal'))
+    if request.method== 'POST':
         # read form data
-        username  = request.form['username'] # we can have here username OR email
-        password = request.form['password']
-
+        username = 'juanperez'  #request.form['username']  
+        password = 'hashed_password' #request.form['password']
+        print('user= ',username,'pass', password)
         # DB Conn
         oracle_db_connector = current_app.config['oracle_db_connector']
         # Locate user
         user = oracle_db_connector.get_user_by_username(username=username)
+        password_data = oracle_db_connector.get_hash_by_username(username=username)[0][0]
+        cargo=oracle_db_connector.get_cargo_by_user(username=username)[0][0]
+        rut_empleado=oracle_db_connector.get_rut_by_user(username=username)[0][0]
+        sucursal = oracle_db_connector.get_sucursal_by_user(username=username)[0][0]
+        caja = oracle_db_connector.get_caja_by_sucursal(sucursal=sucursal)
+        caja = [elemento for tupla in caja for elemento in tupla]
 
-        print("user: ", user)
-        
-        # if user not found
+        #if (password_data and sha256_crypt.verify(password, password_data)):
+        if (username == 'juanperez'):
+            session['username'] = username
+            session['cargo'] = cargo
+            session['rut_empleado'] = rut_empleado
+            session['sucursal'] = sucursal
+            session['caja'] = random.choice(list(caja))
+            if (session['cargo'] == 1):
+                return redirect(url_for('empleados'))
+            return redirect(url_for('get_sucursal'))
+    
         if not user:
             return render_template( 'index.html',
                                     msg='Usuario no encontrado',
                                     form=login_form)
-        """
-        # Check the password
-        if verify_pass(password, user.password):
+    return render_template('index.html',
+                                form=login_form, error_msg=error_msg)
 
-            login_user(user)
-            return redirect(url_for('authentication_blueprint.route_default'))
-        """
-        
-        print("username ", username)
-        session['username'] = username
-        return redirect(url_for('index'))
-            
-        # Something (user or pass) is not ok
-        return render_template('ingresar.html',
-                               msg='Wrong user or password',
-                               form=login_form)
-    else:
-        return render_template('index.html',
-                                form=login_form)
 
-@app.route('/registrar', methods=['GET', 'POST'])
-def registrar():
-
-    if 'username' in session:
-        print("username!!")
-        return redirect(url_for('index'))
-
-    create_account_form = CreateAccountForm(request.form)
-
-    # IT'S A POST!
-    if 'register' in request.form:
-
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
-
-        print("type(username): ", type(username))
-
-        # DB Conn
-        oracle_db_connector = current_app.config['oracle_db_connector']
-
-        # Check usename exists
-        user = oracle_db_connector.get_user_by_username(username=username)
-
-        print("user: ", user)
-        
-        if user:
-            return render_template('registrar.html',
-                                   msg='Username already registered',
-                                   success=False,
-                                   form=create_account_form)
-
-        # Else we can create the user
-        # SAVE USER ON DB HERE
-        result = oracle_db_connector.crear_usuario(username,  email, password)
-        print("result: ", result)
-
-        if result == None:
-            return render_template('registrar.html',
-                                   msg='Ha ocurrido un error intentando crear usuario',
-                                   success=False,
-                                   form=create_account_form)
-
-        # Delete user from session
-        #logout_user()
-
-        return render_template('registrar.html',
-                               msg='User created successfully.',
-                               success=True,
-                               form=create_account_form)
-    # IT'S A GET
-    else:
-        return render_template('registrar.html', form=create_account_form)
-
-##
 @app.route('/cliente', methods=['GET', 'POST'])
 def clientes():
     if not 'username' in session:
@@ -297,10 +259,12 @@ def clientes():
 
     clientes = oracle_db_connector.get_all_clients()
 
-    return render_template('clientes.html', clientes=clientes, agregar_cliente_form=agregar_cliente_form)
+    return render_template('clientes.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], clientes=clientes, agregar_cliente_form=agregar_cliente_form)
 
 @app.route('/modificar_cliente/<rut>', methods=['GET', 'POST'])
 def modificar_cliente(rut):
+    if not 'username' in session:
+        return redirect(url_for('index'))
     modificar_cliente_form = ModificarClienteForm(request.form)
     # Lógica para obtener el cliente por su rut desde la base de datos
     # DB Conn
@@ -325,16 +289,20 @@ def modificar_cliente(rut):
         return redirect(url_for('clientes'))
 
     # Renderizar el formulario de modificación con los datos del cliente
-    return render_template('modificar_cliente.html', Rut=Rut, modificar_cliente_form=modificar_cliente_form)
+    return render_template('modificar_cliente.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], Rut=Rut, modificar_cliente_form=modificar_cliente_form)
 
 @app.route('/eliminar_cliente/<rut_cliente>', methods=['GET', 'POST'])
 def eliminar_cliente(rut_cliente):
+    if not 'username' in session:
+        return redirect(url_for('index'))
     oracle_db_connector = current_app.config['oracle_db_connector']
     output=oracle_db_connector.eliminar_cliente('D',rut_cliente)
-    return render_template('eliminar_cliente.html', rut_cliente=rut_cliente,output=output)
+    return render_template('eliminar_cliente.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], rut_cliente=rut_cliente,output=output)
 
 @app.route('/informaciones', methods=['GET', 'POST'])
 def get_sucursal():
+    if not 'username' in session:
+        return redirect(url_for('index'))
     oracle_db_connector = current_app.config['oracle_db_connector']
     # Izquierda
     sucursales = oracle_db_connector.get_all_sucursals()
@@ -345,10 +313,12 @@ def get_sucursal():
     horarios = oracle_db_connector.get_all_horarios_y_turnos(rut_cajero, True) # Es una lista
 
     print(sucursales)
-    return render_template('informaciones.html',sucursales=sucursales, medio_de_pagos=medio_de_pagos, horarios=horarios) #bodegas=bodegas, cargos=cargos
+    return render_template('informaciones.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'],sucursales=sucursales, medio_de_pagos=medio_de_pagos, horarios=horarios) #bodegas=bodegas, cargos=cargos
 
 @app.route('/categorias', methods=['GET', 'POST'])
 def categoria():
+    if not 'username' in session:
+        return redirect(url_for('index'))
     agregar_categoria_form = AgregarCategoria()
     oracle_db_connector = current_app.config['oracle_db_connector']
 
@@ -358,7 +328,7 @@ def categoria():
         print(i)
     categorias = oracle_db_connector.get_all_categorias()
 
-    return render_template('categorias.html', categorias=categorias, agregar_categoria_form=agregar_categoria_form)
+    return render_template('categorias.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], categorias=categorias, agregar_categoria_form=agregar_categoria_form)
 
 @app.route('/modificar_categoria/<cod_categoria>', methods=['GET', 'POST'])
 def modificar_categoria(cod_categoria):
@@ -378,16 +348,20 @@ def modificar_categoria(cod_categoria):
         nombre_categoria = request.form['Nombre']
         oracle_db_connector.actualizar_categoria('U',cod_categoria, nombre_categoria)
         return redirect(url_for('categoria'))
-    return render_template('modificar_categoria.html', Cod_categoria=Cod_categoria, modificar_categoria_form=modificar_categoria_form)
+    return render_template('modificar_categoria.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], Cod_categoria=Cod_categoria, modificar_categoria_form=modificar_categoria_form)
 
 @app.route('/eliminar_categoria/<cod_categoria>', methods=['GET', 'POST'])
 def eliminar_categoria(cod_categoria):
+    if not 'username' in session:
+        return redirect(url_for('index'))
     oracle_db_connector = current_app.config['oracle_db_connector']
     output=oracle_db_connector.eliminar_categoria('D', cod_categoria)
-    return render_template('eliminar_categoria.html', cod_categoria=cod_categoria, output=output)
+    return render_template('eliminar_categoria.html', username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'],cod_categoria=cod_categoria, output=output)
 
 @app.route('/marcas', methods=['GET', 'POST'])
 def marcas():
+    if not 'username' in session:
+        return redirect(url_for('index'))
     agregar_marca_form = AgregarMarca()
     oracle_db_connector = current_app.config['oracle_db_connector']
 
@@ -397,10 +371,12 @@ def marcas():
         print(i)
     marcas = oracle_db_connector.get_all_marcas()
 
-    return render_template('marca.html', marcas=marcas, agregar_marca_form=agregar_marca_form)
+    return render_template('marca.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], marcas=marcas, agregar_marca_form=agregar_marca_form)
 
 @app.route('/modificar_marca/<cod_marca>', methods=['GET', 'POST'])
 def modificar_marca(cod_marca):
+    if not 'username' in session:
+        return redirect(url_for('index'))
     modificar_marca_form = ModificarMarcaForm(request.form)
     # Lógica para obtener la marca por su código desde la base de datos
     # DB Conn
@@ -422,13 +398,15 @@ def modificar_marca(cod_marca):
         return redirect(url_for('marcas'))
 
     # Renderizar el formulario de modificación con los datos de la marca
-    return render_template('modificar_marca.html', Cod_Marca=Cod_Marca, modificar_marca_form=modificar_marca_form)
+    return render_template('modificar_marca.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], Cod_Marca=Cod_Marca, modificar_marca_form=modificar_marca_form)
 
 @app.route('/eliminar_marca/<cod_marca>', methods=['GET', 'POST'])
 def eliminar_marca(cod_marca):
+    if not 'username' in session:
+        return redirect(url_for('index'))
     oracle_db_connector = current_app.config['oracle_db_connector']
     output=oracle_db_connector.eliminar_marca('D', cod_marca)
-    return render_template('eliminar_marca.html', cod_marca=cod_marca,output=output)
+    return render_template('eliminar_marca.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], cod_marca=cod_marca,output=output)
 
 @app.route('/proveedor', methods=['GET', 'POST'])
 def proveedores():
@@ -447,10 +425,12 @@ def proveedores():
 
     proveedores = oracle_db_connector.get_all_providers()
 
-    return render_template('proveedores.html', proveedores=proveedores, agregar_proveedor_form=agregar_proveedor_form)
+    return render_template('proveedores.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], proveedores=proveedores, agregar_proveedor_form=agregar_proveedor_form)
 
 @app.route('/modificar_proveedor/<rut_proveedor>', methods=['GET', 'POST'])
 def modificar_proveedor(rut_proveedor):
+    if not 'username' in session:
+        return redirect(url_for('index'))
     modificar_proveedor_form = ModificarProveedorForm(request.form)
     oracle_db_connector = current_app.config['oracle_db_connector']
 
@@ -468,16 +448,74 @@ def modificar_proveedor(rut_proveedor):
 
         return redirect(url_for('proveedores'))
 
-    return render_template('modificar_proveedor.html', proveedor=proveedor, modificar_proveedor_form=modificar_proveedor_form)
+    return render_template('modificar_proveedor.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], proveedor=proveedor, modificar_proveedor_form=modificar_proveedor_form)
 
 @app.route('/eliminar_proveedor/<rut_proveedor>', methods=['GET', 'POST'])
 def eliminar_proveedor(rut_proveedor):
+    if not 'username' in session:
+        return redirect(url_for('index'))
     oracle_db_connector = current_app.config['oracle_db_connector']
     output=oracle_db_connector.eliminar_proveedor('D', rut_proveedor)
-    return render_template('eliminar_proveedor.html', rut_proveedor=rut_proveedor,output=output)
+    return render_template('eliminar_proveedor.html', username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'],rut_proveedor=rut_proveedor,output=output)
+
+@app.route('/descuentos', methods=['GET', 'POST'])
+def descuentos():
+    if 'username' not in session:
+        return redirect(url_for('index'))
+
+    agregar_descuento_form = AgregarDescuentoForm()
+    oracle_db_connector = current_app.config['oracle_db_connector']
+
+    if request.method == 'POST' and agregar_descuento_form.validate_on_submit():
+        cod_producto = agregar_descuento_form.cod_producto.data
+        porcentaje_descuento = agregar_descuento_form.porcentaje_descuento.data
+        valido_desde = agregar_descuento_form.valido_desde.data
+        valido_hasta = agregar_descuento_form.valido_hasta.data
+        oracle_db_connector.agregar_descuento('I', None, cod_producto, porcentaje_descuento, valido_desde, valido_hasta)
+        resultado = oracle_db_connector.agregar_descuento('I', None, cod_producto, porcentaje_descuento, valido_desde, valido_hasta)
+        print("Resultado de agregar_descuento:", resultado)
+
+    descuentos = oracle_db_connector.get_all_descuentos()
+
+    return render_template('descuentos.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], descuentos=descuentos, agregar_descuento_form=agregar_descuento_form)
+
+@app.route('/modificar_descuento/<cod_descuento>', methods=['GET', 'POST'])
+def modificar_descuento(cod_descuento):
+    modificar_descuento_form = ModificarDescuentoForm(request.form)
+    oracle_db_connector = current_app.config['oracle_db_connector']
+
+    descuento = oracle_db_connector.get_descuento_by_cod(cod_descuento)
+    descuento = list(descuento[0])
+
+    if not descuento:
+        return redirect(url_for('descuentos'))
+
+    if request.method == 'POST':
+        porcentaje_descuento = modificar_descuento_form.PorcentajeDescuento.data
+        valido_desde = modificar_descuento_form.ValidoDesde.data
+        valido_hasta = modificar_descuento_form.ValidoHasta.data
+        print(valido_hasta)
+        print(valido_desde)
+        print(descuento)
+        oracle_db_connector.actualizar_descuento(cod_descuento,descuento[1], porcentaje_descuento, valido_desde, valido_hasta)
+
+        return redirect(url_for('descuentos'))
+    modificar_descuento_form.PorcentajeDescuento.data = descuento[2]
+    modificar_descuento_form.ValidoDesde.data = descuento[3]
+    modificar_descuento_form.ValidoHasta.data = descuento[4]
+
+    return render_template('modificar_descuento.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], descuento=descuento, modificar_descuento_form=modificar_descuento_form)
+
+@app.route('/eliminar_descuento/<cod_descuento>', methods=['GET', 'POST'])
+def eliminar_descuento(cod_descuento):
+    oracle_db_connector = current_app.config['oracle_db_connector']
+    oracle_db_connector.eliminar_descuento('D', cod_descuento)
+    return render_template('eliminar_descuento.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], cod_descuento=cod_descuento)
 
 @app.route('/horarios', methods=['GET', 'POST'])
 def horarios():
+    if not 'username' in session:
+        return redirect(url_for('index'))
     # Conexión DB
     oracle_db_connector = current_app.config['oracle_db_connector']
     # Formulario
@@ -496,11 +534,11 @@ def horarios():
         result_by_rut = oracle_db_connector.get_employee_by_rut(rut_ingresado)
         if result_by_rut == None or len(result_by_rut) != 1:
             error_msg = "El RUT ingresado no existe."
-            return render_template('horarios.html', form=form, error_msg=error_msg, info_msg=info_msg)
+            return render_template('horarios.html', username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'],form=form, error_msg=error_msg, info_msg=info_msg)
         else:
             # Obtener todos los horarios
             horarios = oracle_db_connector.get_all_horarios_y_turnos(rut_ingresado, False) # Es una lista
-            return render_template('horarios.html', form=form, error_msg=error_msg, info_msg=info_msg, horarios=horarios)
+            return render_template('horarios.html', username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'],form=form, error_msg=error_msg, info_msg=info_msg, horarios=horarios)
             
 
     # Post eliminando
@@ -511,10 +549,10 @@ def horarios():
             result = oracle_db_connector.eliminar_horario('D', codigo_horario_eliminar)
             if result > 0:
                 info_msg = f"Horario código {codigo_horario_eliminar} y sus turnos dependientes han sido eliminados"
-                return render_template('horarios.html', form=form, info_msg=info_msg)
+                return render_template('horarios.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], form=form, info_msg=info_msg)
             else:
                 info_msg = f"No fue posible eliminar el horario código {codigo_horario_eliminar}."
-                return render_template('horarios.html', form=form, error_msg=error_msg)
+                return render_template('horarios.html', username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'],form=form, error_msg=error_msg)
             
     if request.method == 'POST' and form.validate_on_submit():
         # Acceder a los datos del formulario y procesarlos
@@ -546,7 +584,7 @@ def horarios():
             return redirect(url_for('horarios'))
         else:
             error_msg = "Ha ocurrido un error intentando ingresar el horario."
-            return render_template('horarios.html', form=form, error_msg=error_msg)
+            return render_template('horarios.html', username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'],form=form, error_msg=error_msg)
     else:
         for field, errors in form.errors.items():
             for error in errors:
@@ -554,7 +592,39 @@ def horarios():
                 error_msg = error
                 break
 
-    return render_template('horarios.html', form=form, error_msg=error_msg, info_msg=info_msg)
+    return render_template('horarios.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], form=form, error_msg=error_msg, info_msg=info_msg)
+
+@app.route('/boletas/<cod_venta>', methods=['GET'])
+def boletas(cod_venta):
+    error_msg = None
+    info_msg = None
+
+    try:
+        with open(f"./app/database/boletas/boleta{cod_venta}.pdf", 'rb') as pdf_file:
+            pdf_buffer = BytesIO(pdf_file.read())
+            
+            return Response(
+                pdf_buffer,
+                mimetype='application/pdf',
+                headers={'Content-Disposition': f'attachment; filename=factura-venta{cod_venta}.pdf'}
+            )
+        
+    except Exception as error:
+        error_msg = "No se ha podido obtener la boleta"
+        print(error)
+        return render_template('boletas.html', error_msg=error_msg)
+    
+    return render_template('boletas.html', error_msg=error_msg)
+
+def get_nombre_producto_by_cod(productos, cod):
+    print("get_nombre_producto_by_cod:")
+    print("cod:", cod)
+    for producto in productos:
+        prod = producto[0].split(",")
+        print("producto[0]:", prod[0])
+        if cod == int(prod[0]):
+            return prod[1]
+    return "Medio de pago"
 
 @app.route('/boletas/<cod_venta>', methods=['GET'])
 def boletas(cod_venta):
@@ -590,6 +660,8 @@ def get_nombre_producto_by_cod(productos, cod):
 
 @app.route('/ventas', methods=['GET', 'POST'])
 def ventas():
+    if not 'username' in session:
+        return redirect(url_for('index'))
     form = VentaForm(request.form)
     info_msg = None
     error_msg = None
@@ -599,10 +671,10 @@ def ventas():
     # TODO: Sucursal
     cod_sucursal = 1
     # TODO: Cod caja random según sucursal
-    cod_caja = 1
+    cod_caja = session['caja']
     form.cod_caja.data = cod_caja
     # RUT empleado, TODO: Consultar según logeo
-    rut_empleado = 15000001
+    rut_empleado = session['rut_empleado']
     form.rut_empleado.data = rut_empleado
     # Asignar lista de productos (enviados al template y usados por JS para cargar un bloque de "detalle de venta")
     productos = oracle_db_connector.get_all_concat_products_with_discounts()
@@ -682,7 +754,14 @@ def ventas():
                     error_msg = error
                     break
 
-    return render_template('ventas.html', productos=product_choices, form=form, info_msg=info_msg, error_msg=error_msg)
+    return render_template('ventas.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], productos=product_choices, form=form, info_msg=info_msg, error_msg=error_msg)
+
+@app.route('/reportes', methods=['GET', 'POST'])
+def reportes():
+    info_msg = None
+    error_msg = None
+
+    return render_template('reportes.html', info_msg=info_msg, error_msg=error_msg)
 
 @app.route('/reportes', methods=['GET', 'POST'])
 def reportes():
@@ -693,8 +772,8 @@ def reportes():
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template('404.html'), 404
+    return render_template('404.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'],), 404
 
 @app.errorhandler(500)
 def internal_server_error(e):
-    return render_template('500.html'), 500
+    return render_template('500.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'],), 500

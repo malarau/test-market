@@ -1,7 +1,8 @@
 <!-- sidebar.html -->
-
+{% if mostrar_sidebar() %}
 <aside class="sidebar">
     <ul class="nav flex-column">
+        
         <li class="divider-with-text">Ventas</li>
         <li class="nav-item {% if request.path == '/cliente' %}active{% endif %}">
             <a class="nav-link text-dark" href="/cliente">
@@ -13,12 +14,15 @@
                 <i class="fas fa-chart-line"></i> Ventas
             </a>
         </li>
+        
         <li class="divider-with-text">General</li>
         <li class="nav-item {% if request.path == '/informaciones' %}active{% endif %}">
             <a class="nav-link text-dark" href="/informaciones">
                 <i class="fas fa-cart-plus"></i> Informaciones
             </a>
         </li>
+
+        {%if cargo == 1 %}
         <li class="divider-with-text">RRHH</li>
         <li class="nav-item {% if request.path == '/empleados' %}active{% endif %}">
             <a class="nav-link text-dark" href="/empleados">
@@ -55,7 +59,13 @@
             <a class="nav-link text-dark" href="/pedidos">
                 <i class="fas fa-clipboard-list"></i> Pedidos
             </a>
-        </li> 
+        </li>
+        <li class="nav-item {% if request.path == '/descuentos' %}active{% endif %}">
+            <a class="nav-link text-dark" href="/descuentos">
+                <i class="fas fa-percent"></i> Descuentos
+            </a>
+        </li>  
+        {%endif%}
         <li class="nav-item {% if request.path == '/reportes' %}active{% endif %}">
             <a class="nav-link text-dark" href="/reportes">
                 <i class="fas fa-chart-pie"></i> Reportes
@@ -63,3 +73,4 @@
         </li> 
     </ul>
 </aside>
+{% endif %}

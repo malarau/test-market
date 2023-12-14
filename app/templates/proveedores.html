@@ -55,15 +55,14 @@
                         <td>{{ proveedor[3] }}</td>
                         
                         <td>
-                            <!-- Agrega aquí enlaces para modificar y eliminar proveedores -->
-                            <td>
+                            
                                 <a href="{{ url_for('modificar_proveedor', rut_proveedor=proveedor[0]) }}" class="btn btn-link text-dark">
                                     <i class="fas fa-pencil-alt"></i> Modificar
                                 </a>
                                 <a href="{{ url_for('eliminar_proveedor', rut_proveedor=proveedor[0]) }}" class="btn btn-link text-dark" onclick="return confirm('¿Realmente desea eliminar?')">
                                     <i class="fas fa-trash"></i> Eliminar
                                 </a>
-                            </td>
+                            
                         </td>
                     </tr>
                 {% endfor %}

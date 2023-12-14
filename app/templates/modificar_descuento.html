@@ -1,0 +1,42 @@
+<!-- modificar_descuento.html -->
+{% extends "layouts/base.html" %}
+
+{% block content %}
+
+    <h1>Modificar Descuento</h1>
+    <div class="row">
+        <div class="col-md-3">
+            <form method="post">
+                {{ modificar_descuento_form.hidden_tag() }}
+
+                <div class="form-group mb-1">
+                    <label for="PorcentajeDescuento">Porcentaje de Descuento:</label>
+                    {{ modificar_descuento_form.PorcentajeDescuento(class="form-control", required=True) }}
+                </div>
+
+                <div class="form-group mb-1">
+                    <label for="ValidoDesde">Válido Desde:</label>
+                    {{ modificar_descuento_form.ValidoDesde(class="form-control", required=True) }}
+                </div>
+
+                <div class="form-group mb-1">
+                    <label for="ValidoHasta">Válido Hasta:</label>
+                    {{ modificar_descuento_form.ValidoHasta(class="form-control", required=True) }}
+                </div>
+
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            </form>
+        </div>
+
+        <div class="col-md-9">
+            <h3>Datos Anteriores</h2>
+                <ul class="list-group">
+                    <li type="circle" class="list-group-item"><b>Código de descuento: {{ descuento[0] }}</b></li>
+                    <li type="circle" class="list-group-item"><b>Código de producto: {{ descuento[1] }}</b></li>
+                    <li type="circle" class="list-group-item">Porcentaje de descuento: {{ descuento[2] }}</li>
+                    <li type="circle" class="list-group-item">Válido desde: {{ descuento[3].strftime('%d-%m-%Y') }}</li>
+                    <li type="circle" class="list-group-item">Válido hasta: {{ descuento[4].strftime('%d-%m-%Y') }}</li>
+                </ul>
+        </div>
+    </div>
+{% endblock %}
