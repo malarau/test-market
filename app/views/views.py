@@ -3,9 +3,6 @@ from app import app
 from passlib.hash import sha256_crypt
 from app.forms import * #AgregarProducto, CreateAccountForm, LoginForm, ModificarProductoForm, AgregarEmpleado
 
-
-
-
 @app.route('/logout')
 def logout():
     session.pop('username', None)
@@ -180,7 +177,6 @@ def modificar_empleado(rut):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    
     login_form = LoginForm(request.form)
 
     if 'username' in session:
@@ -215,7 +211,7 @@ def index():
         return redirect(url_for('index'))
             
     else:
-        return render_template('/index.html',
+        return render_template('index.html',
                                 form=login_form)
 
 

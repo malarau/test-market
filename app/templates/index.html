@@ -2,30 +2,32 @@
 
 {% block content %}
 
-    <span class="mb-0 text-muted">
-        {% if msg %}
-            <span class="text-danger">{{ msg | safe }}</span>
-        {% else %}
-            Add your credentials
-        {% endif %} 
-    </span>
-
-    <br />
-    <br />
-
-    <form role="form" method="post" action="">
-
-        {{ form.hidden_tag() }}                    
-
-        <div class="input-group mb-1">
-            {{ form.username(placeholder="Username or eMail", class="form-control") }}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+            <div class="card-header">
+                <h3 class="text-center">Inicio de Sesión</h3>
+            </div>
+            <div class="card-body">
+                <form method="post" action="/">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.username.label(class="form-label") }}
+                        {{ form.username(class="form-control", placeholder="Ingresa tu nombre de usuario") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.password.label(class="form-label") }}
+                        {{ form.password(class="form-control", placeholder="Ingresa tu contraseña") }}
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
+                    </div>
+                </form>
+            </div>
+            </div>
         </div>
-        
-        <div class="input-group mb-1">
-            {{ form.password(placeholder="Password", class="form-control", type="password") }}
         </div>
-        
-        <button type="submit" name="login" class="btn btn-primary shadow-2 mb-4">Login</button>
-
-    </form>
+    </div>
+    
 {% endblock %}

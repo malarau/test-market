@@ -17,7 +17,7 @@ body {
 
 /* Agregar padding a los elementos del sidebar */
 .nav-link {
-    padding: 20px; /* Ajusta el valor según sea necesario */
+    padding: 12px; /* Ajusta el valor según sea necesario */
 }
 
 /* Ajustar el tamaño de fuente si es necesario */

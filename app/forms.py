@@ -13,10 +13,10 @@ from wtforms.validators import Email, DataRequired,Length, NumberRange, InputReq
 
 
 class LoginForm(FlaskForm):
-    username = StringField('Username',
+    username = StringField('Nombre de usuario',
                          id='username_login',
                          validators=[DataRequired()])
-    password = PasswordField('Password',
+    password = PasswordField('Contraseña',
                              id='pwd_login',
                              validators=[DataRequired()])
 
