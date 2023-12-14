@@ -5,6 +5,7 @@ Copyright (c) 2019 - present AppSeed.us
 
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField, PasswordField, SubmitField, SelectField
+from wtforms.fields import DateField
 from wtforms.validators import Email, DataRequired
 
 # login and registration
@@ -114,4 +115,17 @@ class AgregarCategoria(FlaskForm):
 class ModificarCategoriaForm(FlaskForm):
     Cod_Categoria = IntegerField('Código de Categoria', validators=[DataRequired()])
     Nombre = StringField('Nombre de Categoria', validators=[DataRequired()])
+    guardar_cambios = SubmitField('Guardar Cambios')
+
+class AgregarDescuentoForm(FlaskForm):
+    cod_producto = IntegerField('Código de Producto', validators=[DataRequired()])
+    porcentaje_descuento = IntegerField('Porcentaje de Descuento', validators=[DataRequired()])
+    valido_desde = DateField('Válido Desde', format='%Y-%m-%d', validators=[DataRequired()])
+    valido_hasta = DateField('Válido Hasta', format='%Y-%m-%d', validators=[DataRequired()])
+    agregar_descuento = SubmitField('Agregar Descuento')
+
+class ModificarDescuentoForm(FlaskForm):
+    PorcentajeDescuento = IntegerField('Porcentaje de Descuento', validators=[DataRequired()])
+    ValidoDesde = DateField('Válido Desde', format='%Y-%m-%d', validators=[DataRequired()])
+    ValidoHasta = DateField('Válido Hasta', format='%Y-%m-%d', validators=[DataRequired()])
     guardar_cambios = SubmitField('Guardar Cambios')

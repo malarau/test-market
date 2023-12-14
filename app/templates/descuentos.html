@@ -1,0 +1,75 @@
+<!-- descuentos.html -->
+{% extends "layouts/base.html" %}
+
+{% block content %}    
+    <!-- ... (código existente) ... -->
+    <div class="row">
+        <!-- Sección lateral para agregar Descuentos -->
+        <div class="col-md-3">
+            <h2 class="mb-4">Agregar descuento</h2>
+            
+            <!-- Formulario para agregar un nuevo descuento -->
+            <form method="post">
+                {{ agregar_descuento_form.hidden_tag() }}
+
+                <div class="form-group mb-1">
+                    <label for="cod_producto">Código de producto:</label>
+                    {{ agregar_descuento_form.cod_producto(class="form-control", required=True) }}
+                </div>
+                <div class="form-group mb-1">
+                    <label for="porcentaje_descuento">Porcentaje de descuento:</label>
+                    {{ agregar_descuento_form.porcentaje_descuento(class="form-control", required=True) }}
+                </div>
+                <div class="form-group mb-1">
+                    <label for="valido_desde">Válido desde:</label>
+                    {{ agregar_descuento_form.valido_desde(class="form-control", required=True) }}
+                </div>
+                <div class="form-group mb-1">
+                    <label for="valido_hasta">Válido hasta:</label>
+                    {{ agregar_descuento_form.valido_hasta(class="form-control", required=True) }}
+                </div>
+
+                <button type="submit" class="btn btn-primary" name="AgregarDescuento">Agregar descuento</button>
+            </form>
+        </div>
+
+        <!-- Sección para ver todos los descuentos -->
+        <div class="col-md-9">
+            <h2 class="mb-4">Lista de descuentos</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Código de producto</th>
+                        <th>Porcentaje de descuento</th>
+                        <th>Válido desde</th>
+                        <th>Válido hasta</th>
+                        <th>Opciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for descuento in descuentos %}
+                        <tr>
+                            <td>{{ descuento[0] }}</td>
+                            <td>{{ descuento[1] }}</td>
+                            <td>{{ descuento[2] }}</td>
+                            <td>{{ descuento[3].strftime('%d-%m-%Y') }}</td>
+                            <td>{{ descuento[4].strftime('%d-%m-%Y') }}</td>
+                            
+                            <td>
+                                <!-- Enlaces para modificar y eliminar descuentos -->
+                                <a href="{{ url_for('modificar_descuento', cod_descuento=descuento[0]) }}" class="btn btn-link text-dark">
+                                    <i class="fas fa-pencil-alt"></i> Modificar
+                                </a>
+                                <a href="{{ url_for('eliminar_descuento', cod_descuento=descuento[0]) }}" class="btn btn-link text-dark" onclick="return confirm('¿Realmente desea eliminar?')">
+                                    <i class="fas fa-trash"></i> Eliminar
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- ... (código existente) ... -->
+{% endblock %}

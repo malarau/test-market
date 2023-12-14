@@ -1,4 +1,5 @@
 import oracledb
+from datetime import datetime
 
 class OracleDBConnector:
     _instance = None
@@ -347,7 +348,52 @@ class OracleDBConnector:
         except Exception as e:
             print(f"Error executing query: {e}")
             return None
+        
+    def agregar_descuento(self, opcion, cod_descuento, cod_producto, porcentaje_descuento, valido_desde, valido_hasta):
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
+                    out_val = cursor.var(int)
 
+                    # Ajustar formato de fechas
+
+
+                    cursor.callproc('MMMB_PROC_DESCUENTO', [opcion, cod_descuento, int(cod_producto), porcentaje_descuento, valido_desde, valido_hasta, out_val])
+
+                    result = out_val.getvalue()
+                return result
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return None
+
+
+    def eliminar_descuento(self, opcion, cod_descuento):
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
+                    out_val = cursor.var(int)
+                    cursor.callproc('MMMB_PROC_DESCUENTO', [opcion, int(cod_descuento), None, None, None, None, out_val])
+                    result = out_val.getvalue()
+                return result
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return None
+
+    def actualizar_descuento(self, cod_descuento, cod_producto, porcentaje_descuento, valido_desde, valido_hasta):
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
+                    out_val = cursor.var(int)
+                    print(["U", int(cod_descuento), int(cod_producto), int(porcentaje_descuento), valido_desde, valido_hasta, out_val])
+                    cursor.callproc('MMMB_PROC_DESCUENTO', ["U", int(cod_descuento), int(cod_producto), int(porcentaje_descuento), valido_desde, valido_hasta, out_val])
+
+
+                    result = out_val.getvalue()
+                return result
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return None
+        
     # Get all    
     def get_all_clients(self):
         query = "SELECT * FROM MMMB_CLIENTE"
@@ -370,6 +416,9 @@ class OracleDBConnector:
     def get_all_medio_de_pago(self):
         query = "SELECT * FROM MMMB_MEDIO_PAGO"
         return self.execute_query(query)
+    def get_all_descuentos(self):
+        query = "SELECT * FROM MMMB_DESCUENTO"
+        return self.execute_query(query)
     
     # Get by Id
     def get_categoria_by_cod(self, RUT):
@@ -384,3 +433,6 @@ class OracleDBConnector:
     def get_proveedor_by_rut(self, RUT):
         query = "SELECT * FROM MMMB_PROVEEDOR WHERE RUT_PROVEEDOR = :1"
         return self.execute_query(query, RUT)
+    def get_descuento_by_cod(self, COD):
+        query="SELECT * FROM MMMB_DESCUENTO WHERE COD_DESCUENTO = :1"
+        return self.execute_query(query, COD)

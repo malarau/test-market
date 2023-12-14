@@ -1291,8 +1291,8 @@ BEGIN
                             MMMB_PK_DESCUENTO.NEXTVAL,
                             COD_PRODUCTO_P,
                             PORCENTAJE_DESCUENTO_P,
-                            VALIDO_DESDE_P,
-                            VALIDO_HASTA_P
+                            TO_DATE(VALIDO_DESDE_P, 'DD/MM/YY'),
+                            TO_DATE(VALIDO_HASTA_P, 'DD/MM/YY')
                         );
                     CONFIRM_OUTPUT := 1;
                 END IF;
@@ -1305,8 +1305,8 @@ BEGIN
                 UPDATE MMMB_DESCUENTO 
                     SET COD_PRODUCTO = COD_PRODUCTO_P,
                         PORCENTAJE_DESCUENTO = PORCENTAJE_DESCUENTO_P,
-                        VALIDO_DESDE = VALIDO_DESDE_P,
-                        VALIDO_HASTA = VALIDO_HASTA_P
+                        VALIDO_DESDE = TO_DATE(VALIDO_DESDE_P, 'DD/MM/YY'),
+                        VALIDO_HASTA = TO_DATE(VALIDO_HASTA_P, 'DD/MM/YY')
                     WHERE (COD_DESCUENTO = COD_DESCUENTO_P);
                 CONFIRM_OUTPUT := 1;
             END IF;
