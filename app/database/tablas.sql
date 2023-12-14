@@ -31,7 +31,7 @@ DROP SEQUENCE MMMB_PK_HORARIO;
 DROP SEQUENCE MMMB_PK_PRODUCTO;
 DROP SEQUENCE MMMB_PK_CATEGORIA;
 DROP SEQUENCE MMMB_PK_PROVEEDOR;
-DROP SEQUENCE MMMB_PK_CAJA;
+-- DROP SEQUENCE MMMB_PK_CAJA; 
 DROP SEQUENCE MMMB_PK_DETALLE_CUADRATURA;
 --DROP SEQUENCE MMMB_PK_MEDIO_PAGO;
 DROP SEQUENCE MMMB_PK_VENTA;
@@ -71,11 +71,6 @@ CREATE SEQUENCE MMMB_PK_PROVEEDOR
     INCREMENT BY 1
     CACHE 10;
 
-CREATE SEQUENCE MMMB_PK_CAJA
-    START WITH 1
-    INCREMENT BY 1
-    CACHE 10;
-
 CREATE SEQUENCE MMMB_PK_DETALLE_CUADRATURA
     START WITH 1
     INCREMENT BY 1
@@ -99,6 +94,11 @@ CREATE SEQUENCE MMMB_PK_HISTORIAL_PRECIOS
 ------ No usados
 
 /*
+CREATE SEQUENCE MMMB_PK_CAJA
+    START WITH 1
+    INCREMENT BY 1
+    CACHE 10;
+
 CREATE SEQUENCE MMMB_PK_DETALLE_VENTA_PRODUCTO
     START WITH 1
     INCREMENT BY 1
@@ -205,7 +205,6 @@ CREATE TABLE MMMB_DETALLE_PRODUCTO_PROVEEDOR(
     CONSTRAINT FK_DETALLE_PRODUCTO_PROVEEDOR_PROVEEDOR FOREIGN KEY (RUT_PROVEEDOR) REFERENCES MMMB_PROVEEDOR(RUT_PROVEEDOR)
 );
 
-
 CREATE TABLE MMMB_DETALLE_SUCURSAL_PRODUCTO(
     COD_SUCURSAL NUMBER,
     COD_PRODUCTO NUMBER,
@@ -249,13 +248,14 @@ CREATE TABLE MMMB_MEDIO_PAGO(
 
 CREATE TABLE MMMB_VENTA(
     COD_VENTA NUMBER,
+    COD_SUCURSAL NUMBER, -- Se ha agregado la sucursal
     COD_CAJA NUMBER,        -- Droplist, según sucursal, según empleado
     RUT_CLIENTE NUMBER,     -- Se ingresa y se busca
     RUT_EMPLEADO NUMBER,    -- Automático (por logeo)
     COD_PAGO NUMBER,        -- Droplist (Medio de pago?)
     FECHA_VENTA DATE,       -- Automático
     TOTAL_VENTA NUMBER,     -- Trigger
-    DESCUENTO_VENTA NUMBER, -- Trigger (según productos MMMB_DETALLE_VENTA_PRODUCTO)
+    DESCUENTO_VENTA NUMBER, -- NO HAY TRIGGER, ERA MENTIRA
     CONSTRAINT PK_VENTA PRIMARY KEY (COD_VENTA),
     CONSTRAINT FK_VENTA_CAJA FOREIGN KEY (COD_CAJA) REFERENCES MMMB_CAJA(COD_CAJA),
     CONSTRAINT FK_VENTA_CLIENTE FOREIGN KEY (RUT_CLIENTE) REFERENCES MMMB_CLIENTE(RUT_CLIENTE),
@@ -940,7 +940,7 @@ BEGIN
                 ELSE
                     CONFIRM_OUTPUT := MMMB_PK_HORARIO.NEXTVAL;
                     INSERT INTO MMMB_HORARIO 
-                        VALUES(CONFIRM_OUTPUT, RUT_EMPLEADO_P, FECHA_INICIO_P);   
+                        VALUES(CONFIRM_OUTPUT, RUT_EMPLEADO_P, TO_DATE(FECHA_INICIO_P, 'DD/MM/YY'));   
                 END IF;              
             END IF;
         WHEN 'U' THEN
@@ -950,7 +950,7 @@ BEGIN
             ELSE
                 UPDATE MMMB_HORARIO 
                     SET RUT_EMPLEADO = RUT_EMPLEADO_P,
-                        FECHA_INICIO = FECHA_INICIO_P
+                        FECHA_INICIO = TO_DATE(FECHA_INICIO_P, 'DD/MM/YY')
                     WHERE (COD_HORARIO = COD_HORARIO_P);
                 CONFIRM_OUTPUT := 1;
             END IF;
@@ -1011,14 +1011,14 @@ BEGIN
                     CONFIRM_OUTPUT := MMMB_PK_TURNO.NEXTVAL;
                     INSERT INTO MMMB_TURNO 
                         VALUES(
-                            CONFIRM_OUTPUT, COD_HORARIO_P, DIA_P, HORA_ENTRADA_P, HORA_SALIDA_P,
+                            CONFIRM_OUTPUT, COD_HORARIO_P, TO_DATE(DIA_P, 'DD/MM/YY'), HORA_ENTRADA_P, HORA_SALIDA_P,
                             INICIO_COLACION_P, TERMINO_COLACION_P
                         );
                 END IF;
             END IF;
         WHEN 'U' THEN
             UPDATE MMMB_TURNO 
-                SET DIA = DIA_P,
+                SET DIA = TO_DATE(DIA_P, 'DD/MM/YY'),
                     HORA_ENTRADA = HORA_ENTRADA_P,
                     HORA_SALIDA = HORA_SALIDA_P,
                     INICIO_COLACION = INICIO_COLACION_P,
@@ -1051,7 +1051,7 @@ END;
 /
 
 -- Caja
-
+/*
 CREATE OR REPLACE PROCEDURE MMMB_PROC_CAJA(
     OPCION VARCHAR2,
     COD_CAJA_P NUMBER,
@@ -1111,6 +1111,7 @@ EXCEPTION
         ROLLBACK;
 END;
 /
+*/
 
 -- Detalle cuadratura
 
@@ -1385,11 +1386,11 @@ END;
 CREATE OR REPLACE PROCEDURE MMMB_PROC_VENTA(
     OPCION VARCHAR2,
     COD_VENTA_P NUMBER,
+    COD_SUCURSAL_P NUMBER DEFAULT NULL, 
     COD_CAJA_P NUMBER DEFAULT NULL,
     RUT_CLIENTE_P NUMBER DEFAULT NULL,
     RUT_EMPLEADO_P NUMBER DEFAULT NULL,
     COD_PAGO_P NUMBER DEFAULT NULL,
-    FECHA_VENTA_P DATE DEFAULT NULL,
     TOTAL_VENTA_P NUMBER DEFAULT NULL,
     DESCUENTO_VENTA_P NUMBER DEFAULT NULL,
     CONFIRM_OUTPUT OUT NUMBER 
@@ -1400,12 +1401,14 @@ BEGIN
 
     CASE OPCION
         WHEN 'I' THEN
-            IF (COD_CAJA_P IS NULL OR RUT_CLIENTE_P IS NULL OR RUT_EMPLEADO_P IS NULL 
-                OR COD_PAGO_P IS NULL OR FECHA_VENTA_P IS NULL OR TOTAL_VENTA_P IS NULL) THEN
+            IF COALESCE(COD_SUCURSAL_P, COD_CAJA_P, RUT_CLIENTE_P, RUT_EMPLEADO_P, COD_PAGO_P, TOTAL_VENTA_P) IS NULL THEN
                 DBMS_OUTPUT.PUT_LINE('Error: Alguno de los parámetros contiene valores nulos.');
                 CONFIRM_OUTPUT := -1;
             ELSE
-                IF MMMB_EXISTE_CAJA(COD_CAJA_P) = 0 THEN
+                IF MMMB_EXISTE_SUCURSAL(COD_SUCURSAL_P) = 0 THEN
+                    DBMS_OUTPUT.PUT_LINE('Error: La sucursal no existe.');
+                    CONFIRM_OUTPUT := -1;
+                ELSIF MMMB_EXISTE_CAJA(COD_CAJA_P) = 0 THEN
                     DBMS_OUTPUT.PUT_LINE('Error: La caja no existe.');
                     CONFIRM_OUTPUT := -1;
                 ELSIF MMMB_EXISTE_CLIENTE(RUT_CLIENTE_P) = 0 THEN
@@ -1415,22 +1418,26 @@ BEGIN
                     DBMS_OUTPUT.PUT_LINE('Error: El empleado no existe.');
                     CONFIRM_OUTPUT := -1;
                 ELSE
+                    CONFIRM_OUTPUT := MMMB_PK_VENTA.NEXTVAL;
                     INSERT INTO MMMB_VENTA 
                         VALUES(
-                            MMMB_PK_VENTA.NEXTVAL,
+                            CONFIRM_OUTPUT,
+                            COD_SUCURSAL_P,
                             COD_CAJA_P,
                             RUT_CLIENTE_P,
                             RUT_EMPLEADO_P,
                             COD_PAGO_P,
-                            FECHA_VENTA_P,
+                            SYSDATE,
                             TOTAL_VENTA_P,
                             DESCUENTO_VENTA_P
                         );
-                    CONFIRM_OUTPUT := 1;
                 END IF;
             END IF;
-        WHEN 'U' THEN
-            IF MMMB_EXISTE_CAJA(COD_CAJA_P) = 0 THEN
+        WHEN 'U' THEN -- NUNCA DEBERÍA USARSE, PORQUE NO ES LEGAL, PARA ESO, NOTAS DE CRÉDITO
+            IF MMMB_EXISTE_SUCURSAL(COD_SUCURSAL_P) = 0 THEN
+                DBMS_OUTPUT.PUT_LINE('Error: La sucursal no existe.');
+                CONFIRM_OUTPUT := -1;
+            ELSIF MMMB_EXISTE_CAJA(COD_CAJA_P) = 0 THEN
                 DBMS_OUTPUT.PUT_LINE('Error: La caja no existe.');
                 CONFIRM_OUTPUT := -1;
             ELSIF MMMB_EXISTE_CLIENTE(RUT_CLIENTE_P) = 0 THEN
@@ -1441,11 +1448,11 @@ BEGIN
                 CONFIRM_OUTPUT := -1;
             ELSE
                 UPDATE MMMB_VENTA 
-                    SET COD_CAJA = COD_CAJA_P,
+                    SET COD_SUCURSAL = COD_SUCURSAL_P,
+                        COD_CAJA = COD_CAJA_P,
                         RUT_CLIENTE = RUT_CLIENTE_P,
                         RUT_EMPLEADO = RUT_EMPLEADO_P,
                         COD_PAGO = COD_PAGO_P,
-                        FECHA_VENTA = FECHA_VENTA_P,
                         TOTAL_VENTA = TOTAL_VENTA_P,
                         DESCUENTO_VENTA = DESCUENTO_VENTA_P
                     WHERE (COD_VENTA = COD_VENTA_P);
@@ -1510,16 +1517,46 @@ BEGIN
 END;
 /
 
+-- Trigger sobre MMMB_DETALLE_VENTA_PRODUCTO, debe capturar CANTIDAD de la venta
+-- MMMB_DETALLE_SUCURSAL_PRODUCTO STOCK_SUCURSAL_PRODUCTO
+
+CREATE OR REPLACE TRIGGER MMMB_TRG_ACTUALIZAR_STOCK
+AFTER INSERT ON MMMB_DETALLE_VENTA_PRODUCTO
+FOR EACH ROW
+DECLARE
+    v_cod_sucursal NUMBER;
+BEGIN
+    -- Obtener el código de sucursal desde la tabla MMMB_VENTA
+    SELECT COD_SUCURSAL INTO v_cod_sucursal
+    FROM MMMB_VENTA
+    WHERE COD_VENTA = :NEW.COD_VENTA;
+
+    -- Actualizar el stock en la tabla MMMB_DETALLE_SUCURSAL_PRODUCTO
+    UPDATE MMMB_DETALLE_SUCURSAL_PRODUCTO
+    SET STOCK_SUCURSAL_PRODUCTO = STOCK_SUCURSAL_PRODUCTO - :NEW.CANTIDAD
+    WHERE COD_SUCURSAL = v_cod_sucursal AND COD_PRODUCTO = :NEW.COD_PRODUCTO;
+END;
+/
+
 
 /*
     BASE DATA
 */
 
--- Inserts para añadir 2 sucursales
+-- Inserts para añadir 2 sucursales (y 2 cajas para cada una)
 INSERT INTO MMMB_SUCURSAL (COD_SUCURSAL, NOMBRE_SUCURSAL, TELEFONO_SUCURSAL)
-VALUES (1, 'Sucursal A', '+56954685222');
+    VALUES (1, 'Sucursal A', '+56954685222');
+INSERT INTO MMMB_CAJA (COD_CAJA, COD_SUCURSAL)
+    VALUES (1, 1);
+INSERT INTO MMMB_CAJA (COD_CAJA, COD_SUCURSAL)
+    VALUES (2, 1);
+
 INSERT INTO MMMB_SUCURSAL (COD_SUCURSAL, NOMBRE_SUCURSAL, TELEFONO_SUCURSAL)
-VALUES (2, 'Sucursal B', '+56954685222');
+    VALUES (2, 'Sucursal B', '+56954685222');
+INSERT INTO MMMB_CAJA (COD_CAJA, COD_SUCURSAL)
+    VALUES (3, 2);
+INSERT INTO MMMB_CAJA (COD_CAJA, COD_SUCURSAL)
+    VALUES (4, 2);
 
 -- Inserts para añadir 2 cargos
 INSERT INTO MMMB_CARGO (COD_CARGO, NOMBRE_CARGO) VALUES (1, 'Dueño');
@@ -1567,6 +1604,17 @@ BEGIN
             confirm_output
         );
     END LOOP;
+
+    -- Insertar cliente nulo, RUT = 0, para los que no se logean
+    MMMB_PROC_CLIENTE(
+        'I',
+        0,
+        'SIN CUENTA',
+        'SIN APELLIDO1',
+        'SIN APELLIDO2',
+        'SIN CORREO',
+        confirm_output
+    );
 END;
 /
 

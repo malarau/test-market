@@ -1,6 +1,9 @@
-from flask import current_app, redirect, render_template, request, session, url_for
+from io import BytesIO
+import os
+from flask import Response, current_app, flash, redirect, render_template, request, session, url_for
 from app import app
-from app.forms import * #AgregarProducto, CreateAccountForm, LoginForm, ModificarProductoForm, AgregarEmpleado
+from app.forms import *
+from app.util import generar_pdf #AgregarProducto, CreateAccountForm, LoginForm, ModificarProductoForm, AgregarEmpleado
 
 @app.route('/logout')
 def logout():
@@ -201,7 +204,6 @@ def index():
             return render_template( 'index.html',
                                     msg='Usuario no encontrado',
                                     form=login_form)
-
         """
         # Check the password
         if verify_pass(password, user.password):
@@ -554,6 +556,38 @@ def horarios():
 
     return render_template('horarios.html', form=form, error_msg=error_msg, info_msg=info_msg)
 
+@app.route('/boletas/<cod_venta>', methods=['GET'])
+def boletas(cod_venta):
+    error_msg = None
+    info_msg = None
+
+    try:
+        with open(f"./app/database/boletas/boleta{cod_venta}.pdf", 'rb') as pdf_file:
+            pdf_buffer = BytesIO(pdf_file.read())
+            
+            return Response(
+                pdf_buffer,
+                mimetype='application/pdf',
+                headers={'Content-Disposition': f'attachment; filename=factura-venta{cod_venta}.pdf'}
+            )
+        
+    except Exception as error:
+        error_msg = "No se ha podido obtener la boleta"
+        print(error)
+        return render_template('boletas.html', error_msg=error_msg)
+    
+    return render_template('boletas.html', error_msg=error_msg)
+
+def get_nombre_producto_by_cod(productos, cod):
+    print("get_nombre_producto_by_cod:")
+    print("cod:", cod)
+    for producto in productos:
+        prod = producto[0].split(",")
+        print("producto[0]:", prod[0])
+        if cod == int(prod[0]):
+            return prod[1]
+    return "Medio de pago"
+
 @app.route('/ventas', methods=['GET', 'POST'])
 def ventas():
     form = VentaForm(request.form)
@@ -562,7 +596,8 @@ def ventas():
 
     # DB
     oracle_db_connector = current_app.config['oracle_db_connector']
-
+    # TODO: Sucursal
+    cod_sucursal = 1
     # TODO: Cod caja random según sucursal
     cod_caja = 1
     form.cod_caja.data = cod_caja
@@ -580,11 +615,13 @@ def ventas():
         if form.validate_on_submit(): # significa que todo está validado y OK, no? No??
 
             print("form.rut_cliente: ", form.rut_cliente.data)
-            print("form.medio_de_pago: ", form.medio_de_pago.data[0])
+            print("form.medio_de_pago0: ", form.medio_de_pago.data[0])
+            print("form.medio_de_pago1: ", form.medio_de_pago.data.split(',')[1])
             print("form.total: ", form.total.data)
             print("post, detalles.data:\n\t", form.detalles.data) # Detalle de venta
 
-            result = oracle_db_connector.agregar_venta(
+            cod_venta = oracle_db_connector.agregar_venta(
+                cod_sucursal,
                 cod_caja,
                 form.rut_cliente.data,
                 rut_empleado,
@@ -595,9 +632,43 @@ def ventas():
                 form.detalles.data
             )
 
-            if result < 0:
-                print("aaaaaaaaaaaaaaaaaaaaaaaa")
+            if cod_venta < 0:
+                error_msg = "Ha ocurrido un error al ingresar la venta"
+            else:
+                nombre_negocio = os.getenv('NOMBRE_NEGOCIO')
+                rut_sucursal = os.getenv('RUT_SUCURSAL')
 
+                detalles_venta = form.detalles.data
+
+                # Detalles de venta completo
+                total = 0 # Sin descuento aplicado
+                for detalle in detalles_venta:
+                    # Agregar nombre producto
+                    detalle['nombre_producto'] = get_nombre_producto_by_cod(productos, int(detalle['cod_producto']))
+
+                    # Agregar descuento en detalle
+                    detalle['descuento'] = int(detalle['producto'])*int(detalle['cantidad']) - int(detalle['subtotal'])
+                    total += int(detalle['producto'])*int(detalle['cantidad']) 
+
+                diferencia_total_descuento = total - int(form.total.data) # form.total.data = Con descuento aplicado
+
+                pdf_buffer = generar_pdf(
+                    f"./app/database/boletas/boleta{cod_venta}.pdf",
+                    nombre_negocio,
+                    rut_sucursal,
+                    cod_sucursal,
+                    cod_caja,
+                    rut_empleado,
+                    form.medio_de_pago.data[0],
+                    form.medio_de_pago.data.split(',')[1],
+                    form.total.data,
+                    diferencia_total_descuento,
+                    detalles_venta
+                )
+
+                # Redirigir a la misma vista con un mensaje
+                info_msg = "Venta ingresada exitosamente."
+                return render_template('ventas.html', productos=product_choices, form=form, info_msg=info_msg, error_msg=error_msg, pdf=cod_venta)
         else:
             for field, errors in form.errors.items():
                 for error in errors:
@@ -612,6 +683,13 @@ def ventas():
                     break
 
     return render_template('ventas.html', productos=product_choices, form=form, info_msg=info_msg, error_msg=error_msg)
+
+@app.route('/reportes', methods=['GET', 'POST'])
+def reportes():
+    info_msg = None
+    error_msg = None
+
+    return render_template('reportes.html', info_msg=info_msg, error_msg=error_msg)
 
 @app.errorhandler(404)
 def page_not_found(e):

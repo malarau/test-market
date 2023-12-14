@@ -91,7 +91,7 @@
                         <tr data-bs-toggle="collapse" data-bs-target="#detalles{{ loop.index }}" aria-expanded="false" aria-controls="detalles{{ loop.index }}">
                             <td>{{ horario[0] }}</td>
                             <td>{{ horario[1] }}</td>
-                            <td>{{ horario[2].strftime('%Y-%m-%d') }}</td>
+                            <td>{{ horario[2].strftime('%d-%m-%Y') }}</td>
                             <form method="post" action="{{ url_for('horarios') }}">
                                 <td>
                                     <button type="submit" name="eliminar_horario" value="{{ horario[0] }}" class="btn btn-link text-dark" onclick="return confirm('¿Realmente desea eliminar?')">
@@ -116,7 +116,7 @@
                                         <tbody>
                                             {% for turno in horario[3] %}
                                                 <tr>
-                                                    <td>{{ turno[2].strftime('%Y-%m-%d') }}</td>
+                                                    <td>{{ turno[2].strftime('%d-%m-%Y') }}</td>
                                                     <td>{{ turno[3].strftime('%H:%M:%S') }}</td>
                                                     <td>{{ turno[4].strftime('%H:%M:%S') }}</td>
                                                     <td>{{ turno[5].strftime('%H:%M:%S') }}</td>

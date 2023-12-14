@@ -10,7 +10,8 @@ class OracleDBConnector:
     #    
 
     def __new__(cls, username, password, connect_string, mode=oracledb.SYSDBA):
-        print(F'username, password, connect_string: {(username, password, connect_string)}')
+        #print(F'username, password, connect_string: {(username, password, connect_string)}')
+        print(F'username, password, connect_string: OCULTO (100% SEGURO)')
         if not cls._instance:
             cls._instance = super(OracleDBConnector, cls).__new__(cls)
             cls._instance._username = username
@@ -37,7 +38,7 @@ class OracleDBConnector:
                     return result
         except Exception as e:
             print(f"Error executing query: {e}")
-            return None
+            return -1
         
     # EJECUTA UNA QUERY PARA INSERTAR COSAS, IMAGINO QUE FUNCIONA PARA UPDATE
     # TODO: NO USAR ESTO, CREAR PROCEDIMIENTOS ESPECIALES
@@ -461,21 +462,67 @@ class OracleDBConnector:
     #   VENTA
     #
 
-    def agregar_venta(self, cod_caja, rut_cliente, rut_empleado, cod_medio_de_pago, total, detalles_venta):
-        # FECHA_VENTA = SYSDATE
-        # DESCUENTO_VENTA = Calcular diferencia entre precio_venta y subtotal para cada item de form.detalles.data
+    """
+            OPCION VARCHAR2,
+            COD_VENTA_P NUMBER,
+            COD_CAJA_P NUMBER DEFAULT NULL,
+            RUT_CLIENTE_P NUMBER DEFAULT NULL,
+            RUT_EMPLEADO_P NUMBER DEFAULT NULL,
+            COD_PAGO_P NUMBER DEFAULT NULL,
+            FECHA_VENTA_P DATE DEFAULT NULL,
+            TOTAL_VENTA_P NUMBER DEFAULT NULL,
+            DESCUENTO_VENTA_P NUMBER DEFAULT NULL,
+            CONFIRM_OUTPUT OUT NUMBER 
+    """
+    def agregar_venta(self, cod_sucursal, cod_caja, rut_cliente, rut_empleado, cod_medio_de_pago, total, detalles_venta):
 
-        # 1.- Ingresar venta MMMB_VENTA creando un procedimiento (para calcular descuentos dentro)
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
+                    out_val = cursor.var(int)
+                    connection.autocommit = False
 
-        # 2.- Ingresar detalles de venta MMMB_DETALLE_VENTA_PRODUCTO (un FOR sobre detalles_venta)
+                    # 1.- Ingresar venta MMMB_VENTA creando un procedimiento (para calcular descuentos dentro)
+                        # FECHA_VENTA = SYSDATE
+                        # DESCUENTO_VENTA = Calcular diferencia entre precio_venta y subtotal para cada item de form.detalles.data
+                    total = 0
+                    total_con_descuento = 0
+                    for detalle in detalles_venta:
+                        total += int(detalle['producto'])*int(detalle['cantidad'])
+                        total_con_descuento += int(detalle['subtotal'])
 
-        # 3.- Trigges para disminuir stock según sucursal
-            # Trigger sobre MMMB_DETALLE_VENTA_PRODUCTO que modifican MMMB_DETALLE_SUCURSAL_PRODUCTO
-            # Usar :NEW para obtener cod_venta, sacar cod_caja y recuperar cod_sucursal?
-        
-        # 3.- Rezar y esperar que salga todo bien
-                
-        return -1
+                    diferencia_total_descuento = total - total_con_descuento
+
+                    cursor.callproc('MMMB_PROC_VENTA', ['I', None, int(cod_sucursal), int(cod_caja), int(rut_cliente), int(rut_empleado), int(cod_medio_de_pago), int(total), diferencia_total_descuento, out_val])
+
+                    cod_result = out_val.getvalue()
+                    print("cod_result", cod_result)
+                    if cod_result < 0:
+                        return cod_result
+                    
+                    """
+                            COD_VENTA NUMBER,
+                            COD_PRODUCTO NUMBER,
+                            CANTIDAD NUMBER
+                    """
+                    # 2.- Ingresar detalles de venta MMMB_DETALLE_VENTA_PRODUCTO (un FOR sobre detalles_venta)
+                    for detalle in detalles_venta:
+                        query = "INSERT INTO MMMB_DETALLE_VENTA_PRODUCTO VALUES(:1, :2, :3)"
+                        cursor.execute(query, (cod_result, int(detalle['cod_producto']), int(detalle['cantidad'])))
+
+                    # 3.- Trigges para disminuir stock según sucursal -----> OK
+                        # Trigger sobre MMMB_DETALLE_VENTA_PRODUCTO que modifican MMMB_DETALLE_SUCURSAL_PRODUCTO
+                        # Usar :NEW para obtener cod_venta
+ 
+                    # 4.- Rezar y esperar que salga todo bien
+                    
+                    connection.autocommit = True
+                    connection.commit() # No tiene sentido
+                    return cod_result
+
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return -1
 
     # Get all    
     def get_all_clients(self):

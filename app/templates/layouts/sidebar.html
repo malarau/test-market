@@ -56,5 +56,10 @@
                 <i class="fas fa-clipboard-list"></i> Pedidos
             </a>
         </li> 
+        <li class="nav-item {% if request.path == '/reportes' %}active{% endif %}">
+            <a class="nav-link text-dark" href="/reportes">
+                <i class="fas fa-chart-pie"></i> Reportes
+            </a>
+        </li> 
     </ul>
 </aside>
