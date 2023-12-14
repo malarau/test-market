@@ -21,16 +21,6 @@ class LoginForm(FlaskForm):
                              validators=[DataRequired()])
 
 
-class CreateAccountForm(FlaskForm):
-    username = StringField('Username',
-                         id='username_create',
-                         validators=[DataRequired()])
-    email = EmailField('Email',
-                      id='email_create',
-                      validators=[DataRequired(), Email()])
-    password = PasswordField('Password',
-                             id='pwd_create',
-                             validators=[DataRequired()])
 
 #
 # Empleado

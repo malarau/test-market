@@ -1,18 +1,10 @@
 from flask import current_app, redirect, render_template, request, session, url_for
 from app import app
+from passlib.hash import sha256_crypt
 from app.forms import * #AgregarProducto, CreateAccountForm, LoginForm, ModificarProductoForm, AgregarEmpleado
 
-@app.route('/')
-def index():
-    # DB Conn
-    oracle_db_connector = current_app.config['oracle_db_connector']
-    # Locate user
-    username = None
-    if 'username' in session:
-        username = session['username']
 
-    # Lógica de la ruta de la página de inicio
-    return render_template('index.html', username=username)
+
 
 @app.route('/logout')
 def logout():
@@ -186,109 +178,47 @@ def modificar_empleado(rut):
     # Renderizar el formulario de modificación con los datos del producto
     return render_template('modificar_empleado.html', Rut=Rut, sucursales=sucursales,modificar_empleado_form=modificar_empleado_form)
 
-@app.route('/ingresar', methods=['GET', 'POST'])
-def ingresar():
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    
     login_form = LoginForm(request.form)
 
     if 'username' in session:
-        print("username!!")
-        return redirect(url_for('index'))
-    else:
-        print("NOT username!!")
-
+        # consulta si es empleado o admin
+        return redirect(url_for('informaciones'))
+    print("Nombre de usuario incorrecto!!")
+        
+    info_msg = None
+    error_msg = None
+    
     if 'login' in request.form:
         # read form data
         username  = request.form['username'] # we can have here username OR email
         password = request.form['password']
 
+
         # DB Conn
         oracle_db_connector = current_app.config['oracle_db_connector']
         # Locate user
         user = oracle_db_connector.get_user_by_username(username=username)
-
+        password_data = oracle_db_connector.get_hash_by_username(username=username)
         print("user: ", user)
         
-        # if user not found
+        if (password_data and sha256_crypt.verify(password, password_data)):
+            return redirect(url_for('informaciones'))
+        
         if not user:
-            return render_template( 'ingresar.html',
+            return render_template( 'index.html',
                                     msg='Usuario no encontrado',
                                     form=login_form)
-
-        """
-        # Check the password
-        if verify_pass(password, user.password):
-
-            login_user(user)
-            return redirect(url_for('authentication_blueprint.route_default'))
-        """
-        
-        print("username ", username)
         session['username'] = username
         return redirect(url_for('index'))
             
-        # Something (user or pass) is not ok
-        return render_template('ingresar.html',
-                               msg='Wrong user or password',
-                               form=login_form)
     else:
-        return render_template('ingresar.html',
+        return render_template('/index.html',
                                 form=login_form)
 
-@app.route('/registrar', methods=['GET', 'POST'])
-def registrar():
 
-    if 'username' in session:
-        print("username!!")
-        return redirect(url_for('index'))
-
-    create_account_form = CreateAccountForm(request.form)
-
-    # IT'S A POST!
-    if 'register' in request.form:
-
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
-
-        print("type(username): ", type(username))
-
-        # DB Conn
-        oracle_db_connector = current_app.config['oracle_db_connector']
-
-        # Check usename exists
-        user = oracle_db_connector.get_user_by_username(username=username)
-
-        print("user: ", user)
-        
-        if user:
-            return render_template('registrar.html',
-                                   msg='Username already registered',
-                                   success=False,
-                                   form=create_account_form)
-
-        # Else we can create the user
-        # SAVE USER ON DB HERE
-        result = oracle_db_connector.crear_usuario(username,  email, password)
-        print("result: ", result)
-
-        if result == None:
-            return render_template('registrar.html',
-                                   msg='Ha ocurrido un error intentando crear usuario',
-                                   success=False,
-                                   form=create_account_form)
-
-        # Delete user from session
-        #logout_user()
-
-        return render_template('registrar.html',
-                               msg='User created successfully.',
-                               success=True,
-                               form=create_account_form)
-    # IT'S A GET
-    else:
-        return render_template('registrar.html', form=create_account_form)
-
-##
 @app.route('/cliente', methods=['GET', 'POST'])
 def clientes():
     if not 'username' in session:

@@ -62,6 +62,11 @@ class OracleDBConnector:
         print("query: ", query)
         return self.execute_query(query, username)
     
+    def get_hash_by_username(self, username):
+        query = "SELECT CONTRASEÑA_EMPLEADO FROM USUARIO WHERE username = :1"
+        print("query: ", query)
+        return self.execute_query(query, username)
+    
     # USO DE PROCEDIMIENTO
     def crear_usuario(self, username, email, password):
         try:
