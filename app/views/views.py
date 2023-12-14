@@ -2,18 +2,6 @@ from flask import current_app, redirect, render_template, request, session, url_
 from app import app
 from app.forms import * #AgregarProducto, CreateAccountForm, LoginForm, ModificarProductoForm, AgregarEmpleado
 
-@app.route('/')
-def index():
-    # DB Conn
-    oracle_db_connector = current_app.config['oracle_db_connector']
-    # Locate user
-    username = None
-    if 'username' in session:
-        username = session['username']
-
-    # Lógica de la ruta de la página de inicio
-    return render_template('index.html', username=username)
-
 @app.route('/logout')
 def logout():
     session.pop('username', None)
@@ -186,8 +174,8 @@ def modificar_empleado(rut):
     # Renderizar el formulario de modificación con los datos del producto
     return render_template('modificar_empleado.html', Rut=Rut, sucursales=sucursales,modificar_empleado_form=modificar_empleado_form)
 
-@app.route('/ingresar', methods=['GET', 'POST'])
-def ingresar():
+@app.route('/', methods=['GET', 'POST'])
+def index():
     login_form = LoginForm(request.form)
 
     if 'username' in session:
@@ -210,7 +198,7 @@ def ingresar():
         
         # if user not found
         if not user:
-            return render_template( 'ingresar.html',
+            return render_template( 'index.html',
                                     msg='Usuario no encontrado',
                                     form=login_form)
 
@@ -231,7 +219,7 @@ def ingresar():
                                msg='Wrong user or password',
                                form=login_form)
     else:
-        return render_template('ingresar.html',
+        return render_template('index.html',
                                 form=login_form)
 
 @app.route('/registrar', methods=['GET', 'POST'])
