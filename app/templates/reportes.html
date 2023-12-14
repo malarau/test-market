@@ -2,6 +2,224 @@
 
 {% block content %}  
 
-    cry cry
+    <div class="row contenedor">
+        <!-- Sección lateral consultar ventas según medio de pago -->
+        <div class="col-md-6">
+            <h4 class="mb-4">Últimos registros de venta (7 días)</h4>
+            <ul class="nav nav-tabs" id="myTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" id="sucursal1-tab-ventas" data-bs-toggle="tab" href="#sucursal1-ventas" role="tab" aria-controls="sucursal1-ventas" aria-selected="true">Sucursal 1</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="sucursal2-tab-ventas" data-bs-toggle="tab" href="#sucursal2-ventas" role="tab" aria-controls="sucursal2-ventas" aria-selected="false">Sucursal 2</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabsContent">
+                <!-- Tab de Sucursal 1 -->
+                <div class="tab-pane fade show active" id="sucursal1-ventas" role="tabpanel" aria-labelledby="sucursal1-tab-ventas">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Código venta</th>
+                                <th>Código caja</th>
+                                <th>RUT cliente</th>
+                                <th>RUT empleado</th>
+                                <th>Medio de pago</th>
+                                <th>Fecha venta</th>
+                                <th>Total</th>
+                                <th>Descuento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for venta in ultimas_ventas_suc1 %}
+                                <tr>
+                                    <td>{{ venta[0] }}</td>
+                                    <td>{{ venta[2] }}</td>
+                                    <td>{{ venta[3] }}</td>
+                                    <td>{{ venta[4] }}</td>
+                                    <td>{{ venta[5] }}</td>
+                                    <td>{{ venta[6].strftime('%d-%m-%Y') }}</td>
+                                    <td>${{ venta[7] }}</td>
+                                    <td>${{ venta[8] }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            
+                <!-- Tab de Sucursal 2 -->
+                <div class="tab-pane fade" id="sucursal2-ventas" role="tabpanel" aria-labelledby="sucursal2-tab-ventas">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Código Caja</th>
+                                <th>RUT Cliente</th>
+                                <th>RUT Empleado</th>
+                                <th>Medio pago</th>
+                                <th>Fecha</th>
+                                <th>Total</th>
+                                <th>Descuento</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for venta in ultimas_ventas_suc2 %}
+                                <tr>
+                                    <td>{{ venta[0] }}</td>
+                                    <td>{{ venta[2] }}</td>
+                                    <td>{{ venta[3] }}</td>
+                                    <td>{{ venta[4] }}</td>
+                                    <td>{{ venta[5] }}</td>
+                                    <td>{{ venta[6].strftime('%d-%m-%Y') }}</td>
+                                    <td>${{ venta[7] }}</td>
+                                    <td>${{ venta[8] }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sección lateral para productos por stock y cambios de precios -->
+        <div class="col-md-6">
+            <div class="row">
+                <h4 class="mb-4">En bajo stock</h4>
+                <ul class="nav nav-tabs" id="myTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" id="sucursal1-tab-stock" data-bs-toggle="tab" href="#sucursal1-stock" role="tab" aria-controls="sucursal1-stock" aria-selected="true">Sucursal 1</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="sucursal2-tab-stock" data-bs-toggle="tab" href="#sucursal2-stock" role="tab" aria-controls="sucursal2-stock" aria-selected="false">Sucursal 2</a>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabsContent">
+                    <!-- Tab de Sucursal 1 -->
+                    <div class="tab-pane fade show active" id="sucursal1-stock" role="tabpanel" aria-labelledby="sucursal1-tab-stock">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nombre</th>
+                                    <th>Stock</th>
+                                    <th>P. Compra</th>
+                                    <th>P. Venta</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for producto in productos_por_stock_suc1 %}
+                                    <tr>
+                                        <td>{{ producto[0] }}</td>
+                                        <td>{{ producto[1] }}</td>
+                                        <td>{{ producto[2] }}</td>
+                                        <td>${{ producto[3] }}</td>
+                                        <td>${{ producto[4] }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+            
+                    <!-- Tab de Sucursal 2 -->
+                    <div class="tab-pane fade" id="sucursal2-stock" role="tabpanel" aria-labelledby="sucursal2-tab-stock">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nombre</th>
+                                    <th>Stock</th>
+                                    <th>P. Compra</th>
+                                    <th>P. Venta</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for producto in productos_por_stock_suc2 %}
+                                    <tr>
+                                        <td>{{ producto[0] }}</td>
+                                        <td>{{ producto[1] }}</td>
+                                        <td>{{ producto[2] }}</td>
+                                        <td>${{ producto[3] }}</td>
+                                        <td>${{ producto[4] }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <h4 class="mb-4">Cambios de precios recientes</h4>
+
+                <ul class="nav nav-tabs" id="myTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" id="compra-tab-historial" data-bs-toggle="tab" href="#compra-historial" role="tab" aria-controls="compra-historial" aria-selected="true">Precio de Compra</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="venta-tab-historial" data-bs-toggle="tab" href="#venta-historial" role="tab" aria-controls="venta-historial" aria-selected="false">Precio de Venta</a>
+                    </li>
+                </ul>
+                
+                <div class="tab-content" id="myTabsContent">
+                    <!-- Tab de Precio de Compra -->
+                    <div class="tab-pane fade show active" id="compra-historial" role="tabpanel" aria-labelledby="compra-tab-historial">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nombre</th>
+                                    <th>Valor Anterior</th>
+                                    <th>Valor Nuevo</th>
+                                    <th>Fecha</th>
+                                    <th>Diferencia Porcentual</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cambio in historial_cambio_precios_compra %}
+                                    <tr>
+                                        <td>{{ cambio[0] }}</td>
+                                        <td>{{ cambio[1] }}</td>
+                                        <td>${{ cambio[3] }}</td>
+                                        <td>${{ cambio[4] }}</td>
+                                        <td>{{ cambio[5].strftime('%d-%m-%Y') }}</td>
+                                        <td>{{ cambio[6] }}%</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                
+                    <!-- Tab de Precio de Venta -->
+                    <div class="tab-pane fade" id="venta-historial" role="tabpanel" aria-labelledby="venta-tab-historial">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Código</th>
+                                    <th>Nombre</th>
+                                    <th>Valor Anterior</th>
+                                    <th>Valor Nuevo</th>
+                                    <th>Fecha</th>
+                                    <th>Diferencia Porcentual</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for cambio in historial_cambio_precios_venta %}
+                                    <tr>
+                                        <td>{{ cambio[0] }}</td>
+                                        <td>{{ cambio[1] }}</td>
+                                        <td>${{ cambio[3] }}</td>
+                                        <td>${{ cambio[4] }}</td>
+                                        <td>{{ cambio[5].strftime('%d-%m-%Y') }}</td>
+                                        <td>{{ cambio[6] }}%</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+        
+            </div>
+        </div>
+    </div>
 
 {% endblock %}

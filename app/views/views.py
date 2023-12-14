@@ -737,8 +737,30 @@ def ventas():
 def reportes():
     info_msg = None
     error_msg = None
+    # DB
+    oracle_db_connector = current_app.config['oracle_db_connector']
 
-    return render_template('reportes.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'],info_msg=info_msg, error_msg=error_msg)
+    # Ventas última semana por sucursal
+    ultimas_ventas_suc1 = oracle_db_connector.get_ventas_ultima_semana_by_sucursal(1)
+    ultimas_ventas_suc2 = oracle_db_connector.get_ventas_ultima_semana_by_sucursal(2)
+
+    # Bajo stock de productos
+    productos_por_stock_suc1 = oracle_db_connector.get_productos_en_bajo_stock_by_sucursal(1)
+    productos_por_stock_suc2 = oracle_db_connector.get_productos_en_bajo_stock_by_sucursal(2)
+
+    # Historial cambios de precios
+    historial_cambio_precios_compra = oracle_db_connector.get_historial_precios_con_variacion('PRECIO_COMPRA')
+    historial_cambio_precios_venta = oracle_db_connector.get_historial_precios_con_variacion('PRECIO_VENTA')
+    
+    return render_template(
+        'reportes.html',username=session.get('username', None),cargo=session.get('cargo', None),rut_empleado=session.get('rut_empleado', None),sucursal=session.get('sucursal', None),caja=session.get('caja', None),
+        info_msg=info_msg, error_msg=error_msg,
+        ultimas_ventas_suc1=ultimas_ventas_suc1,
+        ultimas_ventas_suc2=ultimas_ventas_suc2,
+        productos_por_stock_suc1=productos_por_stock_suc1,
+        productos_por_stock_suc2=productos_por_stock_suc2,
+        historial_cambio_precios_compra=historial_cambio_precios_compra,
+        historial_cambio_precios_venta=historial_cambio_precios_venta)
 
 @app.errorhandler(404)
 def page_not_found(e):
