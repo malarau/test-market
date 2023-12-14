@@ -303,23 +303,40 @@ CREATE OR REPLACE FUNCTION MMMB_VALIDAR_STOCK(
     COD_PRODUCTO_P NUMBER,
     CANTIDAD_P NUMBER
 ) RETURN NUMBER AS
-    v_stock_disponible NUMBER DEFAULT -1;
+    v_stock_disponible NUMBER;
 BEGIN
-    -- Obtener el stock disponible para el producto en la sucursal
-    SELECT STOCK_SUCURSAL_PRODUCTO
-    INTO v_stock_disponible
-    FROM MMMB_DETALLE_SUCURSAL_PRODUCTO
-    WHERE COD_SUCURSAL = COD_SUCURSAL_P
-        AND COD_PRODUCTO = COD_PRODUCTO_P;
+    -- Inicializar el stock_disponible a -1 para el caso en que no se encuentre ningún registro
+    v_stock_disponible := -1;
+
+    BEGIN
+        -- Intentar obtener el stock disponible para el producto en la sucursal
+        SELECT STOCK_SUCURSAL_PRODUCTO
+        INTO v_stock_disponible
+        FROM MMMB_DETALLE_SUCURSAL_PRODUCTO
+        WHERE COD_SUCURSAL = COD_SUCURSAL_P
+            AND COD_PRODUCTO = COD_PRODUCTO_P;
+
+    EXCEPTION
+        -- Manejar la excepción cuando no se encuentra ningún registro
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('No se encuentra el producto en la sucursal.');
+            v_stock_disponible := -1;
+
+        -- Otras excepciones personalizadas según sea necesario
+        WHEN OTHERS THEN
+            DBMS_OUTPUT.PUT_LINE('Error al intentar obtener el stock: ' || SQLERRM);
+            v_stock_disponible := -1;
+    END;
 
     -- Verificar si la cantidad supera el stock disponible
-    IF CANTIDAD_P > v_stock_disponible THEN
-        RETURN -1; -- La cantidad supera el stock disponible
+    IF v_stock_disponible = -1 THEN
+        RETURN -1; -- No se pudo obtener el stock
     ELSE
         RETURN 1; -- La cantidad es válida
     END IF;
 END;
 /
+
 
 -- Existe tal cargo? Retorna el número.
 CREATE OR REPLACE FUNCTION MMMB_EXISTE_CARGO(COD_CARGO_P NUMBER) RETURN NUMBER
