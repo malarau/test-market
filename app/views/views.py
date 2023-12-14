@@ -457,8 +457,8 @@ def eliminar_proveedor(rut_proveedor):
 
 @app.route('/descuentos', methods=['GET', 'POST'])
 def descuentos():
-    #if 'username' not in session:
-    #    return redirect(url_for('index'))
+    if 'username' not in session:
+        return redirect(url_for('index'))
 
     agregar_descuento_form = AgregarDescuentoForm()
     oracle_db_connector = current_app.config['oracle_db_connector']
@@ -474,7 +474,7 @@ def descuentos():
 
     descuentos = oracle_db_connector.get_all_descuentos()
 
-    return render_template('descuentos.html', descuentos=descuentos, agregar_descuento_form=agregar_descuento_form)
+    return render_template('descuentos.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], descuentos=descuentos, agregar_descuento_form=agregar_descuento_form)
 
 @app.route('/modificar_descuento/<cod_descuento>', methods=['GET', 'POST'])
 def modificar_descuento(cod_descuento):
@@ -501,13 +501,13 @@ def modificar_descuento(cod_descuento):
     modificar_descuento_form.ValidoDesde.data = descuento[3]
     modificar_descuento_form.ValidoHasta.data = descuento[4]
 
-    return render_template('modificar_descuento.html', descuento=descuento, modificar_descuento_form=modificar_descuento_form)
+    return render_template('modificar_descuento.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], descuento=descuento, modificar_descuento_form=modificar_descuento_form)
 
 @app.route('/eliminar_descuento/<cod_descuento>', methods=['GET', 'POST'])
 def eliminar_descuento(cod_descuento):
     oracle_db_connector = current_app.config['oracle_db_connector']
     oracle_db_connector.eliminar_descuento('D', cod_descuento)
-    return render_template('eliminar_descuento.html', cod_descuento=cod_descuento)
+    return render_template('eliminar_descuento.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], cod_descuento=cod_descuento)
 
 @app.route('/horarios', methods=['GET', 'POST'])
 def horarios():
