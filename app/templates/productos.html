@@ -39,8 +39,13 @@
                 </div>
 
                 <div class="form-group mb-2">
-                    <label for="stock_producto">Stock Producto:</label>
-                    {{ agregar_producto_form.stock_producto(class="form-control", required=True) }}
+                    <label for="stock_sucursal1">Stock sucursal 1:</label>
+                    {{ agregar_producto_form.stock_sucursal1(class="form-control", required=True) }}
+                </div>
+
+                <div class="form-group mb-2">
+                    <label for="stock_sucursal2">Stock sucursal 2:</label>
+                    {{ agregar_producto_form.stock_sucursal2(class="form-control", required=True) }}
                 </div>
 
                 <div class="form-group mb-2">
@@ -65,9 +70,8 @@
                         <th>Nombre Producto</th>
                         <th>Precio Compra</th>
                         <th>Precio Venta</th>
-                        <th>Stock Producto</th>
+                        <th>Stock (total)</th>
                         <th>Rut Proveedor</th>
-                        <th>Codigo Lote</th> <!-- Columna para las opciones -->
                         <th>Opciones</th>
                     </tr>
                 </thead>
@@ -82,7 +86,6 @@
                             <td>{{ producto[5] }}</td>
                             <td>{{ producto[6] }}</td>
                             <td>{{ producto[7] }}</td>
-                            <td>{{ producto[8] }}</td>
 
                             <td>
                                 <a href="{{ url_for('modificar_producto', codigo=producto[0]) }}" class="btn btn-link text-dark">

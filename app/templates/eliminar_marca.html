@@ -1,9 +1,17 @@
 {% extends "layouts/base.html" %}
 
 {% block content %}
-    <h2>La marca de codigo: {{cod_marca}} ha sido eliminada de la base de datos</h2>
 
+    {%if output == 1%}
+    <h2>La marca de codigo: {{cod_marca}} ha sido eliminada de la base de datos</h2>
+    {%elif output==-1%}
+    <h2>La marca de codigo: {{cod_marca}} no se pudo eliminar de la base de datos</h2>
+    {%elif output==-2292%}
+    <h2>
+        No fue posible eliminar la marca con el código {{cod_marca}} de la base de datos debido a su dependencia con otros datos.
+    </h2>
+    {% endif %}
     <a href="{{ url_for('marcas')}}" class="btn btn-link text-dark">
-        <i></i> Volver a marcas
+        <i></i> Volver a Marcas
     </a>
 {% endblock %}

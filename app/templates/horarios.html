@@ -1,0 +1,139 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}    
+
+    <div class="row contenedor">
+        <!-- Sección lateral para agregar Empleados -->
+        <div class="col-md-6">
+            <h2 class="mb-4">Agregar</h2>
+            
+                <form method="post" action="/horarios">
+                    {{ form.csrf_token }}
+            
+                    <div class="row mb-3">
+                        <div class="col">
+                            {{ form.rut_empleado.label }} {{ form.rut_empleado(size=10, class="form-control") }}
+                        </div>
+                        <div class="col">
+                            {{ form.fecha_inicio.label }} {{ form.fecha_inicio(size=10, class="form-control") }}
+                        </div>
+                    </div>
+
+                    <div id="turnosContainer" class="panel-con-scroll">
+                        {% for turno in form.turnos %}
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="row mb-3">                                        
+                                        <div class="col">
+                                            {{ turno.fecha.label }} {{ turno.fecha(size=10, class="form-control") }}
+                                        </div>
+                                        <div class="col">
+                                            {{ turno.hora_entrada.label }} {{ turno.hora_entrada(size=10, class="form-control") }}
+                                        </div>
+                                        <div class="col">
+                                            {{ turno.hora_salida.label }} {{ turno.hora_salida(size=10, class="form-control") }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row mb-3">
+                                        <div class="col">
+                                            {{ turno.inicio_colacion.label }} {{ turno.inicio_colacion(size=10, class="form-control") }}
+                                        </div>
+                                        <div class="col">
+                                            {{ turno.termino_colacion.label }} {{ turno.termino_colacion(size=10, class="form-control") }}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <!-- Botón eliminar acá -->
+                                    <button type="button" class="btn btn-danger eliminarTurno float-end">Eliminar</button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <!-- Botón agregar acá -->
+                    <button type="button" class="btn btn-primary" id="agregarTurno">Agregar Turno</button>
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                </form>
+        </div>
+
+        <div class="col-md-6 panel-izquierdo">
+            <!-- Bloque Derecho - Buscar Horarios por RUT -->
+            <h2 class="mb-4">Buscar Horarios por RUT</h2>
+
+            <br>
+            
+            <form method="GET" action="{{ url_for('horarios') }}" class="row g-3">
+                <!-- Columna izquierda - Input RUT -->
+                <div class="col">
+                    <input type="text" class="form-control" name="inputRUT" placeholder="Ingrese RUT">
+                </div>
+                <!-- Columna derecha - Botón Buscar Horarios -->
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">Buscar Horarios</button>
+                </div>
+            </form>
+
+            <br>
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Código de Horario</th>
+                        <th>RUT</th>
+                        <th>Fecha</th>
+                        <th>Opciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for horario in horarios %}
+                        <tr data-bs-toggle="collapse" data-bs-target="#detalles{{ loop.index }}" aria-expanded="false" aria-controls="detalles{{ loop.index }}">
+                            <td>{{ horario[0] }}</td>
+                            <td>{{ horario[1] }}</td>
+                            <td>{{ horario[2].strftime('%Y-%m-%d') }}</td>
+                            <form method="post" action="{{ url_for('horarios') }}">
+                                <td>
+                                    <button type="submit" name="eliminar_horario" value="{{ horario[0] }}" class="btn btn-link text-dark" onclick="return confirm('¿Realmente desea eliminar?')">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </button>
+                                </td>
+                            </form>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <div class="collapse" id="detalles{{ loop.index }}">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Fecha del Turno</th>
+                                                <th>Hora de Entrada</th>
+                                                <th>Hora de Salida</th>
+                                                <th>Hora de Inicio Colación</th>
+                                                <th>Hora de Término Colación</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for turno in horario[3] %}
+                                                <tr>
+                                                    <td>{{ turno[2].strftime('%Y-%m-%d') }}</td>
+                                                    <td>{{ turno[3].strftime('%H:%M:%S') }}</td>
+                                                    <td>{{ turno[4].strftime('%H:%M:%S') }}</td>
+                                                    <td>{{ turno[5].strftime('%H:%M:%S') }}</td>
+                                                    <td>{{ turno[6].strftime('%H:%M:%S') }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+    
+
+{% endblock %}

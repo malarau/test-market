@@ -1,0 +1,254 @@
+<script>
+
+    //
+    // HORARIOS
+    //
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const turnosContainer = document.getElementById('turnosContainer');
+        const agregarTurnoBtn = document.getElementById('agregarTurno');
+
+        agregarTurnoBtn.addEventListener('click', function () {
+            const turnoIndex = turnosContainer.querySelectorAll('.card').length;
+
+            const nuevoTurnoHtml = `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="turnos-${turnoIndex}-fecha">Fecha</label>
+                                <input class="form-control" id="turnos-${turnoIndex}-fecha" name="turnos-${turnoIndex}-fecha" size="10" type="date" value="">
+                            </div>
+                            <div class="col">
+                                <label for="turnos-${turnoIndex}-hora_entrada">Hora Entrada</label>
+                                <input name="turnos-${turnoIndex}-hora_entrada" class="form-control" size="10" type="time">
+                            </div>
+                            <div class="col">
+                                <label for="turnos-${turnoIndex}-hora_salida">Hora Salida</label>
+                                <input name="turnos-${turnoIndex}-hora_salida" class="form-control" size="10" type="time">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col">
+                                <label for="turnos-${turnoIndex}-inicio_colacion">Inicio Colación</label>
+                                <input class="form-control" id="turnos-${turnoIndex}-inicio_colacion" name="turnos-${turnoIndex}-inicio_colacion" size="10" type="time" value="">
+                            </div>
+                            <div class="col">
+                                <label for="turnos-${turnoIndex}-termino_colacion">Termino Colación</label>
+                                <input class="form-control" id="turnos-${turnoIndex}-termino_colacion" name="turnos-${turnoIndex}-termino_colacion" size="10" type="time" value="">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Resto del HTML del nuevo turno -->
+                    <div class="card-footer">
+                        <button type="button" class="btn btn-danger eliminarTurno">Eliminar</button>
+                    </div>
+                </div>
+            `;
+
+            // Agregar el nuevo turno al contenedor
+            turnosContainer.insertAdjacentHTML('beforeend', nuevoTurnoHtml);
+        });
+
+        // Agregar evento para eliminar turnos
+        turnosContainer.addEventListener('click', function (event) {
+            if (event.target.classList.contains('eliminarTurno')) {
+                // Eliminar el bloque del turno
+                const turnoCard = event.target.closest('.card');
+                turnoCard.parentNode.removeChild(turnoCard);
+            }
+        });
+    });
+
+    //
+    // VENTAS
+    //
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const detallesContainer = document.getElementById('detallesContainer');
+        const agregarDetalleBtn = document.getElementById('agregarDetalle');
+
+        agregarDetalleBtn.addEventListener('click', function () {
+            const detalleIndex = detallesContainer.querySelectorAll('.card').length;
+
+            const nuevoDetalleHtml = `
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-auto">
+                                <label for="detalles-${detalleIndex}-cod_producto">Código</label>
+                                <input name="detalles-${detalleIndex}-cod_producto" id="detalles-${detalleIndex}-cod_producto" class="form-control" type="text" readonly style="width: 5em">
+                            </div>
+                            <div class="col-auto flex-grow-1">
+                                <label for="detalles-${detalleIndex}-producto">Producto</label>
+                                <select class="form-control" id="detalles-${detalleIndex}-producto" name="detalles-${detalleIndex}-producto" onchange="actualizarSubtotal(${detalleIndex})">
+                                    <!-- Agrega tus opciones de productos aquí -->
+                                </select>
+                            </div>
+                            <div class="col-auto">
+                                <label for="detalles-${detalleIndex}-cantidad">Cantidad</label>
+                                <input name="detalles-${detalleIndex}-cantidad" id="detalles-${detalleIndex}-cantidad" class="form-control" type="number" onchange="actualizarSubtotal(${detalleIndex})">
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="card-footer">
+                        <div class="row d-flex align-items-center">
+                            <div class="row d-flex align-items-center">
+                                <!-- Subtotal a la izquierda -->
+                                <div class="col-auto">
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                                        <input name="detalles-${detalleIndex}-subtotal" id="detalles-${detalleIndex}-subtotal" class="form-control" readonly="true">
+                                    </div>
+                                </div>
+                                <!-- Label de descuento a la derecha -->
+                                <div class="col-auto">
+                                    <span id="descuentoLabel-${detalleIndex}"></span>
+                                </div>
+                                <!-- Botón eliminar a la derecha -->
+                                <div class="col">
+                                    <button type="button" class="btn btn-danger eliminarDetalleVenta float-end">Eliminar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            detallesContainer.insertAdjacentHTML('beforeend', nuevoDetalleHtml);
+
+            // Llenar las opciones del select en el nuevo detalle
+            llenarOpcionesProductos(detalleIndex);
+        });
+
+        detallesContainer.addEventListener('click', function (event) {
+            if (event.target.classList.contains('eliminarDetalleVenta')) {
+                const detalleCard = event.target.closest('.card');
+                detalleCard.parentNode.removeChild(detalleCard);
+
+                actualizarTotalGeneral();
+            }
+        });
+
+        // Función para actualizar el subtotal al cambiar la cantidad o el producto
+        window.actualizarSubtotal = function (detalleIndex) {
+            const productoSelect = document.getElementById(`detalles-${detalleIndex}-producto`);
+            const cantidadInput = document.getElementById(`detalles-${detalleIndex}-cantidad`);
+            const subtotalInput = document.getElementById(`detalles-${detalleIndex}-subtotal`);
+            const descuentoLabel = document.getElementById(`descuento-label-${detalleIndex}`);
+
+            const precioVenta = parseInt(productoSelect.value);
+            const cantidad = parseInt(cantidadInput.value);
+
+            if (!isNaN(precioVenta) && !isNaN(cantidad)) {
+                // Obtener el porcentaje de descuento
+                const porcentajeDescuentoMatch = productoSelect.options[productoSelect.selectedIndex].text.match(/-(\d+)%!/);
+                const porcentajeDescuento = porcentajeDescuentoMatch ? parseInt(porcentajeDescuentoMatch[1]) : 0;
+
+                // Calcular el subtotal aplicando el descuento
+                const subtotal = (precioVenta * cantidad * (100 - porcentajeDescuento)) / 100;
+
+                subtotalInput.value = subtotal; //.toFixed(2)
+
+                // Llama a una función que actualice el total general
+                actualizarTotalGeneral();
+            } else {
+                subtotalInput.value = '';
+            }
+
+            // Actualizar cód producto si cambia algo:
+            llenarCodProducto(detalleIndex);
+            llenarLabelDescuento(detalleIndex);
+        };
+
+        // Función para actualizar el total general
+        window.actualizarTotalGeneral = function () {
+            const detalles = document.querySelectorAll('[id^="detalles-"]');
+            let totalGeneral = 0;
+
+            detalles.forEach(function (detalle) {                
+                const subtotalInput = detalle.id.match('-subtotal');
+
+                if (subtotalInput && detalle.value !== '') {
+                    totalGeneral += parseInt(detalle.value);
+                }
+            });
+
+            console.log('Total general: ' + totalGeneral);
+
+            const totalInput = document.getElementById('total');
+            totalInput.value = totalGeneral;
+        };
+
+    });
+
+    //
+    // MENSAJES POPUP
+    //
+
+    function mostrarPopupAlert(mensaje) {
+        const popupAlert = document.getElementById('popupAlert');
+        const popupMessage = document.getElementById('popupMessage');
+
+        // Actualizar el mensaje del popup
+        popupMessage.innerHTML = mensaje;
+
+        // Mostrar el popup y agregar la clase de animación 'show'
+        popupAlert.style.display = 'block';
+        popupAlert.classList.add('show');
+
+        // Esperar un breve momento antes de agregar la clase 'fade'
+        setTimeout(function() {
+            popupAlert.classList.add('fade');
+        }, 100);
+
+        // Ocultar el popup después de 5 segundos (puedes ajustar este tiempo)
+        setTimeout(function() {
+            // Quitar la clase de animación 'show' para desaparecer suavemente
+            popupAlert.classList.remove('show');
+
+            // Quitar la clase de animación 'fade' después de la desaparición
+            setTimeout(function() {
+                popupAlert.classList.remove('fade');
+
+                // Ocultar el popup después de la animación
+                popupAlert.style.display = 'none';
+            }, 200); // Ajusta el tiempo para que coincida con la duración de la animación
+        }, 8000);
+}
+
+    function mostrarPopupInfo(mensaje) {
+        const popupInfo = document.getElementById('popupInfo');
+        const popupInfoMessage = document.getElementById('popupInfoMessage');
+
+        // Actualizar el mensaje del popup de información
+        popupInfoMessage.innerHTML = mensaje;
+
+        // Mostrar el popup y agregar la clase de animación 'show'
+        popupInfo.style.display = 'block';
+        popupInfo.classList.add('show');
+
+        // Esperar un breve momento antes de agregar la clase 'fade'
+        setTimeout(function() {
+            popupInfo.classList.add('fade');
+        }, 100);
+
+        // Ocultar el popup después de 5 segundos (puedes ajustar este tiempo)
+        setTimeout(function() {
+            // Quitar la clase de animación 'show' para desaparecer suavemente
+            popupInfo.classList.remove('show');
+
+            // Quitar la clase de animación 'fade' después de la desaparición
+            setTimeout(function() {
+                popupInfo.classList.remove('fade');
+
+                // Ocultar el popup después de la animación
+                popupInfo.style.display = 'none';
+            }, 200); // Ajusta el tiempo para que coincida con la duración de la animación
+        }, 8000);
+    }
+
+</script>

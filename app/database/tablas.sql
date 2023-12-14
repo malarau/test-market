@@ -10,14 +10,13 @@ DROP TABLE MMMB_CLIENTE cascade constraints;
 DROP TABLE MMMB_DETALLE_CUADRATURA cascade constraints;
 DROP TABLE MMMB_CAJA cascade constraints;
 DROP TABLE MMMB_SUCURSAL cascade constraints;
-DROP TABLE MMMB_DETALLE_BODEGA_PRODUCTO cascade constraints;
-DROP TABLE MMMB_BODEGA cascade constraints;
+DROP TABLE MMMB_DETALLE_SUCURSAL_PRODUCTO cascade constraints; -- Se ha cambiado, antes: MMMB_DETALLE_BODEGA_PRODUCTO
 DROP TABLE MMMB_DETALLE_PRODUCTO_PROVEEDOR cascade constraints;
 DROP TABLE MMMB_PRODUCTO cascade constraints;
 DROP TABLE MMMB_PROVEEDOR cascade constraints;
 DROP TABLE MMMB_CATEGORIA cascade constraints;
 DROP TABLE MMMB_MARCA cascade constraints;
-DROP TABLE MMMB_DETALLE_TURNO_HORARIO cascade constraints;
+--DROP TABLE MMMB_DETALLE_TURNO_HORARIO cascade constraints;  -- Se ha quitado
 DROP TABLE MMMB_TURNO cascade constraints;
 DROP TABLE MMMB_HORARIO cascade constraints;
 DROP TABLE MMMB_EMPLEADO cascade constraints;
@@ -100,26 +99,12 @@ CREATE SEQUENCE MMMB_PK_HISTORIAL_PRECIOS
 ------ No usados
 
 /*
-CREATE SEQUENCE MMMB_PK_MEDIO_PAGO
-    START WITH 1
-    INCREMENT BY 1
-    CACHE 10;
 CREATE SEQUENCE MMMB_PK_DETALLE_VENTA_PRODUCTO
     START WITH 1
     INCREMENT BY 1
     CACHE 10;
 
-CREATE SEQUENCE MMMB_PK_DETALLE_BODEGA_PRODUCTO
-    START WITH 1
-    INCREMENT BY 1
-    CACHE 10;
-
 CREATE SEQUENCE MMMB_PK_DETALLE_PRODUCTO_PROVEEDOR
-    START WITH 1
-    INCREMENT BY 1
-    CACHE 10;
-
-CREATE SEQUENCE MMMB_PK_DETALLE_TURNO_HORARIO
     START WITH 1
     INCREMENT BY 1
     CACHE 10;
@@ -135,19 +120,11 @@ CREATE TABLE MMMB_CARGO(
     CONSTRAINT PK_CARGO PRIMARY KEY (COD_CARGO)
 );
 
-CREATE TABLE MMMB_BODEGA(
-    COD_BODEGA NUMBER,
-    CONSTRAINT PK_BODEGA PRIMARY KEY (COD_BODEGA)
-);
-
-CREATE TABLE MMMB_SUCURSAL(
+CREATE TABLE MMMB_SUCURSAL( -- Se ha eliminado el campo y restricción asociados a Bodega
     COD_SUCURSAL NUMBER,
-    COD_BODEGA NUMBER,
     NOMBRE_SUCURSAL VARCHAR2(50),
     TELEFONO_SUCURSAL VARCHAR2(15), -- Se ha cambiado a VARCHAR2 15
-    CONSTRAINT PK_SUCURSAL PRIMARY KEY (COD_SUCURSAL),
-    CONSTRAINT FK_SUCURSAL_BODEGA FOREIGN KEY (COD_BODEGA) REFERENCES MMMB_BODEGA(COD_BODEGA)
-);
+    CONSTRAINT PK_SUCURSAL PRIMARY KEY (COD_SUCURSAL));
 
 CREATE TABLE MMMB_EMPLEADO(
     RUT_EMPLEADO NUMBER,
@@ -175,20 +152,14 @@ CREATE TABLE MMMB_HORARIO(
 
 CREATE TABLE MMMB_TURNO(
     COD_TURNO NUMBER,
+    COD_HORARIO NUMBER, -- Se ha agregado horario, ahora es 1:M, eliminando MMMB_DETALLE_TURNO_HORARIO
     DIA DATE,
     HORA_ENTRADA TIMESTAMP,
     HORA_SALIDA TIMESTAMP,
     INICIO_COLACION TIMESTAMP,
     TERMINO_COLACION TIMESTAMP,
-    CONSTRAINT PK_TURNO PRIMARY KEY (COD_TURNO)
-);
-
-CREATE TABLE MMMB_DETALLE_TURNO_HORARIO(
-    COD_TURNO NUMBER,
-    COD_HORARIO NUMBER,
-    CONSTRAINT PK_DETALLE_TURNO_HORARIO PRIMARY KEY (COD_TURNO,COD_HORARIO),
-    CONSTRAINT FK_DETALLE_TURNO_HORARIO_TURNO FOREIGN KEY (COD_TURNO) REFERENCES MMMB_TURNO(COD_TURNO),
-    CONSTRAINT FK_DETALLE_TURNO_HORARIO_HORARIO FOREIGN KEY (COD_HORARIO) REFERENCES MMMB_HORARIO(COD_HORARIO)
+    CONSTRAINT PK_TURNO PRIMARY KEY (COD_TURNO),
+    CONSTRAINT FK_TURNO_HORARIO FOREIGN KEY (COD_HORARIO) REFERENCES MMMB_HORARIO(COD_HORARIO)
 );
 
 CREATE TABLE MMMB_MARCA(
@@ -218,7 +189,7 @@ CREATE TABLE MMMB_PRODUCTO( -- Se ha quitado LOTE
     NOMBRE_PRODUCTO VARCHAR2(50), -- Se ha cambiado de 30 a 50 (me dio error en pruebas con un nombre 'corto')
     PRECIO_COMPRA NUMBER,
     PRECIO_VENTA NUMBER,
-    STOCK_PRODUCTO NUMBER,
+    -- STOCK_PRODUCTO NUMBER, Se ha eliminado stock, se debe consultar y actualizar stock según sucursal
     RUT_PROVEEDOR NUMBER, -- Se ha agregado como FK
     CONSTRAINT PK_PRODUCTO PRIMARY KEY (COD_PRODUCTO),
     CONSTRAINT FK_PRODUCTO_MARCA FOREIGN KEY (COD_MARCA) REFERENCES MMMB_MARCA(COD_MARCA),
@@ -235,13 +206,13 @@ CREATE TABLE MMMB_DETALLE_PRODUCTO_PROVEEDOR(
 );
 
 
-CREATE TABLE MMMB_DETALLE_BODEGA_PRODUCTO(
-    COD_BODEGA NUMBER,
+CREATE TABLE MMMB_DETALLE_SUCURSAL_PRODUCTO(
+    COD_SUCURSAL NUMBER,
     COD_PRODUCTO NUMBER,
-    STOCK_BODEGA_PRODUCTO NUMBER,
-    CONSTRAINT PK_DETALLE_BODEGA_PRODUCTO PRIMARY KEY (COD_BODEGA,COD_PRODUCTO),
-    CONSTRAINT FK_DETALLE_BODEGA_PRODUCTO_BODEGA FOREIGN KEY (COD_BODEGA) REFERENCES MMMB_BODEGA(COD_BODEGA),
-    CONSTRAINT FK_DETALLE_BODEGA_PRODUCTO_PRODUCTO FOREIGN KEY (COD_PRODUCTO) REFERENCES MMMB_PRODUCTO(COD_PRODUCTO)
+    STOCK_SUCURSAL_PRODUCTO NUMBER,
+    CONSTRAINT PK_DETALLE_SUCURSAL_PRODUCTO PRIMARY KEY (COD_SUCURSAL,COD_PRODUCTO),
+    CONSTRAINT FK_DETALLE_SUCURSAL_PRODUCTO_SUCURSAL FOREIGN KEY (COD_SUCURSAL) REFERENCES MMMB_SUCURSAL(COD_SUCURSAL),
+    CONSTRAINT FK_DETALLE_SUCURSAL_PRODUCTO_PRODUCTO FOREIGN KEY (COD_PRODUCTO) REFERENCES MMMB_PRODUCTO(COD_PRODUCTO)
 );
 
 CREATE TABLE MMMB_CAJA(
@@ -278,13 +249,13 @@ CREATE TABLE MMMB_MEDIO_PAGO(
 
 CREATE TABLE MMMB_VENTA(
     COD_VENTA NUMBER,
-    COD_CAJA NUMBER,
-    RUT_CLIENTE NUMBER,
-    RUT_EMPLEADO NUMBER,
-    COD_PAGO NUMBER,
-    FECHA_VENTA DATE,
-    TOTAL_VENTA NUMBER,
-    DESCUENTO_VENTA NUMBER,
+    COD_CAJA NUMBER,        -- Droplist, según sucursal, según empleado
+    RUT_CLIENTE NUMBER,     -- Se ingresa y se busca
+    RUT_EMPLEADO NUMBER,    -- Automático (por logeo)
+    COD_PAGO NUMBER,        -- Droplist (Medio de pago?)
+    FECHA_VENTA DATE,       -- Automático
+    TOTAL_VENTA NUMBER,     -- Trigger
+    DESCUENTO_VENTA NUMBER, -- Trigger (según productos MMMB_DETALLE_VENTA_PRODUCTO)
     CONSTRAINT PK_VENTA PRIMARY KEY (COD_VENTA),
     CONSTRAINT FK_VENTA_CAJA FOREIGN KEY (COD_CAJA) REFERENCES MMMB_CAJA(COD_CAJA),
     CONSTRAINT FK_VENTA_CLIENTE FOREIGN KEY (RUT_CLIENTE) REFERENCES MMMB_CLIENTE(RUT_CLIENTE),
@@ -318,13 +289,37 @@ CREATE TABLE MMMB_HISTORIAL_PRECIOS( -- Se ha agregado tabla
     VALOR_ANTERIOR NUMBER,
     VALOR_NUEVO NUMBER,
     FECHA DATE,
-    CONSTRAINT PK_HISTORIAL_PRECIOS PRIMARY KEY(COD_HISTORIAL_PRECIO),
-    CONSTRAINT FK_HISTORIAL_PRECIOS_PRODUCTO FOREIGN KEY(COD_PRODUCTO) REFERENCES MMMB_PRODUCTO(COD_PRODUCTO)
+    CONSTRAINT PK_HISTORIAL_PRECIOS PRIMARY KEY(COD_HISTORIAL_PRECIO)
+    -- ,CONSTRAINT FK_HISTORIAL_PRECIOS_PRODUCTO FOREIGN KEY(COD_PRODUCTO) REFERENCES MMMB_PRODUCTO(COD_PRODUCTO) -- Es un registro, puede que el producto sea eliminado y esto bloquea.
 );
 
 /*
     FUNCTIONS
 */
+
+-- Hay stock?
+CREATE OR REPLACE FUNCTION MMMB_VALIDAR_STOCK(
+    COD_SUCURSAL_P NUMBER,
+    COD_PRODUCTO_P NUMBER,
+    CANTIDAD_P NUMBER
+) RETURN NUMBER AS
+    v_stock_disponible NUMBER DEFAULT -1;
+BEGIN
+    -- Obtener el stock disponible para el producto en la sucursal
+    SELECT STOCK_SUCURSAL_PRODUCTO
+    INTO v_stock_disponible
+    FROM MMMB_DETALLE_SUCURSAL_PRODUCTO
+    WHERE COD_SUCURSAL = COD_SUCURSAL_P
+        AND COD_PRODUCTO = COD_PRODUCTO_P;
+
+    -- Verificar si la cantidad supera el stock disponible
+    IF CANTIDAD_P > v_stock_disponible THEN
+        RETURN -1; -- La cantidad supera el stock disponible
+    ELSE
+        RETURN 1; -- La cantidad es válida
+    END IF;
+END;
+/
 
 -- Existe tal cargo? Retorna el número.
 CREATE OR REPLACE FUNCTION MMMB_EXISTE_CARGO(COD_CARGO_P NUMBER) RETURN NUMBER
@@ -423,6 +418,24 @@ EXCEPTION
     WHEN OTHERS THEN
         RETURN -1;
 END MMMB_EXISTE_EMPLEADO;
+/
+
+-- Existe horario?
+CREATE OR REPLACE FUNCTION MMMB_EXISTE_HORARIO(COD_HORARIO_P NUMBER)
+RETURN NUMBER
+IS
+    v_horario_exists NUMBER;
+BEGIN
+    SELECT COUNT(*)
+    INTO v_horario_exists
+    FROM MMMB_HORARIO
+    WHERE COD_HORARIO = COD_HORARIO_P;
+
+    RETURN v_horario_exists;
+EXCEPTION
+    WHEN OTHERS THEN
+        RETURN -1;
+END MMMB_EXISTE_HORARIO;
 /
 
 -- Existe turno?
@@ -789,7 +802,7 @@ END;
 
 -- Producto
 
-    CREATE OR REPLACE PROCEDURE MMMB_PROC_PRODUCTO(
+CREATE OR REPLACE PROCEDURE MMMB_PROC_PRODUCTO(
         OPCION VARCHAR2,
         COD_PRODUCTO_P NUMBER,
         COD_MARCA_P NUMBER DEFAULT NULL,
@@ -797,7 +810,8 @@ END;
         NOMBRE_PRODUCTO_P VARCHAR2 DEFAULT NULL,
         PRECIO_COMPRA_P NUMBER DEFAULT NULL,
         PRECIO_VENTA_P NUMBER DEFAULT NULL,
-        STOCK_PRODUCTO_P NUMBER DEFAULT NULL,
+        STOCK_SUCURSAL1_P NUMBER DEFAULT NULL, -- Se ha agregado stock sucursal 1
+        STOCK_SUCURSAL2_P NUMBER DEFAULT NULL, -- Se ha agregado stock sucursal 2
         RUT_PROVEEDOR_P NUMBER DEFAULT NULL,
         CONFIRM_OUTPUT OUT NUMBER 
     )
@@ -808,7 +822,7 @@ BEGIN
     CASE OPCION
         WHEN 'I' THEN
             IF COALESCE(
-                COD_MARCA_P, COD_CATEGORIA_P, NOMBRE_PRODUCTO_P, PRECIO_COMPRA_P, PRECIO_VENTA_P, STOCK_PRODUCTO_P, RUT_PROVEEDOR_P
+                COD_MARCA_P, COD_CATEGORIA_P, NOMBRE_PRODUCTO_P, PRECIO_COMPRA_P, PRECIO_VENTA_P, STOCK_SUCURSAL1_P, STOCK_SUCURSAL2_P, RUT_PROVEEDOR_P
             ) IS NULL THEN
                 DBMS_OUTPUT.PUT_LINE('Error: Alguno de los parámetros contiene valores nulos.');
                 CONFIRM_OUTPUT := -1;
@@ -823,11 +837,18 @@ BEGIN
                     DBMS_OUTPUT.PUT_LINE('Error: El proveedor no existe.');
                     CONFIRM_OUTPUT := -1;
                 ELSE
+                    CONFIRM_OUTPUT := MMMB_PK_PRODUCTO.NEXTVAL;
+                    -- Inserar en productos
                     INSERT INTO MMMB_PRODUCTO 
                         VALUES(
-                            MMMB_PK_PRODUCTO.NEXTVAL, COD_MARCA_P, COD_CATEGORIA_P, NOMBRE_PRODUCTO_P,
-                            PRECIO_COMPRA_P, PRECIO_VENTA_P, STOCK_PRODUCTO_P, RUT_PROVEEDOR_P
+                            CONFIRM_OUTPUT, COD_MARCA_P, COD_CATEGORIA_P, NOMBRE_PRODUCTO_P,
+                            PRECIO_COMPRA_P, PRECIO_VENTA_P, RUT_PROVEEDOR_P
                         );
+                    -- Agregar stock a sucursal 1
+                    INSERT INTO MMMB_DETALLE_SUCURSAL_PRODUCTO VALUES (1, CONFIRM_OUTPUT, STOCK_SUCURSAL1_P);
+                    -- Agregar stock en sucursal 2
+                    INSERT INTO MMMB_DETALLE_SUCURSAL_PRODUCTO VALUES (2, CONFIRM_OUTPUT, STOCK_SUCURSAL2_P);
+
                     CONFIRM_OUTPUT := 1;
                 END IF;
             END IF;
@@ -841,19 +862,35 @@ BEGIN
             ELSIF MMMB_EXISTE_PROVEEDOR(RUT_PROVEEDOR_P) = 0 THEN
                 DBMS_OUTPUT.PUT_LINE('Error: El proveedor no existe.');
                 CONFIRM_OUTPUT := -1;
+            ELSIF MMMB_EXISTE_PRODUCTO(COD_PRODUCTO_P) = 0 THEN
+                DBMS_OUTPUT.PUT_LINE('Error: El producto no existe.');
+                CONFIRM_OUTPUT := -1;
             ELSE
+                -- Actualizar producto
                 UPDATE MMMB_PRODUCTO 
                     SET COD_MARCA = COD_MARCA_P,
                         COD_CATEGORIA = COD_CATEGORIA_P,
                         NOMBRE_PRODUCTO = NOMBRE_PRODUCTO_P,
                         PRECIO_COMPRA = PRECIO_COMPRA_P,
                         PRECIO_VENTA = PRECIO_VENTA_P,
-                        STOCK_PRODUCTO = STOCK_PRODUCTO_P,
                         RUT_PROVEEDOR = RUT_PROVEEDOR_P
                     WHERE (COD_PRODUCTO = COD_PRODUCTO_P);
+                -- Actualizar stock en sucursal 1
+                UPDATE MMMB_DETALLE_SUCURSAL_PRODUCTO
+                    SET STOCK_SUCURSAL_PRODUCTO = STOCK_SUCURSAL1_P
+                    WHERE (COD_PRODUCTO = COD_PRODUCTO_P AND COD_SUCURSAL = 1);
+                -- Actualizar stock en sucursal 2
+                UPDATE MMMB_DETALLE_SUCURSAL_PRODUCTO
+                    SET STOCK_SUCURSAL_PRODUCTO = STOCK_SUCURSAL2_P
+                    WHERE (COD_PRODUCTO = COD_PRODUCTO_P AND COD_SUCURSAL = 2);
                 CONFIRM_OUTPUT := 1;
             END IF;
         WHEN 'D' THEN
+            -- Eliminar stock de sucursal 1
+            DELETE FROM MMMB_DETALLE_SUCURSAL_PRODUCTO WHERE (COD_PRODUCTO = COD_PRODUCTO_P AND COD_SUCURSAL = 1);
+            -- Eliminar stock de sucursal 2
+            DELETE FROM MMMB_DETALLE_SUCURSAL_PRODUCTO WHERE (COD_PRODUCTO = COD_PRODUCTO_P AND COD_SUCURSAL = 2);
+            -- Eliminar producto
             DELETE FROM MMMB_PRODUCTO WHERE (COD_PRODUCTO = COD_PRODUCTO_P);
             CONFIRM_OUTPUT := 1;
         ELSE
@@ -901,9 +938,9 @@ BEGIN
                     DBMS_OUTPUT.PUT_LINE('Error: El empleado no existe.');
                     CONFIRM_OUTPUT := -1;
                 ELSE
+                    CONFIRM_OUTPUT := MMMB_PK_HORARIO.NEXTVAL;
                     INSERT INTO MMMB_HORARIO 
-                        VALUES(MMMB_PK_HORARIO.NEXTVAL, RUT_EMPLEADO_P, FECHA_INICIO_P);
-                    CONFIRM_OUTPUT := 1;      
+                        VALUES(CONFIRM_OUTPUT, RUT_EMPLEADO_P, FECHA_INICIO_P);   
                 END IF;              
             END IF;
         WHEN 'U' THEN
@@ -918,6 +955,8 @@ BEGIN
                 CONFIRM_OUTPUT := 1;
             END IF;
         WHEN 'D' THEN
+            -- ELIMINA TAMBIÉN TODOS LOS TURNOS, PORQUE NO HAY TIEMPO PA IR DE A UNO.
+            DELETE FROM MMMB_TURNO WHERE (COD_HORARIO = COD_HORARIO_P);
             DELETE FROM MMMB_HORARIO WHERE (COD_HORARIO = COD_HORARIO_P);
             CONFIRM_OUTPUT := 1;
         ELSE
@@ -947,6 +986,7 @@ END;
 CREATE OR REPLACE PROCEDURE MMMB_PROC_TURNO(
     OPCION VARCHAR2,
     COD_TURNO_P NUMBER,
+    COD_HORARIO_P NUMBER,
     DIA_P DATE DEFAULT NULL,
     HORA_ENTRADA_P TIMESTAMP DEFAULT NULL,
     HORA_SALIDA_P TIMESTAMP DEFAULT NULL,
@@ -960,16 +1000,21 @@ BEGIN
 
     CASE OPCION
         WHEN 'I' THEN
-            IF DIA_P IS NULL OR COALESCE(HORA_ENTRADA_P, HORA_SALIDA_P, INICIO_COLACION_P, TERMINO_COLACION_P) IS NULL THEN
+            IF COD_HORARIO_P IS NULL OR DIA_P IS NULL OR COALESCE(HORA_ENTRADA_P, HORA_SALIDA_P, INICIO_COLACION_P, TERMINO_COLACION_P) IS NULL THEN
                 DBMS_OUTPUT.PUT_LINE('Error: Alguno de los parámetros contiene valores nulos.');
                 CONFIRM_OUTPUT := -1;
             ELSE
-                INSERT INTO MMMB_TURNO 
-                    VALUES(
-                        MMMB_PK_TURNO.NEXTVAL, DIA_P, HORA_ENTRADA_P, HORA_SALIDA_P,
-                        INICIO_COLACION_P, TERMINO_COLACION_P
-                    );
-                CONFIRM_OUTPUT := 1;
+                IF MMMB_EXISTE_HORARIO(COD_HORARIO_P) = 0 THEN
+                    DBMS_OUTPUT.PUT_LINE('Error: Horario no existe.');
+                    CONFIRM_OUTPUT := -1;
+                ELSE
+                    CONFIRM_OUTPUT := MMMB_PK_TURNO.NEXTVAL;
+                    INSERT INTO MMMB_TURNO 
+                        VALUES(
+                            CONFIRM_OUTPUT, COD_HORARIO_P, DIA_P, HORA_ENTRADA_P, HORA_SALIDA_P,
+                            INICIO_COLACION_P, TERMINO_COLACION_P
+                        );
+                END IF;
             END IF;
         WHEN 'U' THEN
             UPDATE MMMB_TURNO 
@@ -1470,15 +1515,11 @@ END;
     BASE DATA
 */
 
--- Inserts para añadir 2 bodegas
-INSERT INTO MMMB_BODEGA (COD_BODEGA) VALUES (1);
-INSERT INTO MMMB_BODEGA (COD_BODEGA) VALUES (2);
-
 -- Inserts para añadir 2 sucursales
-INSERT INTO MMMB_SUCURSAL (COD_SUCURSAL, COD_BODEGA, NOMBRE_SUCURSAL, TELEFONO_SUCURSAL)
-VALUES (1, 1, 'Sucursal A', '+56954685222');
-INSERT INTO MMMB_SUCURSAL (COD_SUCURSAL, COD_BODEGA, NOMBRE_SUCURSAL, TELEFONO_SUCURSAL)
-VALUES (2, 2, 'Sucursal B', '+56954685222');
+INSERT INTO MMMB_SUCURSAL (COD_SUCURSAL, NOMBRE_SUCURSAL, TELEFONO_SUCURSAL)
+VALUES (1, 'Sucursal A', '+56954685222');
+INSERT INTO MMMB_SUCURSAL (COD_SUCURSAL, NOMBRE_SUCURSAL, TELEFONO_SUCURSAL)
+VALUES (2, 'Sucursal B', '+56954685222');
 
 -- Inserts para añadir 2 cargos
 INSERT INTO MMMB_CARGO (COD_CARGO, NOMBRE_CARGO) VALUES (1, 'Dueño');
@@ -1624,75 +1665,84 @@ BEGIN
     -- Productos
     
         -- Bebidas - Coca-Cola
-    MMMB_PROC_PRODUCTO('I', '', 1, 1, 'Coca-Cola Regular', 1500, 2500, 100, 75000001, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 1, 1, 'Coca-Cola Zero', 2500, 3000, 100, 75000001, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 1, 1, 'Coca-Cola Regular', 1500, 2500, 40,72, 75000001, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 1, 1, 'Coca-Cola Zero', 2500, 3000, 12,92, 75000001, out_val);
         -- Bebidas - Pepsi
-    MMMB_PROC_PRODUCTO('I', '', 2, 1, 'Pepsi Regular', 1500, 2500, 100, 75000001, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 2, 1, 'Pepsi Max', 2500, 2800, 100, 75000001, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 2, 1, 'Pepsi Regular', 1500, 2500, 50,47, 75000001, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 2, 1, 'Pepsi Max', 2500, 2800, 16,18, 75000001, out_val);
         -- Enlatados - San José
-    MMMB_PROC_PRODUCTO('I', '', 3, 2, 'Atún San José', 2000, 3500, 50, 75000010, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 3, 2, 'Maíz enlatado', 1800, 2.8, 50, 75000010, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 3, 2, 'Atún San José', 2000, 3500, 35,80, 75000010, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 3, 2, 'Maíz enlatado', 1800, 2800, 99,45, 75000010, out_val);
         -- Enlatados - Robinson Crusoe
-    MMMB_PROC_PRODUCTO('I', '', 4, 2, 'Sardinas kawai', 1700, 3000, 40, 75000010, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 4, 2, 'Choclo enlatado', 1900, 3.2, 40, 75000010, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 4, 2, 'Sardinas kawai', 1700, 3000, 95,75, 75000010, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 4, 2, 'Choclo enlatado', 1900, 3200, 5,88, 75000010, out_val);
         -- Productos lácteos - Nestlé
-    MMMB_PROC_PRODUCTO('I', '', 5, 3, 'Leche Nestlé', 2500, 3500, 30, 75000003, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 5, 3, 'Yogurt Nestlé', 1800, 2500, 40, 75000003, out_val);    
+    MMMB_PROC_PRODUCTO('I', '', 5, 3, 'Leche Nestlé', 2500, 3500, 36,45, 75000003, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 5, 3, 'Yogurt Nestlé', 1800, 2500, 87,78, 75000003, out_val);    
         -- Productos lácteos - Colun
-    MMMB_PROC_PRODUCTO('I', '', 6, 3, 'Lache', 2200, 3000, 35, 75000003, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 6, 3, 'Queso de ayer', 3000, 4500, 25, 75000003, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 6, 3, 'Lache', 2200, 3000, 56,65, 75000003, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 6, 3, 'Queso de ayer', 3000, 4500, 12,21, 75000003, out_val);
         -- Panadería - Bimbo
-    MMMB_PROC_PRODUCTO('I', '', 7, 4, 'Pan Blanco Bimbo', 1500, 2000, 50, 75000004, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 7, 4, 'Pan Integral Bimbo', 2000, 2500, 40, 75000004, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 7, 4, 'Pan Blanco Bimbo', 1500, 2000, 85,58, 75000004, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 7, 4, 'Pan Integral Bimbo', 2000, 2500, 5,7, 75000004, out_val);
         -- Panadería - Ideal
-    MMMB_PROC_PRODUCTO('I', '', 8, 4, 'Pan Blanco Ideal', 1800, 2200, 45, 75000004, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 8, 4, 'Pan Integral Ideal', 2200, 2800, 35, 75000004, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 8, 4, 'Pan Blanco Ideal', 1800, 2200, 4,5, 75000004, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 8, 4, 'Pan Integral Ideal', 2200, 2800, 77,8, 75000004, out_val);
         -- Snacks - Costa
-    MMMB_PROC_PRODUCTO('I', '', 9, 5, 'Papas Fritas', 1500, 2000, 60, 75000005, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 9, 5, 'Galletas Saladas', 1200, 1800, 75, 75000005, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 9, 5, 'Papas Fritas', 1500, 2000, 98,78, 75000005, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 9, 5, 'Galletas Saladas', 1200, 1800, 23,54, 75000005, out_val);
         -- Snacks - Evercrisp
-    MMMB_PROC_PRODUCTO('I', '', 10, 5, 'Chips HD', 2000, 2500, 55, 75000005, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 10, 5, 'Pretzels 2G', 1800, 2200, 50, 75000005, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 10, 5, 'Chips HD', 2000, 2500, 78,74, 75000005, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 10, 5, 'Pretzels 2G', 1800, 2200, 44,55, 75000005, out_val);
         -- Cuidado personal - Dove
-    MMMB_PROC_PRODUCTO('I', '', 11, 6, 'Shampoo 1L', 5000, 7000, 30, 75000006, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 11, 6, 'Acondicionador II', 4500, 6500, 25, 75000006, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 11, 6, 'Shampoo 1L', 5000, 7000, 33,55, 75000006, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 11, 6, 'Acondicionador II', 4500, 6500, 23,32, 75000006, out_val);
         -- Cuidado personal - Pantene
-    MMMB_PROC_PRODUCTO('I', '', 12, 6, 'Shampoo con instrucciones', 4800, 6800, 35, 75000006, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 12, 6, 'Acondicionador Palpelo', 4300, 6300, 28, 75000006, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 12, 6, 'Shampoo con instrucciones', 4800, 6800, 66,55, 75000006, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 12, 6, 'Acondicionador Palpelo', 4300, 6300, 23,56, 75000006, out_val);
         -- Limpieza - Clorox
-    MMMB_PROC_PRODUCTO('I', '', 13, 7, 'Cloro 15L', 3000, 4500, 40, 75000007, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 13, 7, 'Limpiador Multiusos', 2500, 4000, 45, 75000007, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 13, 7, 'Cloro 15L', 3000, 4500, 42,15, 75000007, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 13, 7, 'Limpiador Multiusos', 2500, 4000, 65,45, 75000007, out_val);
         -- Limpieza - Cif
-    MMMB_PROC_PRODUCTO('I', '', 14, 7, 'Limpiador Baño', 2800, 4200, 38, 75000007, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 14, 7, 'Limpiador Cocina', 3200, 4800, 32, 75000007, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 14, 7, 'Limpiador Baño', 2800, 4200, 32,65, 75000007, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 14, 7, 'Limpiador Cocina', 3200, 4800, 25,55, 75000007, out_val);
         -- Higiene - Colgate
-    MMMB_PROC_PRODUCTO('I', '', 15, 8, 'Pasta Dental picante', 2000, 3500, 55, 75000008, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 15, 8, 'Cepillo Dental usado', 1500, 2800, 60, 75000008, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 15, 8, 'Pasta Dental picante', 2000, 3500, 41,54, 75000008, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 15, 8, 'Cepillo Dental usado', 1500, 2800, 32,56, 75000008, out_val);
         -- Higiene - Johnson & Johnson
-    MMMB_PROC_PRODUCTO('I', '', 16, 8, 'Jabón Líquido 2L', 4000, 5500, 28, 75000008, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 16, 8, 'Shampoo Bebé', 3500, 5000, 30, 75000008, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 16, 8, 'Jabón Líquido 2L', 4000, 5500, 75,85, 75000008, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 16, 8, 'Shampoo Bebé', 3500, 5000, 12,47, 75000008, out_val);
     -- Carnes y embutidos - Ariztía
-    MMMB_PROC_PRODUCTO('I', '', 17, 9, 'Pollo fresco', 5000, 8000, 25, 75000010, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 17, 9, 'Embutidos en butido', 6000, 9000, 20, 75000010, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 17, 9, 'Pollo fresco', 5000, 8000, 9,85, 75000010, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 17, 9, 'Embutidos en butido', 6000, 9000, 45,54, 75000010, out_val);
     -- Carnes y embutidos - Super Pollo
-    MMMB_PROC_PRODUCTO('I', '', 18, 9, 'Pollo Super', 4500, 7500, 30, 75000010, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 18, 9, 'Embutidos embutibles', 5500, 8500, 22, 75000010, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 18, 9, 'Pollo Super', 4500, 7500, 41,45, 75000010, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 18, 9, 'Embutidos embutibles', 5500, 8500, 25,21, 75000010, out_val);
     -- Artículos de Oficina - Proarte
-    MMMB_PROC_PRODUCTO('I', '', 19, 10, 'Set Pinceles usados', 8000, 12000, 18, 75000006, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 19, 10, 'Bloc de Dibujo seminuevo', 6500, 10000, 25, 75000006, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 19, 10, 'Set Pinceles usados', 8000, 12000, 54,26, 75000006, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 19, 10, 'Bloc de Dibujo seminuevo', 6500, 10000, 12,45, 75000006, out_val);
     -- Artículos de Oficina - Torre
-    MMMB_PROC_PRODUCTO('I', '', 20, 10, 'Lápices color blanco', 3000, 5000, 35, 75000006, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 20, 10, 'Libretas 50 hojas', 2500, 4000, 40, 75000006, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 20, 10, 'Lápices color blanco', 3000, 5000, 35,54, 75000006, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 20, 10, 'Libretas 50 hojas', 2500, 4000, 42,56, 75000006, out_val);
     -- Mascotas - Whiskas
-    MMMB_PROC_PRODUCTO('I', '', 21, 11, 'Comida uwu', 7000, 10000, 15, 75000008, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 21, 11, 'Snacks Gatos', 4500, 7000, 20, 75000008, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 21, 11, 'Comida uwu', 7000, 10000, 35,56, 75000008, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 21, 11, 'Snacks Gatos', 4500, 7000, 24,45, 75000008, out_val);
     -- Mascotas - Master Dog
-    MMMB_PROC_PRODUCTO('I', '', 22, 11, 'Comida Pa Kiltros', 8000, 12000, 12, 75000008, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 22, 11, 'Snacks Perros', 5500, 8000, 18, 75000008, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 22, 11, 'Comida Pa Kiltros', 8000, 12000, 35,65, 75000008, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 22, 11, 'Snacks Perros', 5500, 8000, 14,45, 75000008, out_val);
     -- Frutas y verduras
-    MMMB_PROC_PRODUCTO('I', '', 23, 12, 'Manzana 1Kg', 500, 2100, 18, 75000008, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 23, 12, 'Tomate 1Kg', 800, 1000, 18, 75000008, out_val);
-    MMMB_PROC_PRODUCTO('I', '', 23, 12, 'Zanahoria 1Kg', 500, 700, 18, 75000008, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 23, 12, 'Manzana 1Kg', 500, 2100, 78,87, 75000008, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 23, 12, 'Tomate 1Kg', 800, 1000, 112,44, 75000008, out_val);
+    MMMB_PROC_PRODUCTO('I', '', 23, 12, 'Zanahoria 1Kg', 500, 700, 41,14, 75000008, out_val);
+
+    -- Descuentos
+
+    MMMB_PROC_DESCUENTO('I', NULL, 3, 2, TO_DATE('12/12/23', 'DD/MM/YY'), TO_DATE('15/12/23', 'DD/MM/YY'), out_val);
+    MMMB_PROC_DESCUENTO('I', NULL, 4, 10, TO_DATE('12/12/23', 'DD/MM/YY'), TO_DATE('15/12/23', 'DD/MM/YY'), out_val);
+    MMMB_PROC_DESCUENTO('I', NULL, 4, 2, TO_DATE('12/11/23', 'DD/MM/YY'), TO_DATE('10/12/23', 'DD/MM/YY'), out_val);
+    MMMB_PROC_DESCUENTO('I', NULL, 4, 7, TO_DATE('12/12/23', 'DD/MM/YY'), TO_DATE('25/12/23', 'DD/MM/YY'), out_val);
+    MMMB_PROC_DESCUENTO('I', NULL, 5, 6, TO_DATE('12/12/23', 'DD/MM/YY'), TO_DATE('25/12/23', 'DD/MM/YY'), out_val);
+    MMMB_PROC_DESCUENTO('I', NULL, 6, 15, TO_DATE('12/12/23', 'DD/MM/YY'), TO_DATE('25/12/23', 'DD/MM/YY'), out_val);
 END;
 /
 ----
