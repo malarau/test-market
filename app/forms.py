@@ -303,7 +303,9 @@ def validador_venta(form, field):
         productos_agregados.add(detalle.cod_producto.data)
 
 class VentaForm(FlaskForm):
+    cod_sucursal = IntegerField('Código de sucursal', validators=[]) # Al azar, input bloqueado. # DataRequired()
     cod_caja = IntegerField('Código de caja', validators=[]) # Al azar, input bloqueado. # DataRequired()
+
     rut_cliente = IntegerField('RUT Cliente', validators=[validador_rut_cliente], default=0)
     rut_empleado = IntegerField('RUT Empleado', validators=[validador_rut_empleado]) # Input bloqueado # DataRequired()
     medio_de_pago = SelectField('Medio de pago', choices=[], validators=[]) # DataRequired()

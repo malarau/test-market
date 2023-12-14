@@ -645,10 +645,11 @@ def ventas():
     # DB
     oracle_db_connector = current_app.config['oracle_db_connector']
     # TODO: Sucursal
-    cod_sucursal = 1
+    cod_sucursal = session['sucursal']
     # TODO: Cod caja random según sucursal
     cod_caja = session['caja']
     form.cod_caja.data = cod_caja
+    form.cod_sucursal.data = cod_sucursal
     # RUT empleado, TODO: Consultar según logeo
     rut_empleado = session['rut_empleado']
     form.rut_empleado.data = rut_empleado
@@ -737,7 +738,7 @@ def reportes():
     info_msg = None
     error_msg = None
 
-    return render_template('reportes.html', info_msg=info_msg, error_msg=error_msg)
+    return render_template('reportes.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'],info_msg=info_msg, error_msg=error_msg)
 
 @app.errorhandler(404)
 def page_not_found(e):

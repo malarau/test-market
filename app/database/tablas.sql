@@ -1792,11 +1792,7 @@ BEGIN
     MMMB_PROC_DESCUENTO('I', NULL, 5, 6, TO_DATE('12/12/23', 'DD/MM/YY'), TO_DATE('25/12/23', 'DD/MM/YY'), out_val);
     MMMB_PROC_DESCUENTO('I', NULL, 6, 15, TO_DATE('12/12/23', 'DD/MM/YY'), TO_DATE('25/12/23', 'DD/MM/YY'), out_val);
 
-    -- Cajas
-    MMMB_PROC_CAJA('I', 1,1,out_val);
-    MMMB_PROC_CAJA('I', 1,1,out_val);
-    MMMB_PROC_CAJA('I', 1,2,out_val);
-    MMMB_PROC_CAJA('I', 1,2,out_val);
+    
 END;
 /
 ----
