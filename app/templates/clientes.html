@@ -60,7 +60,7 @@
                         <td>{{ cliente[3] }}</td>
                         <td>{{ cliente[4] }}</td>
                         
-                        <td>
+                        
                             <!-- Agrega aquí enlaces para modificar y eliminar clientes -->
                             <td>
                                 <a href="{{ url_for('modificar_cliente', rut=cliente[0]) }}" class="btn btn-link text-dark">
@@ -69,7 +69,7 @@
                                 <a href="{{ url_for('eliminar_cliente', rut_cliente=cliente[0]) }}" class="btn btn-link text-dark" onclick="return confirm('¿Realmente desea eliminar?')">
                                     <i class="fas fa-trash"></i> Eliminar
                                 </a>
-                            </td>
+                            
                         </td>
                     </tr>
                 {% endfor %}
