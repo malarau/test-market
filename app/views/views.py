@@ -594,28 +594,6 @@ def horarios():
 
     return render_template('horarios.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], form=form, error_msg=error_msg, info_msg=info_msg)
 
-@app.route('/boletas/<cod_venta>', methods=['GET'])
-def boletas(cod_venta):
-    error_msg = None
-    info_msg = None
-
-    try:
-        with open(f"./app/database/boletas/boleta{cod_venta}.pdf", 'rb') as pdf_file:
-            pdf_buffer = BytesIO(pdf_file.read())
-            
-            return Response(
-                pdf_buffer,
-                mimetype='application/pdf',
-                headers={'Content-Disposition': f'attachment; filename=factura-venta{cod_venta}.pdf'}
-            )
-        
-    except Exception as error:
-        error_msg = "No se ha podido obtener la boleta"
-        print(error)
-        return render_template('boletas.html', error_msg=error_msg)
-    
-    return render_template('boletas.html', error_msg=error_msg)
-
 def get_nombre_producto_by_cod(productos, cod):
     print("get_nombre_producto_by_cod:")
     print("cod:", cod)
@@ -645,8 +623,6 @@ def boletas(cod_venta):
         error_msg = "No se ha podido obtener la boleta"
         print(error)
         return render_template('boletas.html', error_msg=error_msg)
-    
-    return render_template('boletas.html', error_msg=error_msg)
 
 def get_nombre_producto_by_cod(productos, cod):
     print("get_nombre_producto_by_cod:")
@@ -755,13 +731,6 @@ def ventas():
                     break
 
     return render_template('ventas.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], productos=product_choices, form=form, info_msg=info_msg, error_msg=error_msg)
-
-@app.route('/reportes', methods=['GET', 'POST'])
-def reportes():
-    info_msg = None
-    error_msg = None
-
-    return render_template('reportes.html', info_msg=info_msg, error_msg=error_msg)
 
 @app.route('/reportes', methods=['GET', 'POST'])
 def reportes():
