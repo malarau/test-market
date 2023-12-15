@@ -26,7 +26,8 @@ def productos():
     # Si no está logeado, chao!
     if not 'username' in session:
         return redirect(url_for('index'))
-    
+    if session['cargo'] != 1:
+        return redirect(url_for('get_sucursal'))
     agregar_producto_form = AgregarProducto()
     # DB Conn
     oracle_db_connector = current_app.config['oracle_db_connector']
@@ -55,6 +56,8 @@ def productos():
 def modificar_producto(codigo):
     if not 'username' in session:
         return redirect(url_for('index'))
+    if session['cargo'] != 1:
+        return redirect(url_for('get_sucursal'))
     modificar_producto_form = ModificarProductoForm(request.form)
     error_msg = None
     # Lógica para obtener el producto por su nombre desde la base de datos
@@ -107,7 +110,8 @@ def empleados():
     # Si no está logeado, chao!
     if not 'username' in session:
         return redirect(url_for('index'))
-    
+    if session['cargo'] != 1:
+        return redirect(url_for('get_sucursal'))
     agregar_empleado_form = AgregarEmpleado()
     # DB Conn
     oracle_db_connector = current_app.config['oracle_db_connector']
@@ -142,6 +146,8 @@ def empleados():
 def eliminar_producto(codigo):
     if not 'username' in session:
         return redirect(url_for('index'))
+    if session['cargo'] != 1:
+        return redirect(url_for('get_sucursal'))
     oracle_db_connector = current_app.config['oracle_db_connector']
     output=oracle_db_connector.eliminar_producto(codigo)  
     return render_template('eliminar_producto.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'],codigo=codigo,output=output)
@@ -151,6 +157,8 @@ def eliminar_producto(codigo):
 def eliminar_empleado(rut):
     if not 'username' in session:
         return redirect(url_for('index'))
+    if session['cargo'] != 1:
+        return redirect(url_for('get_sucursal'))
     oracle_db_connector = current_app.config['oracle_db_connector']
     output=oracle_db_connector.eliminar_empleado('D',rut)    
     
@@ -160,6 +168,8 @@ def eliminar_empleado(rut):
 def modificar_empleado(rut):
     if not 'username' in session:
         return redirect(url_for('index'))
+    if session['cargo'] != 1:
+        return redirect(url_for('get_sucursal'))
     modificar_empleado_form = ModificarEmpleadoForm(request.form)
     # Lógica para obtener el producto por su nombre desde la base de datos
     # DB Conn
@@ -208,8 +218,8 @@ def index():
         return redirect(url_for('get_sucursal'))
     if request.method== 'POST':
         # read form data
-        username = 'juanperez'  #request.form['username']  
-        password = 'hashed_password' #request.form['password']
+        username =  request.form['username']  #juanperez
+        password = request.form['password']   #hashedpassword
         print('user= ',username,'pass', password)
         # DB Conn
         oracle_db_connector = current_app.config['oracle_db_connector']
@@ -223,8 +233,8 @@ def index():
         caja = oracle_db_connector.get_caja_by_sucursal(sucursal=sucursal)
         caja = [elemento for tupla in caja for elemento in tupla]
 
-        #if (password_data and sha256_crypt.verify(password, password_data)):
-        if (username == 'juanperez'):
+        #if username == 'juanperez':
+        if (password_data and sha256_crypt.verify(password, password_data)):
             session['username'] = username
             session['cargo'] = cargo
             session['rut_empleado'] = rut_empleado
@@ -362,6 +372,8 @@ def eliminar_categoria(cod_categoria):
 def marcas():
     if not 'username' in session:
         return redirect(url_for('index'))
+    if session['cargo'] != 1:
+        return redirect(url_for('get_sucursal'))
     agregar_marca_form = AgregarMarca()
     oracle_db_connector = current_app.config['oracle_db_connector']
 
@@ -377,6 +389,8 @@ def marcas():
 def modificar_marca(cod_marca):
     if not 'username' in session:
         return redirect(url_for('index'))
+    if session['cargo'] != 1:
+        return redirect(url_for('get_sucursal'))
     modificar_marca_form = ModificarMarcaForm(request.form)
     # Lógica para obtener la marca por su código desde la base de datos
     # DB Conn
@@ -404,6 +418,8 @@ def modificar_marca(cod_marca):
 def eliminar_marca(cod_marca):
     if not 'username' in session:
         return redirect(url_for('index'))
+    if session['cargo'] != 1:
+        return redirect(url_for('get_sucursal'))
     oracle_db_connector = current_app.config['oracle_db_connector']
     output=oracle_db_connector.eliminar_marca('D', cod_marca)
     return render_template('eliminar_marca.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], cod_marca=cod_marca,output=output)
@@ -412,7 +428,8 @@ def eliminar_marca(cod_marca):
 def proveedores():
     if 'username' not in session:
         return redirect(url_for('index'))
-
+    if session['cargo'] != 1:
+        return redirect(url_for('get_sucursal'))
     agregar_proveedor_form = AgregarProveedor()
     oracle_db_connector = current_app.config['oracle_db_connector']
 
@@ -431,6 +448,8 @@ def proveedores():
 def modificar_proveedor(rut_proveedor):
     if not 'username' in session:
         return redirect(url_for('index'))
+    if session['cargo'] != 1:
+        return redirect(url_for('get_sucursal'))
     modificar_proveedor_form = ModificarProveedorForm(request.form)
     oracle_db_connector = current_app.config['oracle_db_connector']
 
@@ -454,6 +473,8 @@ def modificar_proveedor(rut_proveedor):
 def eliminar_proveedor(rut_proveedor):
     if not 'username' in session:
         return redirect(url_for('index'))
+    if session['cargo'] != 1:
+        return redirect(url_for('get_sucursal'))
     oracle_db_connector = current_app.config['oracle_db_connector']
     output=oracle_db_connector.eliminar_proveedor('D', rut_proveedor)
     return render_template('eliminar_proveedor.html', username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'],rut_proveedor=rut_proveedor,output=output)
@@ -462,7 +483,8 @@ def eliminar_proveedor(rut_proveedor):
 def descuentos():
     if 'username' not in session:
         return redirect(url_for('index'))
-
+    if session['cargo'] != 1:
+        return redirect(url_for('get_sucursal'))
     agregar_descuento_form = AgregarDescuentoForm()
     oracle_db_connector = current_app.config['oracle_db_connector']
 
@@ -481,6 +503,10 @@ def descuentos():
 
 @app.route('/modificar_descuento/<cod_descuento>', methods=['GET', 'POST'])
 def modificar_descuento(cod_descuento):
+    if 'username' not in session:
+        return redirect(url_for('index'))
+    if session['cargo'] != 1:
+        return redirect(url_for('get_sucursal'))
     modificar_descuento_form = ModificarDescuentoForm(request.form)
     oracle_db_connector = current_app.config['oracle_db_connector']
 
@@ -508,6 +534,10 @@ def modificar_descuento(cod_descuento):
 
 @app.route('/eliminar_descuento/<cod_descuento>', methods=['GET', 'POST'])
 def eliminar_descuento(cod_descuento):
+    if 'username' not in session:
+        return redirect(url_for('index'))
+    if session['cargo'] != 1:
+        return redirect(url_for('get_sucursal'))
     oracle_db_connector = current_app.config['oracle_db_connector']
     oracle_db_connector.eliminar_descuento('D', cod_descuento)
     return render_template('eliminar_descuento.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], cod_descuento=cod_descuento)
@@ -516,6 +546,8 @@ def eliminar_descuento(cod_descuento):
 def horarios():
     if not 'username' in session:
         return redirect(url_for('index'))
+    if session['cargo'] != 1:
+        return redirect(url_for('get_sucursal'))
     # Conexión DB
     oracle_db_connector = current_app.config['oracle_db_connector']
     # Formulario
@@ -735,6 +767,10 @@ def ventas():
 
 @app.route('/reportes', methods=['GET', 'POST'])
 def reportes():
+    if 'username' not in session:
+        return redirect(url_for('index'))
+    if session['cargo'] != 1:
+        return redirect(url_for('get_sucursal'))
     info_msg = None
     error_msg = None
     # DB
@@ -764,6 +800,8 @@ def reportes():
 
 @app.route('/cuadratura', methods=['GET', 'POST'])
 def cuadratura():
+    if 'username' not in session:
+        return redirect(url_for('index'))
     info_msg = None
     error_msg = None
 
