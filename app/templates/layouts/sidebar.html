@@ -14,6 +14,11 @@
                 <i class="fas fa-chart-line"></i> Ventas
             </a>
         </li>
+        <li class="nav-item {% if request.path == '/cuadratura' %}active{% endif %}">
+            <a class="nav-link text-dark" href="/cuadratura">
+                <i class="fas fa-balance-scale"></i> cuadratura
+            </a>
+        </li>
         
         <li class="divider-with-text">General</li>
         <li class="nav-item {% if request.path == '/informaciones' %}active{% endif %}">

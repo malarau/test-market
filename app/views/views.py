@@ -215,6 +215,7 @@ def index():
         oracle_db_connector = current_app.config['oracle_db_connector']
         # Locate user
         user = oracle_db_connector.get_user_by_username(username=username)
+        print(oracle_db_connector.get_hash_by_username(username=username)[0][0])
         password_data = oracle_db_connector.get_hash_by_username(username=username)[0][0]
         cargo=oracle_db_connector.get_cargo_by_user(username=username)[0][0]
         rut_empleado=oracle_db_connector.get_rut_by_user(username=username)[0][0]
@@ -762,6 +763,57 @@ def reportes():
         historial_cambio_precios_compra=historial_cambio_precios_compra,
         historial_cambio_precios_venta=historial_cambio_precios_venta)
 
+@app.route('/cuadratura', methods=['GET', 'POST'])
+def cuadratura():
+    info_msg = None
+    error_msg = None
+
+    # DB
+    oracle_db_connector = current_app.config['oracle_db_connector']
+    form = CuadraturaCaja()
+    # Cod_caja sesion actual
+    cod_caja = session.get('caja', None)
+    form.cod_caja.data = cod_caja
+    # Rut_empeado actual
+    rut_empleado = session.get('rut_empleado', None)
+    form.RUT_EMPLEADO.data = rut_empleado
+    
+    
+    if request.method == 'POST' and form.validate_on_submit():
+        # Aquí puedes procesar los datos del formulario, realizar la cuadratura y obtener la información que deseas mostrar en la tabla.
+        # Por ejemplo, asumiendo que tienes una función llamada procesar_cuadratura que devuelve datos a mostrar en la tabla.
+        datos_cuadratura = procesar_cuadratura(form)
+        return render_template(
+            'cuadratura.html',
+            cuadratura_caja_form=form,
+            datos_cuadratura=datos_cuadratura,
+            username=session.get('username', None),
+            cargo=session.get('cargo', None),
+            rut_empleado=session.get('rut_empleado', None),
+            sucursal=session.get('sucursal', None),
+            caja=session.get('caja', None)
+        )
+
+    return render_template(
+        'cuadratura.html',
+        cuadratura_caja_form=form,
+        username=session.get('username', None),
+        cargo=session.get('cargo', None),
+        rut_empleado=session.get('rut_empleado', None),
+        sucursal=session.get('sucursal', None),
+        caja=session.get('caja', None)
+    )
+def procesar_cuadratura(cuadratura_caja_form):
+    # Aquí realizas la lógica para procesar la cuadratura y devolver los datos que deseas mostrar en la tabla.
+    # Puedes acceder a los datos del formulario, por ejemplo cuadratura_caja_form.cod_sucursal.data, cuadratura_caja_form.cod_caja.data, etc.
+    # La lógica específica dependerá de tus necesidades y de cómo estás estructurando tu aplicación.
+    # Retorna los datos en el formato adecuado para ser mostrados en la tabla.
+    # Ejemplo de datos de retorno (simulados):
+    return [
+        {'Fecha': '2023-01-01', 'Venta_Efectivo': 100.0, 'Venta_Tarjeta': 50.0, 'Devoluciones': 5.0, 'Arqueo_Caja': 145.0},
+        # ... otros registros ...
+    ]
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'],), 404
@@ -769,3 +821,4 @@ def page_not_found(e):
 @app.errorhandler(500)
 def internal_server_error(e):
     return render_template('500.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'],), 500
+

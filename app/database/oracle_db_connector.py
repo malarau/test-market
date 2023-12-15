@@ -680,4 +680,8 @@ class OracleDBConnector:
     def get_ventas_ultima_semana_by_sucursal(self, cod_sucursal):
         query = "SELECT COD_VENTA,COD_SUCURSAL,COD_CAJA,RUT_CLIENTE,RUT_EMPLEADO,COD_PAGO,FECHA_VENTA,TOTAL_VENTA,DESCUENTO_VENTA FROM MMMB_VENTA WHERE FECHA_VENTA >= SYSDATE - 7 AND FECHA_VENTA < SYSDATE AND COD_SUCURSAL = :1"
         return self.execute_query(query, cod_sucursal)
+
+    def get_cuadratura(self, cod_sucursal,cod_caja):
+        query = "SELECT COD_VENTA,COD_SUCURSAL,COD_CAJA,RUT_CLIENTE,RUT_EMPLEADO,COD_PAGO,FECHA_VENTA,TOTAL_VENTA,DESCUENTO_VENTA FROM MMMB_VENTA WHERE FECHA_VENTA >= SYSDATE - 7 AND FECHA_VENTA < SYSDATE AND COD_SUCURSAL = :1"
+        return self.execute_query(query,cod_caja)
         
