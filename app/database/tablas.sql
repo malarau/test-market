@@ -1171,7 +1171,7 @@ BEGIN
 
     CASE OPCION
         WHEN 'I' THEN
-            IF (FECHA_P IS NULL) OR COALESCE(COD_CAJA_P, RUT_EMPLEADO_P, SALDO_INICIAL_P, VENTAS_EFECTIVO_P, SALDO_FINAL_P, DIFERENCIA_P) IS NULL THEN
+            IF COALESCE(COD_CAJA_P, RUT_EMPLEADO_P, SALDO_INICIAL_P, VENTAS_EFECTIVO_P, SALDO_FINAL_P, DIFERENCIA_P) IS NULL THEN
                 DBMS_OUTPUT.PUT_LINE('Error: Alguno de los parámetros contiene valores nulos.');
                 CONFIRM_OUTPUT := -1;
             ELSE
@@ -1180,7 +1180,7 @@ BEGIN
                     CONFIRM_OUTPUT := -1;
                 ELSE
                     INSERT INTO MMMB_DETALLE_CUADRATURA 
-                        VALUES(MMMB_PK_DETALLE_CUADRATURA.NEXTVAL, COD_CAJA_P, RUT_EMPLEADO_P, SALDO_INICIAL_P, VENTAS_EFECTIVO_P, SALDO_FINAL_P, DIFERENCIA_P, FECHA_P);
+                        VALUES(MMMB_PK_DETALLE_CUADRATURA.NEXTVAL, COD_CAJA_P, RUT_EMPLEADO_P, SALDO_INICIAL_P, VENTAS_EFECTIVO_P, SALDO_FINAL_P, DIFERENCIA_P, SYSDATE);
                     CONFIRM_OUTPUT := 1;
                 END IF;
             END IF;
@@ -1195,8 +1195,7 @@ BEGIN
                         SALDO_INICIAL = SALDO_INICIAL_P,
                         VENTAS_EFECTIVO = VENTAS_EFECTIVO_P,
                         SALDO_FINAL = SALDO_FINAL_P,
-                        DIFERENCIA = DIFERENCIA_P,
-                        FECHA = FECHA_P
+                        DIFERENCIA = DIFERENCIA_P
                     WHERE (COD_DETALLE_CUADRATURA = COD_DETALLE_CUADRATURA_P);
                 CONFIRM_OUTPUT := 1;
             END IF;
