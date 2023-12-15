@@ -44,8 +44,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% if datos_cuadratura %}
-                    {% for dato in datos_cuadratura %}
+                {% for dato in datos_cuadratura %}
                         <tr>
                             <td>{{ dato[0] }}</td>
                             <td>{{ dato[1] }}</td>
@@ -54,14 +53,9 @@
                             <td>{{ dato[4] }}</td>
                             <td>{{ dato[5] }}</td>
                             <td>{{ dato[6] }}</td>
-                            <td>{{ dato[7] }}</td>
+                            <td>{{ dato[7].strftime('%d-%m-%Y') }}</td>
                         </tr>
                     {% endfor %}
-                {% else %}
-                    <tr>
-                        <td colspan="5">No hay datos para mostrar.</td>
-                    </tr>
-                {% endif %}
             </tbody>
         </table>
     </div>
