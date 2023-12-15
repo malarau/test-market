@@ -593,7 +593,7 @@ class OracleDBConnector:
             with self._pool.acquire() as connection:
                 with connection.cursor() as cursor:
                     out_val = cursor.var(int)
-                    cursor.callproc('MMMB_PROC_DETALLE_CUADRATURA', ['I', None, int(cod_caja), int(rut_empleado), int(saldo_inicial), int(venta_efectivo),int(saldo_final),int(diferencia),None,out_val])
+                    cursor.callproc('MMMB_PROC_DETALLE_CUADRATURA', ['I', 122, int(cod_caja), int(rut_empleado), int(saldo_inicial), int(venta_efectivo),int(saldo_final),int(diferencia),None,out_val])
 
                     result = out_val.getvalue()
                     return result
