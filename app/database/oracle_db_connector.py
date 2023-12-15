@@ -1,4 +1,3 @@
-import datetime
 import oracledb
 from datetime import datetime
 
@@ -440,16 +439,16 @@ class OracleDBConnector:
                         result = 1
                         for turno in turnos:
                             print("turno:", turno)
-                            print("Combine:", datetime.datetime.combine(turno['fecha'], turno['hora_entrada'])) 
+                            print("Combine:", datetime.combine(turno['fecha'], turno['hora_entrada'])) 
                             cursor.callproc('MMMB_PROC_TURNO', 
                                 [opcion, 
                                  None,
                                  cod_horario,
                                  turno['fecha'],
-                                 datetime.datetime.combine(turno['fecha'], turno['hora_entrada']).replace(microsecond=0),
-                                 datetime.datetime.combine(turno['fecha'], turno['hora_salida']).replace(microsecond=0),
-                                 datetime.datetime.combine(turno['fecha'], turno['inicio_colacion']).replace(microsecond=0),
-                                 datetime.datetime.combine(turno['fecha'], turno['termino_colacion']).replace(microsecond=0),
+                                 datetime.combine(turno['fecha'], turno['hora_entrada']).replace(microsecond=0),
+                                 datetime.combine(turno['fecha'], turno['hora_salida']).replace(microsecond=0),
+                                 datetime.combine(turno['fecha'], turno['inicio_colacion']).replace(microsecond=0),
+                                 datetime.combine(turno['fecha'], turno['termino_colacion']).replace(microsecond=0),
                                  out_val])
                             result = out_val.getvalue()
                             if result < 0: # Es un error!
@@ -618,9 +617,6 @@ class OracleDBConnector:
     def get_all_categorias(self):
         query = "SELECT * FROM MMMB_CATEGORIA"
         return self.execute_query(query)
-    def get_all_bodegas(self):
-        query = "SELECT * FROM MMMB_BODEGA"
-        return self.execute_query(query)
     def get_all_medio_de_pago(self):
         query = "SELECT * FROM MMMB_MEDIO_PAGO"
         return self.execute_query(query)
@@ -630,6 +626,8 @@ class OracleDBConnector:
         else:
             horarios_result = self.get_last_5_horarios_by_rut(RUT)
         horarios = []
+        if horarios_result==-1:
+            return []
         for horario in horarios_result:
             horario = list(horario)
             # Obtener turnos

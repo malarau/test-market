@@ -1617,42 +1617,77 @@ DECLARE
 BEGIN
     MMMB_PROC_EMPLEADO(
         'I',
-        12345678,
+        90529322,
         1, -- COD_SUCURSAL
         1, -- COD_CARGO (Dueño)
         'Juan',
         'Pérez',
         'González',
         '555-1234',
-        'juan.perez@example.com',
+        'juan.perez@gmail.com',
         'juanperez',
         '$5$rounds=535000$3GueeYdLFXzw5iLT$MPejbFsCmthWh5r0mKd5bV1A4jJCCppegIagZqLNrp.',
         confirm_output
     );
-END;
-/
 
---      Insertar Cajeros
-DECLARE
-    confirm_output NUMBER;
-BEGIN
-    FOR i IN 1..4 LOOP
-        MMMB_PROC_EMPLEADO(
-            'I',
-            15000000 + i, -- RUT_EMPLEADO (Valores ficticios para cajeros)
-            1, -- COD_SUCURSAL
-            2, -- COD_CARGO (Cajero)
-            'Cajero' || TO_CHAR(i),
-            'Apellido',
-            'Apellido',
-            '555-5678',
-            'cajero' || TO_CHAR(i) || '@example.com',
-            'cajero' || TO_CHAR(i),
-            '$5$rounds=535000$Xa6WCCpyV7Ip96vc$YBuPoEZTgE1W4H6iuPZ19.dnXIGDzwiuTZLlSOyM5T4',
-            confirm_output
-        );
-    END LOOP;
+    MMMB_PROC_EMPLEADO(
+        'I',
+        210463003,
+        1, -- COD_SUCURSAL
+        2, -- COD_CARGO (cajero)
+        'Benjamin Nicolas',
+        'Villablanca',
+        'Zuniga',
+        '968316402',
+        'benjavz@gmail.com',
+        'benjaminvillablanca',
+        '$5$rounds=535000$3GueeYdLFXzw5iLT$MPejbFsCmthWh5r0mKd5bV1A4jJCCppegIagZqLNrp.',
+        confirm_output
+    );
 
+    MMMB_PROC_EMPLEADO(
+        'I',
+        210463001,
+        1, -- COD_SUCURSAL
+        2, -- COD_CARGO (cajero)
+        'Martin alfonso',
+        'Ferrada',
+        'Munoz',
+        '555-134',
+        'martin.ferrada@gmail.com',
+        'martinferrada',
+        '$5$rounds=535000$3GueeYdLFXzw5iLT$MPejbFsCmthWh5r0mKd5bV1A4jJCCppegIagZqLNrp.',
+        confirm_output
+    );
+
+    MMMB_PROC_EMPLEADO(
+        'I',
+        199985819,
+        2, -- COD_SUCURSAL
+        2, -- COD_CARGO (cajero)
+        'Andres Roberto',
+        'Escalante',
+        'Villegas',
+        '555-124',
+        'andres.escalante@gmail.com',
+        'andresescalante',
+        '$5$rounds=535000$3GueeYdLFXzw5iLT$MPejbFsCmthWh5r0mKd5bV1A4jJCCppegIagZqLNrp.',
+        confirm_output
+    );
+    MMMB_PROC_EMPLEADO(
+        'I',
+        106474452,
+        2, -- COD_SUCURSAL
+        2, -- COD_CARGO (cajero)
+        'Marcela',
+        'Mendez',
+        'Tapia',
+        '555-122',
+        'marcela.mendez@example.com',
+        'marcelamendez',
+        '$5$rounds=535000$3GueeYdLFXzw5iLT$MPejbFsCmthWh5r0mKd5bV1A4jJCCppegIagZqLNrp.',
+        confirm_output
+    );
     -- Insertar cliente nulo, RUT = 0, para los que no se logean
     MMMB_PROC_CLIENTE(
         'I',
@@ -1661,6 +1696,16 @@ BEGIN
         'SIN APELLIDO1',
         'SIN APELLIDO2',
         'SIN CORREO',
+        confirm_output
+    );
+
+    MMMB_PROC_CLIENTE(
+        'I',
+        183995621,
+        'Carlos Andres',
+        'Castro',
+        'Bustamante',
+        'ccastro@gmail.com',
         confirm_output
     );
 END;

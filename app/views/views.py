@@ -319,7 +319,7 @@ def get_sucursal():
     medio_de_pagos = oracle_db_connector.get_all_medio_de_pago()
 
     # Derecha
-    rut_cajero = 15_000_001 # TODO: Recuperar desde la sesión!
+    rut_cajero = session['username'] # TODO: Recuperar desde la sesión!
     horarios = oracle_db_connector.get_all_horarios_y_turnos(rut_cajero, True) # Es una lista
 
     print(sucursales)
