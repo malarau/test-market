@@ -225,7 +225,10 @@ def index():
         # DB Conn
         oracle_db_connector = current_app.config['oracle_db_connector']
         # Locate user
+        
         user = oracle_db_connector.get_user_by_username(username=username)
+        if user == []:
+           return redirect(url_for('index')) 
         print(oracle_db_connector.get_hash_by_username(username=username)[0][0])
         password_data = oracle_db_connector.get_hash_by_username(username=username)[0][0]
         cargo=oracle_db_connector.get_cargo_by_user(username=username)[0][0]
@@ -448,11 +451,10 @@ def proveedores():
     oracle_db_connector = current_app.config['oracle_db_connector']
 
     if request.method == 'POST' and agregar_proveedor_form.validate_on_submit():
-        rut_proveedor = agregar_proveedor_form.rut_proveedor.data
         nombre_proveedor = agregar_proveedor_form.nombre_proveedor.data
         correo_proveedor = agregar_proveedor_form.correo_proveedor.data
         telefono_proveedor = agregar_proveedor_form.telefono_proveedor.data
-        oracle_db_connector.agregar_proveedor('I', rut_proveedor, nombre_proveedor, correo_proveedor, telefono_proveedor)
+        oracle_db_connector.agregar_proveedor('I',0, nombre_proveedor, correo_proveedor, telefono_proveedor)
 
     proveedores = oracle_db_connector.get_all_providers()
 
