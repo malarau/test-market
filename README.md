@@ -31,7 +31,7 @@ python -m pip install -r requirements.txt
 SQLPLUS / AS SYSDBA
 alter session set "_ORACLE_SCRIPT"=true;
 CREATE USER testuser IDENTIFIED BY testpassword;
-grant dba to admin;
+grant dba to testuser;
 ```
 
 #### Crear archivo de configuraciones: .env

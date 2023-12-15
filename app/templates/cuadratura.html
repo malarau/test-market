@@ -1,0 +1,59 @@
+{% extends "layouts/base.html" %}
+
+{% block content %}   
+
+<div class="row">
+    <div class="col-md-3">
+
+        <h2 class="mb-4">Cuadratura</h2>
+         <!--Formulario para ingresara datos cuadratura de una caja -->
+         <form method="post">
+            {{ cuadratura_caja_form.hidden_tag() }}
+
+            <div class="form-group mb-1">
+                <label for="cod_sucursal">Saldo Inicial:</label>
+                {{ cuadratura_caja_form.cod_sucursal(class="form-control", required=True) }}
+                <label for="cod_caja">Saldo Final:</label>
+                {{ cuadratura_caja_form.cod_caja(class="form-control", required=True) }}
+            </div>
+            
+
+            <button type="submit" class="btn btn-primary" name="guardar">Guardar</button>
+        </form>
+    </div>
+    <!-- Datos de cuadratura -->
+    <div class="col-md-6 panel-izquierdo">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Saldo Inicial</th>
+                    <th>Venta en Efectivo</th>
+                    <th>Saldo Final</th>
+                    <th>Diferencia</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                {% if datos_cuadratura %}
+                    {% for dato in datos_cuadratura %}
+                        <tr>
+                            <td>{{ dato['Fecha'] }}</td>
+                            <td>{{ dato['Saldo_inicio'] }}</td>
+                            <td>{{ dato['Venta_efectivo'] }}</td>
+                            <td>{{ dato['Saldo_final'] }}</td>
+                            <td>{{ dato['Diferencia']}}</td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr>
+                        <td colspan="5">No hay datos para mostrar.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+</div>
+
+{% endblock %}

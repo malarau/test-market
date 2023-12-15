@@ -325,3 +325,7 @@ class ModificarDescuentoForm(FlaskForm):
     ValidoDesde = DateField('Válido Desde', format='%Y-%m-%d', validators=[DataRequired()])
     ValidoHasta = DateField('Válido Hasta', format='%Y-%m-%d', validators=[DataRequired()])
     guardar_cambios = SubmitField('Guardar Cambios')
+
+class CuadraturaCaja(FlaskForm):
+    Saldo = IntegerField('Código de sucursal', validators=[DataRequired()])
+    cod_caja = IntegerField('Código de caja', validators=[DataRequired()])
