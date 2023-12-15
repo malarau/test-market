@@ -60,7 +60,7 @@
             </form>
         </div>
 
-        <!-- Sección para ver todos los productos -->
+        <!-- Sección para ver todos los empleados -->
         <div class="col-md-9 panel-izquierdo">
             <h2 class="mb-4">Lista de Empleados</h2>
             <table class="table table-striped">
@@ -79,23 +79,23 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for producto in productos %}
+                    {% for empleado in empleados %}
                         <tr>
-                            <td>{{ producto[0] }}</td>
-                            <td>{{ producto[1] }}</td>
-                            <td>{{ producto[2] }}</td>
-                            <td>{{ producto[3] }}</td>
-                            <td>{{ producto[4] }}</td>
-                            <td>{{ producto[5] }}</td>
-                            <td>{{ producto[6] }}</td>
-                            <td>{{ producto[7] }}</td>
-                            <td>{{ producto[8] }}</td>
+                            <td>{{ empleado[0] }}</td>
+                            <td>{{ empleado[1] }}</td>
+                            <td>{{ empleado[2] }}</td>
+                            <td>{{ empleado[3] }}</td>
+                            <td>{{ empleado[4] }}</td>
+                            <td>{{ empleado[5] }}</td>
+                            <td>{{ empleado[6] }}</td>
+                            <td>{{ empleado[7] }}</td>
+                            <td>{{ empleado[8] }}</td>
                             
                             <td>
-                                <a href="{{ url_for('modificar_empleado', rut=producto[0]) }}" class="btn btn-link text-dark">
+                                <a href="{{ url_for('modificar_empleado', rut=empleado[0]) }}" class="btn btn-link text-dark">
                                     <i class="fas fa-pencil-alt"></i> Modificar
                                 </a>
-                                <a href="{{ url_for('eliminar_empleado', rut=producto[0]) }}" class="btn btn-link text-dark" onclick="return confirm('¿Realmente desea eliminar?')">
+                                <a href="{{ url_for('eliminar_empleado', rut=empleado[0]) }}" class="btn btn-link text-dark" onclick="return confirm('¿Realmente desea eliminar?')">
                                     <i class="fas fa-trash"></i> Eliminar
                                 </a>
                                 
