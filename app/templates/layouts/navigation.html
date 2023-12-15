@@ -3,11 +3,12 @@
 <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
+            <a class="navbar-brand" href="{{ url_for('informaciones') }}">NOMBRE_NEGOCIOOO | </a>
             {% if username %}
                 {%if cargo==2%}
-                    <span class="navbar-brand"> Bienvenido, estas logueado como: <strong>{{username}}</strong> | Sucursal: <strong>{{sucursal}}</strong> | Caja: <strong>{{caja}}</strong>  </span>
+                    <span class="navbar-brand">Bienvenido, estas logueado como: <strong>{{username}}</strong> | Sucursal: <strong>{{sucursal}}</strong> | Caja: <strong>{{caja}}</strong>  </span>
                 {%else %}
-                    <span class="navbar-brand"> Bienvenido, estas logueado como: <strong>{{username}}</strong> | Sucursal: <strong>{{sucursal}}</strong> </span>
+                    <span class="navbar-brand">Bienvenido, estas logueado como: <strong>{{username}}</strong> | Sucursal: <strong>{{sucursal}}</strong> </span>
                 {%endif %}                
             {% endif %}
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

@@ -45,17 +45,17 @@
             </thead>
             <tbody>
                 {% for dato in datos_cuadratura %}
-                        <tr>
-                            <td>{{ dato[0] }}</td>
-                            <td>{{ dato[1] }}</td>
-                            <td>{{ dato[2] }}</td>
-                            <td>{{ dato[3] }}</td>
-                            <td>{{ dato[4] }}</td>
-                            <td>{{ dato[5] }}</td>
-                            <td>{{ dato[6] }}</td>
-                            <td>{{ dato[7].strftime('%d-%m-%Y') }}</td>
-                        </tr>
-                    {% endfor %}
+                    <tr>
+                        <td>{{ dato[0] }}</td>
+                        <td>{{ dato[1] }}</td>
+                        <td>{{ dato[2] }}</td>
+                        <td>{{ dato[3] }}</td>
+                        <td>{{ dato[4] }}</td>
+                        <td>{{ dato[5] }}</td>
+                        <td>{{ dato[6] }}</td>
+                        <td>{{ dato[7].strftime('%d-%m-%Y') }}</td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
     </div>

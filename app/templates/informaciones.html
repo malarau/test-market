@@ -1,7 +1,7 @@
 {% extends "layouts/base.html" %}
 
 {% block content %}
-<h2 class="mb-4">Información general</h2>
+<h3 class="mb-4">Información general {%if cargo==1%}- Ventas hoy (descuentos): ${{ventas_hoy}} (${{descuentos_hoy}}){% endif %}</h3>
 <div class="row contenedor">
     <div class="col-md-6">
         <h4 class="mb-4">Lista de Sucursales</h4>

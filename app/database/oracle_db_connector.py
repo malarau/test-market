@@ -679,6 +679,25 @@ class OracleDBConnector:
         except Exception as e:
             print(f"Error executing query: {e}")
             return -1
+        
+    def ventas_hoy(self):
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
+                    return_val = cursor.callfunc("MMMB_TOTAL_VENTAS_HOY", int)           
+                    return return_val
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return -1
+    def descuentos_hoy(self):
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
+                    return_val = cursor.callfunc("MMMB_SUMAR_DESCUENTOS_HOY", int)           
+                    return return_val
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return -1
     def get_descuento_by_cod(self, COD):
         query="SELECT * FROM MMMB_DESCUENTO WHERE COD_DESCUENTO = :1"
         return self.execute_query(query, COD)
