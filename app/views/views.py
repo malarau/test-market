@@ -273,7 +273,6 @@ def modificar_cliente(rut):
 
     Rut = oracle_db_connector.get_cliente_by_rut(rut)
     Rut = list(Rut[0])
-    print("hola",Rut)
     # Si no existe:
     if Rut == []:
         redirect(url_for('clientes'))
@@ -770,19 +769,35 @@ def cuadratura():
 
     # DB
     oracle_db_connector = current_app.config['oracle_db_connector']
+    # Cuadraturas
+
+
     form = CuadraturaCaja()
     # Cod_caja sesion actual
     cod_caja = session.get('caja', None)
     form.cod_caja.data = cod_caja
     # Rut_empeado actual
     rut_empleado = session.get('rut_empleado', None)
-    form.RUT_EMPLEADO.data = rut_empleado
-    
+    form.rut_empleado.data = rut_empleado
+    # Total venta efectivo
+    total_efectivo = oracle_db_connector.get_total_venta_efectivo_by_caja(cod_caja)[0][0]
+    print(f'{total_efectivo}')
+    form.venta_efectivo.data = '$'+str(total_efectivo)
+
+    # Cuadraturas
+    datos_cuadratura = oracle_db_connector.get_all_cuadraturas_by_caja(cod_caja)
+
+
     
     if request.method == 'POST' and form.validate_on_submit():
+        saldo_inicial = form.saldo_inicial.data
+        saldo_final = form.saldo_final.data
+        diferencia = int(saldo_final)-(int(saldo_inicial)+int(total_efectivo))
+        oracle_db_connector.agregar_cuadratura( cod_caja, rut_empleado,saldo_inicial,total_efectivo,saldo_final,diferencia)
+        
         # Aquí puedes procesar los datos del formulario, realizar la cuadratura y obtener la información que deseas mostrar en la tabla.
         # Por ejemplo, asumiendo que tienes una función llamada procesar_cuadratura que devuelve datos a mostrar en la tabla.
-        datos_cuadratura = procesar_cuadratura(form)
+
         return render_template(
             'cuadratura.html',
             cuadratura_caja_form=form,
@@ -796,6 +811,7 @@ def cuadratura():
 
     return render_template(
         'cuadratura.html',
+        datos_cuadratura = datos_cuadratura,
         cuadratura_caja_form=form,
         username=session.get('username', None),
         cargo=session.get('cargo', None),
@@ -803,16 +819,7 @@ def cuadratura():
         sucursal=session.get('sucursal', None),
         caja=session.get('caja', None)
     )
-def procesar_cuadratura(cuadratura_caja_form):
-    # Aquí realizas la lógica para procesar la cuadratura y devolver los datos que deseas mostrar en la tabla.
-    # Puedes acceder a los datos del formulario, por ejemplo cuadratura_caja_form.cod_sucursal.data, cuadratura_caja_form.cod_caja.data, etc.
-    # La lógica específica dependerá de tus necesidades y de cómo estás estructurando tu aplicación.
-    # Retorna los datos en el formato adecuado para ser mostrados en la tabla.
-    # Ejemplo de datos de retorno (simulados):
-    return [
-        {'Fecha': '2023-01-01', 'Venta_Efectivo': 100.0, 'Venta_Tarjeta': 50.0, 'Devoluciones': 5.0, 'Arqueo_Caja': 145.0},
-        # ... otros registros ...
-    ]
+
 
 @app.errorhandler(404)
 def page_not_found(e):

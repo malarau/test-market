@@ -69,12 +69,15 @@
             <a class="nav-link text-dark" href="/descuentos">
                 <i class="fas fa-percent"></i> Descuentos
             </a>
-        </li>  
+        </li>
+          
         <li class="nav-item {% if request.path == '/reportes' %}active{% endif %}">
             <a class="nav-link text-dark" href="/reportes">
                 <i class="fas fa-chart-pie"></i> Reportes
             </a>
+        
         </li>
+        {% endif %}
     </ul>
 </aside>
 {% endif %}

@@ -11,9 +11,16 @@
             {{ cuadratura_caja_form.hidden_tag() }}
 
             <div class="form-group mb-1">
-                <label for="cod_sucursal">Saldo Inicial:</label>
+                <label for="cod_sucursal">Codigo caja:</label>
+                {{ cuadratura_caja_form.cod_caja(class="form-control", required=True, readonly="true") }}
+                <label for="cod_sucursal">RUT empleado:</label>
+                {{ cuadratura_caja_form.rut_empleado(class="form-control", required=True, readonly="true") }}
+                <label for="cod_sucursal">Venta efectivo:</label>
+                {{ cuadratura_caja_form.venta_efectivo(class="form-control", required=True, readonly="true") }}
+
+                <label for="cod_sucursal">Saldo inicial:</label>
                 {{ cuadratura_caja_form.saldo_inicial(class="form-control", required=True) }}
-                <label for="cod_caja">Saldo Final:</label>
+                <label for="cod_caja">Saldo final:</label>
                 {{ cuadratura_caja_form.saldo_final(class="form-control", required=True) }}
             </div>
             
@@ -26,25 +33,28 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>Fecha</th>
-                    <th>Rut Empleado</th>
-                    <th>Saldo Inicial</th>
-                    <th>Venta en Efectivo</th>
-                    <th>Saldo Final</th>
+                    <th>Código cuadratura</th>
+                    <th>Código caja empleado</th>
+                    <th>RUT empleado</th>
+                    <th>Saldo inicial</th>
+                    <th>Venta en efectivo</th>
+                    <th>Saldo final</th>
                     <th>Diferencia</th>
-                    
+                    <th>Fecha</th>
                 </tr>
             </thead>
             <tbody>
                 {% if datos_cuadratura %}
                     {% for dato in datos_cuadratura %}
                         <tr>
-                            <td>{{ dato['Fecha'] }}</td>
-                            <td>{{ dato['Rut_empleado'] }}</td>
-                            <td>{{ dato['Saldo_inicio'] }}</td>
-                            <td>{{ dato['Venta_efectivo'] }}</td>
-                            <td>{{ dato['Saldo_final'] }}</td>
-                            <td>{{ dato['Diferencia']}}</td>
+                            <td>{{ dato[0] }}</td>
+                            <td>{{ dato[1] }}</td>
+                            <td>{{ dato[2] }}</td>
+                            <td>{{ dato[3] }}</td>
+                            <td>{{ dato[4] }}</td>
+                            <td>{{ dato[5] }}</td>
+                            <td>{{ dato[6] }}</td>
+                            <td>{{ dato[7] }}</td>
                         </tr>
                     {% endfor %}
                 {% else %}

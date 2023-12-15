@@ -587,6 +587,20 @@ class OracleDBConnector:
         except Exception as e:
             print(f"Error executing query: {e}")
             return None
+    def agregar_cuadratura(self, cod_caja, rut_empleado,saldo_inicial,venta_efectivo,saldo_final,diferencia):
+        print(int(cod_caja), int(rut_empleado), int(saldo_inicial), int(venta_efectivo),int(saldo_final),int(diferencia))
+        try:
+            with self._pool.acquire() as connection:
+                with connection.cursor() as cursor:
+                    out_val = cursor.var(int)
+                    cursor.callproc('MMMB_PROC_DETALLE_CUADRATURA', ['I', None, int(cod_caja), int(rut_empleado), int(saldo_inicial), int(venta_efectivo),int(saldo_final),int(diferencia),None,out_val])
+
+                    result = out_val.getvalue()
+                    return result
+
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return None
         
     # Get all    
     def get_all_clients(self):
@@ -684,4 +698,13 @@ class OracleDBConnector:
     def get_cuadratura(self, cod_sucursal,cod_caja):
         query = "SELECT COD_VENTA,COD_SUCURSAL,COD_CAJA,RUT_CLIENTE,RUT_EMPLEADO,COD_PAGO,FECHA_VENTA,TOTAL_VENTA,DESCUENTO_VENTA FROM MMMB_VENTA WHERE FECHA_VENTA >= SYSDATE - 7 AND FECHA_VENTA < SYSDATE AND COD_SUCURSAL = :1"
         return self.execute_query(query,cod_caja)
-        
+    # def agregar_cuadratura(self,)
+
+    def get_total_venta_efectivo_by_caja(self, cod_caja):
+        query = "SELECT SUM(total_venta) FROM MMMB_VENTA WHERE COD_CAJA = :1 AND COD_PAGO = 1 AND FECHA_VENTA LIKE SYSDATE"
+        return self.execute_query(query,cod_caja)
+
+    def get_all_cuadraturas_by_caja(self, cod_caja):
+        query = "SELECT * FROM MMMB_DETALLE_CUADRATURA WHERE COD_CAJA = :1"
+        return self.execute_query(query,cod_caja)
+

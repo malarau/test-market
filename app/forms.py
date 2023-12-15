@@ -330,8 +330,7 @@ class CuadraturaCaja(FlaskForm):
     
     saldo_inicial = IntegerField('Código de sucursal', validators=[DataRequired()])
     cod_caja = IntegerField('Código de caja', validators=[DataRequired()])
-    RUT_EMPLEADO = IntegerField('Código de caja', validators=[DataRequired()])
-    SALDO_INICIAL = IntegerField('Código de caja', validators=[DataRequired()])
-    VENTAS_EFECTIVO = IntegerField('Código de caja', validators=[DataRequired()])
+    rut_empleado = IntegerField('Código de caja', validators=[DataRequired()])
+    venta_efectivo = StringField('Código de caja', validators=[DataRequired()])
     saldo_final = IntegerField('Código de caja', validators=[DataRequired()])
     
