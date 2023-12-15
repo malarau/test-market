@@ -1621,7 +1621,7 @@ BEGIN
         '555-1234',
         'juan.perez@example.com',
         'juanperez',
-        'hashed_password',
+        '$5$rounds=535000$3GueeYdLFXzw5iLT$MPejbFsCmthWh5r0mKd5bV1A4jJCCppegIagZqLNrp.',
         confirm_output
     );
 END;
@@ -1643,7 +1643,7 @@ BEGIN
             '555-5678',
             'cajero' || TO_CHAR(i) || '@example.com',
             'cajero' || TO_CHAR(i),
-            'hashed_password',
+            '$5$rounds=535000$Xa6WCCpyV7Ip96vc$YBuPoEZTgE1W4H6iuPZ19.dnXIGDzwiuTZLlSOyM5T4',
             confirm_output
         );
     END LOOP;

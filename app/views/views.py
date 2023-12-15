@@ -749,7 +749,7 @@ def ventas():
 
                 # Redirigir a la misma vista con un mensaje
                 info_msg = "Venta ingresada exitosamente."
-                return render_template('ventas.html', productos=product_choices, form=form, info_msg=info_msg, error_msg=error_msg, pdf=cod_venta)
+                return render_template('ventas.html',username=session['username'],cargo=session['cargo'],rut_empleado=session['rut_empleado'],sucursal=session['sucursal'],caja=session['caja'], productos=product_choices, form=form, info_msg=info_msg, error_msg=error_msg, pdf=cod_venta)
         else:
             for field, errors in form.errors.items():
                 for error in errors:
