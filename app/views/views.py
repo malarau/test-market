@@ -322,13 +322,17 @@ def informaciones():
     medio_de_pagos = oracle_db_connector.get_all_medio_de_pago()
 
     # Derecha
-    rut_cajero = session['username'] # TODO: Recuperar desde la sesión!
+    rut_cajero = session['rut_empleado'] #Recuperar desde la sesión!
     horarios = oracle_db_connector.get_all_horarios_y_turnos(rut_cajero, True) # Es una lista
 
     # Ventas de hoy
     ventas_hoy = oracle_db_connector.ventas_hoy()
     descuentos_hoy = oracle_db_connector.descuentos_hoy()
-
+    if ventas_hoy ==-1:
+        ventas_hoy = 0
+    if descuentos_hoy ==-1:
+        descuentos_hoy = 0
+    
     print(sucursales)
     return render_template('informaciones.html',
         username=session.get('username', None),cargo=session.get('cargo', None),rut_empleado=session.get('rut_empleado', None),sucursal=session.get('sucursal', None),caja=session.get('caja', None),
