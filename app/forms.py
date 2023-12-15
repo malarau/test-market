@@ -327,5 +327,11 @@ class ModificarDescuentoForm(FlaskForm):
     guardar_cambios = SubmitField('Guardar Cambios')
 
 class CuadraturaCaja(FlaskForm):
-    Saldo = IntegerField('Código de sucursal', validators=[DataRequired()])
+    
+    saldo_inicial = IntegerField('Código de sucursal', validators=[DataRequired()])
     cod_caja = IntegerField('Código de caja', validators=[DataRequired()])
+    RUT_EMPLEADO = IntegerField('Código de caja', validators=[DataRequired()])
+    SALDO_INICIAL = IntegerField('Código de caja', validators=[DataRequired()])
+    VENTAS_EFECTIVO = IntegerField('Código de caja', validators=[DataRequired()])
+    saldo_final = IntegerField('Código de caja', validators=[DataRequired()])
+    

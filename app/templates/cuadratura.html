@@ -12,9 +12,9 @@
 
             <div class="form-group mb-1">
                 <label for="cod_sucursal">Saldo Inicial:</label>
-                {{ cuadratura_caja_form.cod_sucursal(class="form-control", required=True) }}
+                {{ cuadratura_caja_form.saldo_inicial(class="form-control", required=True) }}
                 <label for="cod_caja">Saldo Final:</label>
-                {{ cuadratura_caja_form.cod_caja(class="form-control", required=True) }}
+                {{ cuadratura_caja_form.saldo_final(class="form-control", required=True) }}
             </div>
             
 
@@ -27,6 +27,7 @@
             <thead>
                 <tr>
                     <th>Fecha</th>
+                    <th>Rut Empleado</th>
                     <th>Saldo Inicial</th>
                     <th>Venta en Efectivo</th>
                     <th>Saldo Final</th>
@@ -39,6 +40,7 @@
                     {% for dato in datos_cuadratura %}
                         <tr>
                             <td>{{ dato['Fecha'] }}</td>
+                            <td>{{ dato['Rut_empleado'] }}</td>
                             <td>{{ dato['Saldo_inicio'] }}</td>
                             <td>{{ dato['Venta_efectivo'] }}</td>
                             <td>{{ dato['Saldo_final'] }}</td>

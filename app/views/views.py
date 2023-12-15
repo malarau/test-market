@@ -767,16 +767,25 @@ def reportes():
 def cuadratura():
     info_msg = None
     error_msg = None
+
     # DB
     oracle_db_connector = current_app.config['oracle_db_connector']
-    cuadratura_caja_form = CuadraturaCaja()
-    if request.method == 'POST' and cuadratura_caja_form.validate_on_submit():
+    form = CuadraturaCaja()
+    # Cod_caja sesion actual
+    cod_caja = session.get('caja', None)
+    form.cod_caja.data = cod_caja
+    # Rut_empeado actual
+    rut_empleado = session.get('rut_empleado', None)
+    form.RUT_EMPLEADO.data = rut_empleado
+    
+    
+    if request.method == 'POST' and form.validate_on_submit():
         # Aquí puedes procesar los datos del formulario, realizar la cuadratura y obtener la información que deseas mostrar en la tabla.
         # Por ejemplo, asumiendo que tienes una función llamada procesar_cuadratura que devuelve datos a mostrar en la tabla.
-        datos_cuadratura = procesar_cuadratura(cuadratura_caja_form)
+        datos_cuadratura = procesar_cuadratura(form)
         return render_template(
             'cuadratura.html',
-            cuadratura_caja_form=cuadratura_caja_form,
+            cuadratura_caja_form=form,
             datos_cuadratura=datos_cuadratura,
             username=session.get('username', None),
             cargo=session.get('cargo', None),
@@ -787,7 +796,7 @@ def cuadratura():
 
     return render_template(
         'cuadratura.html',
-        cuadratura_caja_form=cuadratura_caja_form,
+        cuadratura_caja_form=form,
         username=session.get('username', None),
         cargo=session.get('cargo', None),
         rut_empleado=session.get('rut_empleado', None),
