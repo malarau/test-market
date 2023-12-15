@@ -644,7 +644,7 @@ class OracleDBConnector:
     # Get by Id
     def get_categoria_by_cod(self, COD):
         query = "SELECT * FROM MMMB_CATEGORIA WHERE COD_CATEGORIA = :1"
-    
+        return query    
     def get_marca_by_cod(self, RUT):
         query = "SELECT * FROM MMMB_MARCA WHERE COD_MARCA = :1"
         return self.execute_query(query, RUT)

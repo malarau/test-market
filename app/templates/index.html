@@ -2,32 +2,38 @@
 
 {% block content %}
 
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card">
-            <div class="card-header">
-                <h3 class="text-center">Inicio de Sesión</h3>
-            </div>
-            <div class="card-body">
-                <form method="post" action="{{ url_for('index') }}">
-                    {{ form.hidden_tag() }}
-                    <div class="mb-3">
-                        {{ form.username.label(class="form-label") }}
-                        {{ form.username(class="form-control", placeholder="Ingresa tu nombre de usuario") }}
+<div class="container login-container">
+    <div class="row">
+        <!-- Logo a la izquierda -->
+        <div class="col">
+            <img src="static/logo.png" alt="Logo" class="logo">
+        </div>
+
+        <div class="col">
+            <div class="card"> 
+                <div class="card-body">
+                    <div class="card-header">
+                        <h3 class="text-center">Inicio de Sesión</h3>
                     </div>
-                    <div class="mb-3">
-                        {{ form.password.label(class="form-label") }}
-                        {{ form.password(class="form-control", placeholder="Ingresa tu contraseña") }}
-                    </div>
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">Iniciar Sesión</button>
-                    </div>
-                </form >
-            </div>
+                    <form method="post" action="{{ url_for('index') }}">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            {{ form.username.label(class="form-label") }}
+                            {{ form.username(class="form-control", placeholder="Ingresa tu nombre de usuario") }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.password.label(class="form-label") }}
+                            {{ form.password(class="form-control", placeholder="Ingresa tu contraseña") }}
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary b_inicio">Iniciar Sesión</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-        </div>
-    </div>
+   </div>
+</div>
+
     
 {% endblock %}

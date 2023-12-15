@@ -8,6 +8,18 @@ body {
     padding: 12px;
 }
 
+.login-container {
+    min-height: calc(100vh - 56px); /* Ajusta el valor según la altura de tu Navbar */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo {
+    max-width: 310px; /* Ajusta el tamaño del logo según tus necesidades */
+    margin-right: 20px;
+}
+
 /* Agregar estilos para hover en la barra lateral */
 .nav-link.text-dark:hover {
     color: white; /* Cambiar el color a blanco */
@@ -23,6 +35,10 @@ body {
 /* Ajustar el tamaño de fuente si es necesario */
 .nav-link i {
     font-size: 20px; /* Tamaño de icono deseado */
+}
+
+.b_inicio{
+    margin-bottom: 10px;
 }
 
 .contenedor {
