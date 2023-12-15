@@ -301,6 +301,52 @@ CREATE TABLE MMMB_HISTORIAL_PRECIOS( -- Se ha agregado tabla
     FUNCTIONS
 */
 
+CREATE OR REPLACE FUNCTION MMMB_SUMAR_DESCUENTOS_HOY RETURN NUMBER IS
+    CURSOR cursor_descuentos IS
+        SELECT DESCUENTO_VENTA
+        FROM MMMB_VENTA
+        WHERE TRUNC(FECHA_VENTA) = TRUNC(SYSDATE);
+    descuento_hoy MMMB_VENTA.DESCUENTO_VENTA%TYPE;
+    suma_descuentos NUMBER DEFAULT 0;
+BEGIN
+    OPEN cursor_descuentos;
+
+    LOOP
+        FETCH cursor_descuentos INTO descuento_hoy;
+        EXIT WHEN cursor_descuentos%NOTFOUND;
+
+        suma_descuentos := suma_descuentos + NVL(descuento_hoy, 0);
+    END LOOP;
+
+    CLOSE cursor_descuentos;
+
+    RETURN suma_descuentos;
+END MMMB_SUMAR_DESCUENTOS_HOY;
+/
+
+CREATE OR REPLACE FUNCTION MMMB_TOTAL_VENTAS_HOY RETURN NUMBER IS
+    CURSOR cursor_ventas IS
+        SELECT TOTAL_VENTA
+        FROM MMMB_VENTA
+        WHERE TRUNC(FECHA_VENTA) = TRUNC(SYSDATE);
+    total_venta_hoy MMMB_VENTA.TOTAL_VENTA%TYPE;
+    suma_total NUMBER DEFAULT 0;
+BEGIN
+    OPEN cursor_ventas;
+
+    LOOP
+        FETCH cursor_ventas INTO total_venta_hoy;
+        EXIT WHEN cursor_ventas%NOTFOUND;
+
+        suma_total := suma_total + NVL(total_venta_hoy, 0);
+    END LOOP;
+
+    CLOSE cursor_ventas;
+
+    RETURN suma_total;
+END MMMB_TOTAL_VENTAS_HOY;
+/
+
 -- Diferencia entre precios, porcentual
 CREATE OR REPLACE FUNCTION MMMB_CALCULAR_DIFERENCIA_PORCENTUAL(
   VALOR_ANTERIOR_P IN NUMBER,
@@ -1153,7 +1199,7 @@ END;
 
 -- Detalle cuadratura
 
-create or replace NONEDITIONABLE PROCEDURE MMMB_PROC_DETALLE_CUADRATURA(
+CREATE OR REPLACE PROCEDURE MMMB_PROC_DETALLE_CUADRATURA(
     OPCION VARCHAR2,
     COD_DETALLE_CUADRATURA_P NUMBER,
     COD_CAJA_P NUMBER DEFAULT NULL,
@@ -1166,7 +1212,6 @@ create or replace NONEDITIONABLE PROCEDURE MMMB_PROC_DETALLE_CUADRATURA(
     CONFIRM_OUTPUT OUT NUMBER 
 )
 IS
-v_count NUMBER;
 BEGIN
     LOCK TABLE MMMB_DETALLE_CUADRATURA IN ROW EXCLUSIVE MODE;
 
@@ -1176,11 +1221,7 @@ BEGIN
                 DBMS_OUTPUT.PUT_LINE('Error: Alguno de los parámetros contiene valores nulos.');
                 CONFIRM_OUTPUT := -1;
             ELSE
-                SELECT COUNT(*)
-                INTO v_count
-                FROM MMMB_CAJA
-                WHERE COD_CAJA = COD_CAJA_P;
-                IF v_count = 0 THEN
+                IF MMMB_EXISTE_CAJA(COD_CAJA_P) = 0 THEN
                     DBMS_OUTPUT.PUT_LINE('Error: La caja no existe.');
                     CONFIRM_OUTPUT := -1;
                 ELSE
