@@ -135,12 +135,12 @@ def empleados():
         password  = sha256_crypt.hash(agregar_empleado_form.passwd.data)
         a=oracle_db_connector.agregar_empleado('I',rut,cod_sucursal,cargo,nombre_empleado,apellido1,apellido2,Telefono,Email,user,password)
         print(a)
-        print(password, len(password))
+        
     # Desde acá es un GET:    
         # Locate user
-    productos = oracle_db_connector.get_all_employees()
+    empleados = oracle_db_connector.get_all_employees()
     
-    return render_template('empleados.html',username=session.get('username', None),cargo=session.get('cargo', None),rut_empleado=session.get('rut_empleado', None),sucursal=session.get('sucursal', None),caja=session.get('caja', None), productos=productos, agregar_empleado_form=agregar_empleado_form,sucursales=sucursales_opciones)
+    return render_template('empleados.html',username=session.get('username', None),cargo=session.get('cargo', None),rut_empleado=session.get('rut_empleado', None),sucursal=session.get('sucursal', None),caja=session.get('caja', None), empleados=empleados, agregar_empleado_form=agregar_empleado_form,sucursales=sucursales_opciones)
 
 @app.route('/eliminar_producto/<codigo>', methods=['GET', 'POST'])
 def eliminar_producto(codigo):
@@ -162,7 +162,7 @@ def eliminar_empleado(rut):
     oracle_db_connector = current_app.config['oracle_db_connector']
     output=oracle_db_connector.eliminar_empleado('D',rut)    
     
-    return render_template('eliminar_empleado.html',username=session.get('username', None),cargo=session.get('cargo', None),rut_empleado=session.get('rut_empleado', None),sucursal=session.get('sucursal', None),caja=session.get('caja', None) ,rut=rut)
+    return render_template('eliminar_empleado.html',output=output,username=session.get('username', None),cargo=session.get('cargo', None),rut_empleado=session.get('rut_empleado', None),sucursal=session.get('sucursal', None),caja=session.get('caja', None) ,rut=rut)
 
 @app.route('/modificar_empleado/<rut>', methods=['GET', 'POST'])
 def modificar_empleado(rut):

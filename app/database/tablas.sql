@@ -288,46 +288,46 @@ CREATE TABLE MMMB_HISTORIAL_PRECIOS( -- Se ha agregado tabla
 */
 
 CREATE OR REPLACE FUNCTION MMMB_SUMAR_DESCUENTOS_HOY RETURN NUMBER IS
-    CURSOR cursor_descuentos IS
+    CURSOR mmmb_cursor_descuentos IS
         SELECT DESCUENTO_VENTA
         FROM MMMB_VENTA
         WHERE TRUNC(FECHA_VENTA) = TRUNC(SYSDATE);
     descuento_hoy MMMB_VENTA.DESCUENTO_VENTA%TYPE;
     suma_descuentos NUMBER DEFAULT 0;
 BEGIN
-    OPEN cursor_descuentos;
+    OPEN mmmb_cursor_descuentos;
 
     LOOP
-        FETCH cursor_descuentos INTO descuento_hoy;
-        EXIT WHEN cursor_descuentos%NOTFOUND;
+        FETCH mmmb_cursor_descuentos INTO descuento_hoy;
+        EXIT WHEN mmmb_cursor_descuentos%NOTFOUND;
 
         suma_descuentos := suma_descuentos + NVL(descuento_hoy, 0);
     END LOOP;
 
-    CLOSE cursor_descuentos;
+    CLOSE mmmb_cursor_descuentos;
 
     RETURN suma_descuentos;
 END MMMB_SUMAR_DESCUENTOS_HOY;
 /
 
 CREATE OR REPLACE FUNCTION MMMB_TOTAL_VENTAS_HOY RETURN NUMBER IS
-    CURSOR cursor_ventas IS
+    CURSOR mmmb_cursor_ventas IS
         SELECT TOTAL_VENTA
         FROM MMMB_VENTA
         WHERE TRUNC(FECHA_VENTA) = TRUNC(SYSDATE);
     total_venta_hoy MMMB_VENTA.TOTAL_VENTA%TYPE;
     suma_total NUMBER DEFAULT 0;
 BEGIN
-    OPEN cursor_ventas;
+    OPEN mmmb_cursor_ventas;
 
     LOOP
-        FETCH cursor_ventas INTO total_venta_hoy;
-        EXIT WHEN cursor_ventas%NOTFOUND;
+        FETCH mmmb_cursor_ventas INTO total_venta_hoy;
+        EXIT WHEN mmmb_cursor_ventas%NOTFOUND;
 
         suma_total := suma_total + NVL(total_venta_hoy, 0);
     END LOOP;
 
-    CLOSE cursor_ventas;
+    CLOSE mmmb_cursor_ventas;
 
     RETURN suma_total;
 END MMMB_TOTAL_VENTAS_HOY;
