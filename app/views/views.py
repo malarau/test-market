@@ -831,8 +831,8 @@ def cuadratura():
         saldo_inicial = form.saldo_inicial.data
         saldo_final = form.saldo_final.data
         diferencia = int(saldo_final)-(int(saldo_inicial)+int(total_efectivo))
-        oracle_db_connector.agregar_cuadratura( cod_caja, rut_empleado,saldo_inicial,total_efectivo,saldo_final,diferencia)
-        
+        i = oracle_db_connector.agregar_cuadratura( cod_caja, rut_empleado,saldo_inicial,total_efectivo,saldo_final,diferencia)
+        print(i)
         # Aquí puedes procesar los datos del formulario, realizar la cuadratura y obtener la información que deseas mostrar en la tabla.
         # Por ejemplo, asumiendo que tienes una función llamada procesar_cuadratura que devuelve datos a mostrar en la tabla.
 
