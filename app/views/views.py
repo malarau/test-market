@@ -509,7 +509,6 @@ def descuentos():
         porcentaje_descuento = agregar_descuento_form.porcentaje_descuento.data
         valido_desde = agregar_descuento_form.valido_desde.data
         valido_hasta = agregar_descuento_form.valido_hasta.data
-        oracle_db_connector.agregar_descuento('I', None, cod_producto, porcentaje_descuento, valido_desde, valido_hasta)
         resultado = oracle_db_connector.agregar_descuento('I', None, cod_producto, porcentaje_descuento, valido_desde, valido_hasta)
         print("Resultado de agregar_descuento:", resultado)
 
