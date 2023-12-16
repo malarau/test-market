@@ -10,8 +10,6 @@ class OracleDBConnector:
     #    
 
     def __new__(cls, username, password, connect_string, mode=oracledb.SYSDBA):
-        #print(F'username, password, connect_string: {(username, password, connect_string)}')
-        print(F'username, password, connect_string: OCULTO (100% SEGURO)')
         if not cls._instance:
             cls._instance = super(OracleDBConnector, cls).__new__(cls)
             cls._instance._username = username
