@@ -140,7 +140,6 @@ def validador_rut_cliente(form, field):
 # Proveedor
 #
 class AgregarProveedor(FlaskForm):
-    rut_proveedor = IntegerField('Rut del Proveedor', validators=[DataRequired()])
     nombre_proveedor = StringField('Nombre del Proveedor', validators=[DataRequired(),Length(max=30)])
     correo_proveedor = EmailField('Correo del Proveedor', validators=[DataRequired(),Length(max=50)])
     telefono_proveedor = StringField('Teléfono del Proveedor', validators=[DataRequired(),Length(max=15)])
